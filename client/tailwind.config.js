@@ -8,7 +8,8 @@ export default {
     extend: {
       backgroundImage: {
         'hero': "url('/src/assets/hero.png')",
-        'blur-ellipse': "url('/src/assets/ellipse.png')"
+        'blur-ellipse': "url('/src/assets/ellipse.png')",
+        'blur-ellipse-small': "url('/src/assets/ellipse-small.png')"
       },
       fontFamily: {
         "outfit": ['Outfit', 'sans-serif'],
