@@ -19,9 +19,17 @@ async function get(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function create(req: Request, res: Response, next: NextFunction) {
+async function login(req: Request, res: Response, next: NextFunction) {
   try {
-    res.json(await userService.create(req.body));
+    res.json(await userService.login(req.body));
+  } catch (err) {
+    console.error(`Error while login`, err);
+    next(err);
+  }
+}
+async function signup(req: Request, res: Response, next: NextFunction) {
+  try {
+    res.json(await userService.signup(req.body));
   } catch (err) {
     console.error(`Error while creating the list`, err);
     next(err);
@@ -46,4 +54,4 @@ async function remove(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { getAll, get, create, update, remove };
+export { getAll, get, login, signup, update, remove };

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import HumanImg3 from "../assets/human-3.png"
 import { toast } from "react-toastify"
+import axios from "axios"
 
 const Login: React.FC = () => {
 
@@ -10,16 +11,17 @@ const Login: React.FC = () => {
     const handleSubmit = () => {
 
         if(!username || !password){
-
-            if(!username && !password)
-                toast.warn('Enter a valid username & password!')
-            else if(!username)
-                toast.warn('Enter a valid username!')
-            else if(!password)
-                toast.warn('Enter a valid password!')
-
+            toast.warn('Please fill the required fields!')
             return
         }
+
+        axios.post("http://localhost:3001/user/login", {
+            username,
+            password
+        })
+            .then((response) => {
+                console.log(response);
+            });
 
     }
     return (
