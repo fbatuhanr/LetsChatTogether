@@ -2,8 +2,12 @@ import { useState } from "react"
 import HumanImg3 from "../assets/human-3.png"
 import { toast } from "react-toastify"
 import axios from "axios"
+import { setUser } from "../redux/features/UserSlice"
+import { useAppDispatch } from "../redux/hooks"
 
 const Login: React.FC = () => {
+
+    const dispatch = useAppDispatch();
 
     const [username, setUsername] = useState<string>("")
     const [password, setPassword] = useState<string>("")
@@ -20,12 +24,14 @@ const Login: React.FC = () => {
             password
         })
             .then((response) => {
-                console.log(response);
+                console.log(response.data);
+                const { token, username } = response.data
+                dispatch(setUser({token, username}));
             });
 
     }
     return (
-        <div className="py-6 flex flex-col gap-y-6 justify-center items-center">
+        <div className="py-8 flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
             <div>
                 <h1 className="text-5xl font-bold">Login</h1>
             </div>

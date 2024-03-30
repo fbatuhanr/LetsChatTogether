@@ -34,7 +34,7 @@ const Signup: React.FC = () => {
             });
     }
     return (
-        <div className="py-6 flex flex-col gap-y-6 justify-center items-center">
+        <div className="py-8 flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
             <div>
                 <h1 className="text-5xl font-bold">Sign up</h1>
             </div>

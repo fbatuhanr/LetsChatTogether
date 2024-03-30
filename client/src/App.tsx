@@ -8,6 +8,8 @@ import { ConnectionManager } from './components/ConnectionManager';
 import { MyForm } from './components/MyForm';
 
 
+import StoreProvider from './providers/StoreProvider';
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -22,6 +24,10 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import GuestGuard from './guards/GuestGuard';
+import Chat from './pages/Chat';
+import Profile from './pages/Profile';
+import UserGuard from './guards/UserGuard';
 
 function App() {
 
@@ -65,19 +71,24 @@ function App() {
   */
 
   return (
-    <div className="bg-[#0D0D0D] text-white font-outfit overflow-x-hidden">
-      <ToastContainer />
-      <Router>
-        <Header />
+    <div className="bg-[rgb(13,13,13)] text-white font-outfit overflow-x-hidden">
+      <StoreProvider>
+        <ToastContainer />
+        <Router>
+          <Header />
           <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<GuestGuard><Login /></GuestGuard>} />
+              <Route path="/signup" element={<GuestGuard><Signup /></GuestGuard>} />
+
+              <Route path="/chat" element={<UserGuard><Chat /></UserGuard>} />
+              <Route path="/profile" element={<UserGuard><Profile /></UserGuard>} />
             </Routes>
           </Layout>
-        <Footer />
-      </Router>
+          <Footer />
+        </Router>
+      </StoreProvider>
     </div>
   )
 }

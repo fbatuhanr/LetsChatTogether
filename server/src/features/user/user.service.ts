@@ -1,7 +1,7 @@
 import { MongooseError } from "mongoose";
 import User, { IUser } from "./user.model"
 import bcrypt from "bcryptjs"
-import jwt from 'jsonwebtoken'
+import { generateToken } from "../utils";
 
 
 type UserProps = {
@@ -21,17 +21,23 @@ async function login(data: UserProps) {
 
   const { username, password } = data
 
-  const result = User.findOne({username})
-  .then((user) => {
+  const result = User.findOne({ username })
+    .then((user) => {
 
-    if(user && user.comparePassword(password)){
-      return { token: jwt.sign({ _id: user._id, username: user.username }, process.env.JWT_SECRET_KEY!) }
-    }
-    return { message: 'Authentication failed. Invalid user or password.' }
-  })
-  .catch((err) => {
-    throw err
-  });
+      if (user && user.comparePassword(password)) {
+
+        const token = generateToken({ _id: user._id, username: user.username });
+
+        return {
+          token,
+          username: user.username
+        }
+      }
+      return { message: 'Authentication failed. Invalid user or password.' }
+    })
+    .catch((err) => {
+      throw err
+    });
 
   return result
 
