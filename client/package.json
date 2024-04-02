@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.2",
     "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
     "react": "^18.2.0",
@@ -23,6 +24,7 @@
     "redux-thunk": "^3.1.0",
     "socket.io-client": "^4.7.5",
     "sort-by": "^1.2.0",
+    "tailwind-datepicker-react": "^1.4.3",
     "typewriter-effect": "^2.21.0"
   },
   "devDependencies": {

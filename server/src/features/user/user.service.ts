@@ -6,7 +6,10 @@ import { generateToken } from "../utils";
 
 type UserProps = {
   username: string,
-  password: string
+  password: string,
+  email: string | null,
+  dateOfBirth: string | null,
+  profilePhoto: string | null,
 }
 
 async function getAll() {
@@ -30,6 +33,7 @@ async function login(data: UserProps) {
 
         return {
           token,
+          id: user._id,
           username: user.username
         }
       }
@@ -51,8 +55,12 @@ async function signup(data: UserProps) {
   return newUser.save();
 }
 
-async function update(id: string, data: UserProps) {
-  return User.findOneAndUpdate({ _id: id }, data);
+async function update(id: string, file: any, data: UserProps) {
+
+  return User.findOneAndUpdate({ _id: id }, {
+    ...data,
+    profilePhoto: file.path
+  });
 }
 
 async function remove(id: string) {

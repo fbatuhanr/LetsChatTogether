@@ -25,8 +25,8 @@ const Login: React.FC = () => {
         })
             .then((response) => {
                 console.log(response.data);
-                const { token, username } = response.data
-                dispatch(setUser({token, username}));
+                const { token, id, username } = response.data
+                dispatch(setUser({token, id, username}));
             });
 
     }

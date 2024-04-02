@@ -2,16 +2,24 @@ import mongoose, { Schema, model, InferSchemaType } from 'mongoose';
 import bcrypt from "bcryptjs"
 
 const UserSchema = new Schema({
-    username: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    hashPassword: {
-      type: String,
-      required: true
-    }
+  username: {
+    type: String,
+    unique: true,
+    required: true,
+    trim: true
   },
+  email: {
+    type: String,
+    unique: true,
+    trim: true
+  },
+  dateOfBirth: Date,
+  profilePhoto: String,
+  hashPassword: {
+    type: String,
+    required: true
+  }
+},
   {
     timestamps: true
   }

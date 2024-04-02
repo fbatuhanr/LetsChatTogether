@@ -1,6 +1,7 @@
 // src/index.ts
-import express, { Express, Request, Response } from "express";
-import { Server } from "socket.io";
+import express, { Express, Request, Response } from "express"
+import { Server } from "socket.io"
+import path from "path"
 import dotenv from "dotenv"
 import mongoose from "mongoose"
 import bodyParser from 'body-parser'
@@ -18,14 +19,15 @@ const app: Express = express();
 
 const port = process.env.PORT || 3001;
 const corsOptions = {
-  origin: "http://localhost:5173",
-  methods: ["GET", "POST"]
+  origin: "http://localhost:5173"
 }
 
 app.use(cors(corsOptions));
 
 app.use(bodyParser.json({limit: "100mb"}))
 app.use(bodyParser.urlencoded({limit:"50mb", extended: true}))
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 const expressServer = app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);

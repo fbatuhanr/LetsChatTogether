@@ -38,7 +38,7 @@ async function signup(req: Request, res: Response, next: NextFunction) {
 
 async function update(req: Request, res: Response, next: NextFunction) {
   try {
-    res.json(await userService.update(req.params.id, req.body));
+    res.json(await userService.update(req.params.id, req.file, req.body));
   } catch (err) {
     console.error(`Error while updating the list`, err);
     next(err);
