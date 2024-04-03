@@ -25,7 +25,7 @@ const Signup: React.FC = () => {
         console.log(password);
         
 
-        axios.post("http://localhost:3001/user/sign-up", {
+        axios.post(`${process.env.USER_API_URL}/sign-up`, {
             username,
             password
         })

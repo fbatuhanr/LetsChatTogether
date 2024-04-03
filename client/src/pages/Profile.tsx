@@ -64,7 +64,6 @@ const Profile = () => {
 
         if (('File' in window && data.profilePhoto instanceof File))
             newData = { ...newData, profilePhoto: data.profilePhoto }
-            
 
         const headers = { 'Content-Type': 'multipart/form-data' };
         axios.put(`${process.env.API_URL}/user/${user.id}`, newData, { headers })
@@ -96,7 +95,7 @@ const Profile = () => {
 
                     <div className="flex flex-col gap-y-1">
                         <label htmlFor="email" className="text-2xl font-semibold ps-2">Email</label>
-                        <input type="text" id="email" className="bg-[#BCA9FF] border-[#20183F] border-2 rounded-2xl px-6 py-4" placeholder="Type here..."
+                        <input type="text" id="email" className="bg-[#BCA9FF] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200" placeholder="Type here..."
                             onChange={handleEmailChange}
                             value={data?.email}
                         />
@@ -105,19 +104,21 @@ const Profile = () => {
                     <div className="flex flex-col gap-y-1">
                         <label htmlFor="dateofbirth" className="text-2xl font-semibold ps-2">Date of Birth</label>
                         {
-                            data.dateOfBirth &&
-                            <Datepicker options={{ defaultDate: new Date(data.dateOfBirth), theme: { input: "!bg-[#BCA9FF] border-[#20183F] border-2 rounded-2xl py-4", inputIcon: "!text-white" } }} onChange={handleDateOfBirthChange} show={isDatepickerVisible} setShow={(state) => setIsDatepickerVisible(state)} />
+                            data.dateOfBirth && <Datepicker options={{ defaultDate: new Date(data.dateOfBirth), theme: { input: "!bg-[#BCA9FF] text-white border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300", inputIcon: "!text-white" } }} onChange={handleDateOfBirthChange} show={isDatepickerVisible} setShow={(state) => setIsDatepickerVisible(state)} />
+                        }
+                        {
+                            !data.dateOfBirth && <Datepicker options={{ defaultDate: null, theme: { input: "!bg-[#BCA9FF] text-white border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300", inputIcon: "!text-white" } }} onChange={handleDateOfBirthChange} show={isDatepickerVisible} setShow={(state) => setIsDatepickerVisible(state)} />
                         }
                     </div>
 
                     <div className="flex flex-col gap-y-1">
                         <label htmlFor="profilephoto" className="text-2xl font-semibold ps-2">Profile Photo</label>
                         <div className="relative">
-                            <input type="file" id="profilephoto" className="w-full bg-[#BCA9FF] border-[#20183F] border-2 rounded-2xl px-6 py-4"
+                            <input type="file" id="profilephoto" className="w-full bg-[#BCA9FF] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300"
                                 onChange={handleProfilePhotoChange}
                             />
                             {
-                                !(('File' in window && data.profilePhoto instanceof File)) &&
+                                !(('File' in window && data.profilePhoto instanceof File)) && data.profilePhoto &&
                                 <div className="absolute top-0 right-0 p-2 h-16 bg-[#0d0d0d] rounded-tr-2xl rounded-br-2xl">
                                     <img src={`${process.env.API_URL}/${data.profilePhoto}`} className="h-full" />
                                 </div>

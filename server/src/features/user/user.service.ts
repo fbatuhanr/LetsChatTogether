@@ -49,6 +49,8 @@ async function login(data: UserProps) {
 
 async function signup(data: UserProps) {
 
+  console.log(data)
+
   const newUser = new User(data)
   newUser.hashPassword = bcrypt.hashSync(data.password, 10);
 
@@ -57,10 +59,13 @@ async function signup(data: UserProps) {
 
 async function update(id: string, file: any, data: UserProps) {
 
-  return User.findOneAndUpdate({ _id: id }, {
-    ...data,
-    profilePhoto: file.path
-  });
+  let newData = {
+    ...data
+  }
+  if (file)
+    newData = { ...newData, profilePhoto: file.path }
+
+  return User.findOneAndUpdate({ _id: id }, newData);
 }
 
 async function remove(id: string) {

@@ -29,6 +29,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
 }
 async function signup(req: Request, res: Response, next: NextFunction) {
   try {
+    console.log(req.body)
     res.json(await userService.signup(req.body));
   } catch (err) {
     console.error(`Error while creating the list`, err);
