@@ -34,8 +34,18 @@ const expressServer = app.listen(port, () => {
 });
 
 const io = new Server(expressServer, { cors: corsOptions });
-io.on("connection", (socket) => {
+io.on('connection', (socket) => {
+
   console.log(socket.id)
+  console.log('New user connected');
+
+  socket.on('sendMessage', (message) => {
+      io.emit('message', message); // Broadcast the message to all connected clients
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
 });
 
 
