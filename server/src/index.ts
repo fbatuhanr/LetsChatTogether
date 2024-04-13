@@ -24,8 +24,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(bodyParser.json({limit: "100mb"}))
-app.use(bodyParser.urlencoded({limit:"50mb", extended: true}))
+app.use(bodyParser.json({ limit: "100mb" }))
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }))
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
@@ -39,32 +39,27 @@ let socketUsers: any = []
 
 io.on('connection', (socket) => {
 
-  console.log("socket connected for user : ",socket.handshake.headers.userid);
-  socket.join(`room-${socket.handshake.headers.userid}`);
-  socketUsers.push(socket.handshake.headers.userid);
-  setTimeout(()=>{
-    io.emit("USERS",socketUsers);
-    console.log(socketUsers)
-  },1000);
+  const userId = socket.handshake.headers.userid
+  console.log("socket connected for user : ", userId);
 
+  if (!socketUsers.includes(userId)){
+  }
 
-  socket.on("disconnect", async () => {
-    console.log("user disconnected",socket.handshake.headers.userid);
-    socketUsers = socketUsers.filter((user:any) => {
-      return user !== socket.handshake.headers.userid
-    })
-    setTimeout(()=>{
-      io.emit("USERS",socketUsers);
-    },1000);
+  socketUsers.push(userId);
+  let room = `room${userId}`;
+  console.log("room", room)
+  socket.join(room);
+
+  socket.on('sendMessage', (message) => {
+    console.log(message)
+
+    let receiver = `room${message.receiver}`;
+    console.log("room", receiver)
+    io.to(receiver).emit('message', message); // Broadcast the message to all connected clients
   });
 
-  socket.on('sendMessage', (e) => {
-    console.log("send message call")
-    console.log(e)
-    console.log(socketUsers)
-    socket.to(`room-${e.receiver}`).emit("message", e);
-    // save in db
-    // addChat(e);
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
   });
 });
 
