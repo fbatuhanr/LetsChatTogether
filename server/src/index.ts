@@ -34,17 +34,37 @@ const expressServer = app.listen(port, () => {
 });
 
 const io = new Server(expressServer, { cors: corsOptions });
+
+let socketUsers: any = []
+
 io.on('connection', (socket) => {
 
-  console.log(socket.id)
-  console.log('New user connected');
+  console.log("socket connected for user : ",socket.handshake.headers.userid);
+  socket.join(`room-${socket.handshake.headers.userid}`);
+  socketUsers.push(socket.handshake.headers.userid);
+  setTimeout(()=>{
+    io.emit("USERS",socketUsers);
+    console.log(socketUsers)
+  },1000);
 
-  socket.on('sendMessage', (message) => {
-      io.emit('message', message); // Broadcast the message to all connected clients
+
+  socket.on("disconnect", async () => {
+    console.log("user disconnected",socket.handshake.headers.userid);
+    socketUsers = socketUsers.filter((user:any) => {
+      return user !== socket.handshake.headers.userid
+    })
+    setTimeout(()=>{
+      io.emit("USERS",socketUsers);
+    },1000);
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
+  socket.on('sendMessage', (e) => {
+    console.log("send message call")
+    console.log(e)
+    console.log(socketUsers)
+    socket.to(`room-${e.receiver}`).emit("message", e);
+    // save in db
+    // addChat(e);
   });
 });
 

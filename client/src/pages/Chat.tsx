@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaUserCircle } from 'react-icons/fa'
 
 import io from 'socket.io-client';
@@ -6,67 +6,115 @@ import Message from '../components/Message';
 import axios from 'axios';
 import { useAppSelector } from '../redux/hooks';
 
-const socket = io('http://localhost:3001');
-
 const Chat = () => {
 
   const user = useAppSelector((state) => state.user)
+  const userId = user ? user.id: null
 
-  const [users, setUsers] = useState<Array<any>>([])
+  const socket = useMemo(() =>
+    io(`${process.env.API_URL}`, {
+      extraHeaders: { userid: userId }
+    }),[]);
+
+    const [msg,setMsg] = useState('');
+    const [users,setUsers] = useState([]);
+    const [selectedUser,setSelecteduser] = useState();
+    const [chats,setChats] = useState([]);
+    const [activeUsers,setActiveusers] = useState([]);
 
   useEffect(() => {
 
-    axios.get(`${process.env.USER_API_URL}`)
-      .then((response) => {
-        console.log(response)
+    const getUsers = async () => {
+      axios.get(`${process.env.USER_API_URL}`)
+        .then((response) => {
+          console.log(response)
 
-        const result = response.data.filter((i: any) => i._id != user.id)
-        setUsers(result)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+          const result = response.data.filter((i: any) => i._id != user.id)
+          setUsers(result)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+    getUsers()
+
+    function onConnect() {
+      console.log("connect");
+    }
+    function onDisconnect() {
+      console.log("disconnect");
+    }
+    function onMsg(value: any) {
+      console.log(value);
+      setChats((chats) => [...chats, value] as any);
+    }
+    function onUser(value: any) {
+      console.log(value);
+      setActiveusers(value);
+      // set active users
+    }
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('message', onMsg);
+
+    socket.on('USERS', onUser);
+    
+    return () => {
+      socket.disconnect();
+    };
 
   }, [])
 
-  const [messages, setMessages] = useState<Array<any>>([]);
-  const [messageText, setMessageText] = useState<string>("");
+  const sendMsg = () => {
+    if(msg == '') return;
 
-  useEffect(() => {
-    socket.on('message', (message) => {
-      setMessages([...messages, message]);
-    });
-  }, [messages]);
+    let resultData = {
+        "message":msg,
+        "receiver":''+selectedUser._id,
+        "sender":''+userId,
+        "createdon": (new Date()).toISOString()
+    }
 
-  const sendMessage = () => {
-    socket.emit('sendMessage', { text: messageText });
-    setMessageText("");
-  };
+    console.log(resultData)
+    
+    socket.emit('sendMessage', resultData);
+    // setChats((chats) => [...chats,data] as any);
+    setMsg('');
+}
 
   return (
 
     <div className="py-8 flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
       <div>
-        <h1 className="text-5xl font-bold">Chat</h1>
+        <h1 className="text-5xl font-bold">Chat {user && `(${user.username})`}</h1>
       </div>
       <div className="flex w-full max-w-3xl min-h-[400px] rounded-xl bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
 
         <div className="basis-3/4 p-12">
 
-          <div className="border-2 border-[#6841F2] w-full h-full rounded-  xl">
-            {messages.map((message, index) => (
-              <Message key={index} username={user.username} text={message.text} />
-            ))}
+          <div className="border-2 border-[#6841F2] w-full h-full rounded-xl">
+            
+            {
+              selectedUser ?
+              selectedUser.username
+              :
+              "Please select a user for start conversation..."
+            }
+
+            {
+             chats && chats.map(chat => <li>{chat}</li>)
+            }
+            
           </div>
           <div className="border-2 border-[#6841F2]">
             <input
               type="text"
-              value={messageText}
+              value={msg}
               className="text-black"
-              onChange={(e) => setMessageText(e.target.value)}
+              onChange={(e) => setMsg(e.target.value)}
               placeholder="Type your message..."
             />
-            <button onClick={sendMessage} className="bg-teal-500">Send</button>
+            <button onClick={sendMsg} className="bg-teal-500">Send</button>
           </div>
 
         </div>
@@ -77,7 +125,7 @@ const Chat = () => {
 
             {
               users.map((user: any) =>
-                <div className="bg-[#BCA9FF] flex items-center cursor-pointer gap-x-2 ps-4 mt-1">
+                <div onClick={() => setSelecteduser(user)} className="bg-[#BCA9FF] flex items-center cursor-pointer gap-x-2 ps-4 mt-1">
                   <FaUserCircle />
                   <span>{user.username}</span>
                 </div>
