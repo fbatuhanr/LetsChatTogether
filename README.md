@@ -1,4 +1,4 @@
-coming soon...
+coming soon..
 
 Figma Design (made by me): https://www.figma.com/file/hQqZzp9YHbtrdf8cFZq9an/Lets-Chat-Together---Design?type=design&node-id=0%3A1&mode=design&t=xynzwpjDAyH4eGVg-1
 
