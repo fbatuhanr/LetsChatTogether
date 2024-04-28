@@ -42,24 +42,22 @@ io.on('connection', (socket) => {
   const userId = socket.handshake.headers.userid
   console.log("socket connected for user : ", userId);
 
-  if (!socketUsers.includes(userId)){
-  }
+  if (!socketUsers.includes(userId))
+    socketUsers.push(userId);
 
-  socketUsers.push(userId);
-  let room = `room${userId}`;
-  console.log("room", room)
-  socket.join(room);
+  socket.join(`room${userId}`);
 
-  socket.on('sendMessage', (message) => {
-    console.log(message)
+  socket.emit("users", socketUsers);
 
-    let receiver = `room${message.receiver}`;
-    console.log("room", receiver)
-    io.to(receiver).emit('message', message); // Broadcast the message to all connected clients
+  socket.on('sendMessage', (messageData) => {
+    console.log(messageData)
+    socket.to(`room${messageData.receiver}`).emit('message', messageData)
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
+  socket.on('disconnect', async () => {
+    console.log("user disconnected", userId);
+    socketUsers = socketUsers.filter((user: any) => user != userId)
+    socket.emit("users", socketUsers);
   });
 });
 

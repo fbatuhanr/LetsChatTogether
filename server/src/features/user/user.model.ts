@@ -11,6 +11,7 @@ const UserSchema = new Schema({
   email: {
     type: String,
     unique: true,
+    required: true,
     trim: true
   },
   dateOfBirth: Date,
