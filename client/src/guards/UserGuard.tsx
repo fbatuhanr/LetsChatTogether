@@ -6,7 +6,7 @@ const UserGuard = ({ children }: { children: React.ReactNode }) => {
 
     const user = useAppSelector((state) => state.user)
 
-    if(!user.username){
+    if(!user.token || !user.username){
         return <Navigate to="/login" />
     }
 

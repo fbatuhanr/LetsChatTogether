@@ -5,7 +5,7 @@ const GuestGuard = ({ children }: { children: React.ReactNode }) => {
 
     const user = useAppSelector((state) => state.user)
 
-    if (user.username) {
+    if (user.username && user.token) {
         return <Navigate to="/" />
     }
 
