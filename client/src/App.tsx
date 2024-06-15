@@ -27,7 +27,7 @@ function App() {
   return (
     <div className="bg-[rgb(13,13,13)] text-white font-outfit overflow-x-hidden">
       <StoreProvider>
-        <ToastContainer />
+        <ToastContainer autoClose={2500} pauseOnHover={false} />
         <Router>
           <Header />
           <Layout>

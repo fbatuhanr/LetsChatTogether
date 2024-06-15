@@ -80,7 +80,7 @@ const Profile = () => {
             <div>
                 <h1 className="text-5xl font-bold">Profile</h1>
             </div>
-            <div className="relative w-full max-w-3xl min-h-[400px] px-8 pt-16 pb-12 rounded-xl bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
+            <div className="relative w-full max-w-3xl min-h-[400px] px-8 pt-16 pb-12 rounded-lg bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
 
                 <div className="absolute -top-14 left-0">
                     <img src={SecureImg} className="w-28" />
@@ -90,12 +90,12 @@ const Profile = () => {
 
                     <div className="flex flex-col gap-y-1">
                         <label htmlFor="username" className="text-2xl font-semibold ps-2">Username</label>
-                        <input type="text" id="username" value={user.username} className="bg-[#BCA9FF] border-[#20183F] border-2 rounded-2xl px-6 py-4" readOnly disabled />
+                        <input type="text" id="username" value={user.username} className="bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 disabled:text-[#cccccc]" readOnly disabled />
                     </div>
 
                     <div className="flex flex-col gap-y-1">
                         <label htmlFor="email" className="text-2xl font-semibold ps-2">Email</label>
-                        <input type="text" id="email" className="bg-[#BCA9FF] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200" placeholder="Type here..."
+                        <input type="text" id="email" className="bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200" placeholder="Type here..."
                             onChange={handleEmailChange}
                             value={data?.email}
                         />
@@ -104,23 +104,23 @@ const Profile = () => {
                     <div className="flex flex-col gap-y-1">
                         <label htmlFor="dateofbirth" className="text-2xl font-semibold ps-2">Date of Birth</label>
                         {
-                            data.dateOfBirth && <Datepicker options={{ defaultDate: new Date(data.dateOfBirth), theme: { input: "!bg-[#BCA9FF] text-white border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300", inputIcon: "!text-white" } }} onChange={handleDateOfBirthChange} show={isDatepickerVisible} setShow={(state) => setIsDatepickerVisible(state)} />
+                            data.dateOfBirth && <Datepicker options={{ defaultDate: new Date(data.dateOfBirth), theme: { input: "!bg-[#6841f2] text-white border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300", inputIcon: "!text-white" } }} onChange={handleDateOfBirthChange} show={isDatepickerVisible} setShow={(state) => setIsDatepickerVisible(state)} />
                         }
                         {
-                            !data.dateOfBirth && <Datepicker options={{ defaultDate: null, theme: { input: "!bg-[#BCA9FF] text-white border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300", inputIcon: "!text-white" } }} onChange={handleDateOfBirthChange} show={isDatepickerVisible} setShow={(state) => setIsDatepickerVisible(state)} />
+                            !data.dateOfBirth && <Datepicker options={{ defaultDate: null, theme: { input: "!bg-[#6841f2] text-white border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300", inputIcon: "!text-white" } }} onChange={handleDateOfBirthChange} show={isDatepickerVisible} setShow={(state) => setIsDatepickerVisible(state)} />
                         }
                     </div>
 
                     <div className="flex flex-col gap-y-1">
                         <label htmlFor="profilephoto" className="text-2xl font-semibold ps-2">Profile Photo</label>
                         <div className="relative">
-                            <input type="file" id="profilephoto" className="w-full bg-[#BCA9FF] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300"
+                            <input type="file" id="profilephoto" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300"
                                 onChange={handleProfilePhotoChange}
                             />
                             {
                                 !(('File' in window && data.profilePhoto instanceof File)) && data.profilePhoto &&
-                                <div className="absolute top-0 right-0 p-2 h-16 bg-[#0d0d0d] rounded-tr-2xl rounded-br-2xl">
-                                    <img src={`${process.env.API_URL}/${data.profilePhoto}`} className="h-full" />
+                                <div className="absolute top-0 right-0 p-1 h-16 bg-[#0d0d0d] rounded-tr-2xl rounded-br-2xl">
+                                    <img src={`${process.env.API_URL}/${data.profilePhoto}`} className="h-full rounded-r-xl" />
                                 </div>
 
                             }

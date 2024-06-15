@@ -3,10 +3,12 @@ import HumanImg3 from "../assets/human-3.png"
 import { toast } from "react-toastify"
 
 import useAuthentication from "../hooks/useAuthentication"
+import { useNavigate } from "react-router-dom"
 
 const Signup: React.FC = () => {
 
     const { signupCall } = useAuthentication()
+    const navigate = useNavigate();
 
     const [username, setUsername] = useState<string>("")
     const [email, setEmail] = useState<string>("")
@@ -21,7 +23,10 @@ const Signup: React.FC = () => {
             return
         }
 
-        await signupCall(username, email, password)
+        const result = await signupCall(username, email, password)
+        console.log(result)
+        if(result)
+            navigate('/login', { replace: true });
     }
     return (
         <form onSubmit={handleSubmit}>

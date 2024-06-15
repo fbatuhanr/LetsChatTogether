@@ -48,7 +48,7 @@ const useAuthentication = () => {
 
     const signupCall = async (username: string, email: string, password: string) => {
 
-        toast.promise(
+        return toast.promise(
             new Promise((resolve, reject) =>
                 axios.post(`${process.env.USER_API_URL}/sign-up`, {
                     username,
@@ -65,8 +65,8 @@ const useAuthentication = () => {
                             return
                         }
 
-                        const { token, id, username } = response.data
-                        dispatch(setUser({ token, id, username }));
+                        /*const { token, id, username } = response.data
+                        dispatch(setUser({ token, id, username }));*/
                         resolve(true)
                     })
                     .catch((error) => {
