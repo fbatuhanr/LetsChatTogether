@@ -9,10 +9,12 @@ import { IoIosSend } from 'react-icons/io';
 
 const Chat = () => {
 
-  const user = useAppSelector((state) => state.user)
-  const userId = user ? user.id : null
+  const currentUser = useAppSelector((state) => state.user)
+  const currentUserId = currentUser ? currentUser.id : null
 
-  const socket = useMemo(() => io(`${process.env.API_URL}`, { extraHeaders: { userid: userId } }), []);
+  const socket = useMemo(() => io(`${process.env.API_URL}`, { extraHeaders: { userid: currentUserId } }), []);
+
+  const [chat, setChat] = useState<string>("");
 
   const [users, setUsers] = useState<Array<any>>([])
   const [onlineUsers, setOnlineUsers] = useState<Array<string>>([])
@@ -57,13 +59,18 @@ const Chat = () => {
     }
   }, [messages]);
 
-  const sendMessage = () => {
-    if(!messageText) return
+  const sendMessage = async () => {
+    if (!messageText) return
 
     console.log("emit send message")
-    const messageData = { text: messageText, sender: userId, receiver: selectedUser?._id };
+    const messageData = { text: messageText, senderId: currentUserId, receiverId: selectedUser?._id }
     socket.emit('sendMessage', messageData);
     setMessages((prev) => [...prev, messageData]);
+
+    const data = { text: messageText, senderId: currentUserId, chatId: chat }
+    const response = await axios.post(`${process.env.MESSAGE_API_URL}`, data)
+    console.log(response.data)
+
     setMessageText("");
 
     chatContainerRef.current.scroll({
@@ -74,8 +81,41 @@ const Chat = () => {
 
   const getUsernameById = (id: string) => users.find(i => i._id == id).username
 
-  return (
 
+  const handleSelectUser = async (user: any) => {
+
+    setSelectedUser(user)
+
+    const data = { firstId: currentUser.id, secondId: user._id }
+    const response = await axios.post(`${process.env.CHAT_API_URL}`, data)
+    console.log(response.data);
+
+    fetchUsersConversation(response.data._id, user._id)
+
+    setChat(response.data._id)
+  }
+
+  const fetchUsersConversation = async (chatId: string, selectedUserId: string) => {
+
+    const response = await axios.get(`${process.env.MESSAGE_API_URL}/${chatId}`)
+    console.log(response.data)
+    console.log("current user: ", currentUserId)
+    console.log("selected user: ", selectedUserId)
+
+    const msg = response.data.map((i:any) => {
+      let isSenderCurrentUser = i.senderId == currentUserId
+      return {
+        text: i.text,
+        senderId: isSenderCurrentUser ? currentUserId : selectedUserId,
+        receiverId: isSenderCurrentUser ? selectedUserId : currentUserId,
+      }
+    })
+    console.log(msg)
+    setMessages(msg)
+  }
+
+
+  return (
     <div className="py-8 flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
@@ -90,14 +130,14 @@ const Chat = () => {
                   {
                     messages && messages.map((messageData, index) => {
 
-                      let isMessageBelongsCurrUser = messageData.sender == userId
-                      let isSenderSamePreviousOne = messages[index-1] ? messageData.sender == messages[index-1].sender : false
+                      let isMessageBelongsCurrUser = messageData.senderId == currentUserId
+                      let isSenderSamePreviousOne = messages[index - 1] ? messageData.senderId == messages[index - 1].senderId : false
                       return (
                         <p className={`flex items-center my-0.5 ${isMessageBelongsCurrUser ? "justify-end" : "justify-start"}`}>
 
                           {
                             !isSenderSamePreviousOne &&
-                            <span className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"}`}>{getUsernameById(messageData.sender)[0].toUpperCase()}</span>
+                            <span className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"}`}>{getUsernameById(messageData.senderId)[0].toUpperCase()}</span>
                           }
                           <span className={`${isMessageBelongsCurrUser ? "rounded-tl-md rounded-bl-md" : "rounded-tr-md rounded-br-md"} ${isSenderSamePreviousOne ? isMessageBelongsCurrUser ? "me-11" : "ms-11" : ""} bg-[#D5CAFF] text-black px-4 text-lg`}>{messageData.text}</span>
                         </p>
@@ -135,13 +175,13 @@ const Chat = () => {
             {
               users.map((user: any) => {
 
-                if (user._id == userId) return
+                if (user._id == currentUserId) return // if self then skip this user
 
                 let isUserOnline = onlineUsers.includes(user._id)
                 let isUserSelected = user._id == selectedUser?._id
                 return (
                   <div className={`${isUserOnline ? "text-slate-800 cursor-pointer" : "text-slate-500 italic"} ${isUserSelected ? "border-[#BCA9FF] border-2 bg-[#d2c6ff]" : "bg-[#BCA9FF]"} flex items-center gap-x-2 ps-4 mt-1.5`}
-                    onClick={() => isUserOnline ? setSelectedUser(user) : null}>
+                    onClick={() => handleSelectUser(user)}>
                     <FaUserCircle />
                     <span>{user.username} ({isUserOnline ? "online" : "offline"})</span>
                   </div>)

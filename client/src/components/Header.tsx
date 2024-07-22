@@ -9,7 +9,7 @@ const Header: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const handleLogout = () => {
-        
+
         dispatch(clearUser());
     }
 
@@ -38,8 +38,9 @@ const Header: React.FC = () => {
                                 <div className="text-2xl font-semibold">
                                     <Link to="/profile">Profile</Link>
                                 </div>
-                                <div className="text-2xl font-semibold text-[#F52525]">
-                                    <button type="button" onClick={handleLogout}>Logout</button>
+                                <div className="relative">
+                                    <span className="text-[0.65rem] text-[#cccccc] absolute -top-2 -right-2">({user.username})</span>
+                                    <button type="button" onClick={handleLogout} className="text-2xl font-semibold text-[#F52525]">Logout</button>
                                 </div>
                             </>
                     }

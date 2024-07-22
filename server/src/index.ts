@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
 
   socket.on('sendMessage', (messageData) => {
     console.log(messageData)
-    socket.to(`room${messageData.receiver}`).emit('message', messageData)
+    socket.to(`room${messageData.receiverId}`).emit('message', messageData)
   });
 
   socket.on('disconnect', async () => {
