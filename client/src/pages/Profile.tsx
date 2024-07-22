@@ -80,7 +80,7 @@ const Profile = () => {
             <div>
                 <h1 className="text-5xl font-bold">Profile</h1>
             </div>
-            <div className="relative w-full max-w-3xl min-h-[400px] px-8 pt-16 pb-12 rounded-lg bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
+            <div className="relative w-full max-w-3xl min-h-[400px] px-8 pt-16 pb-12 rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
 
                 <div className="absolute -top-14 left-0">
                     <img src={SecureImg} className="w-28" />

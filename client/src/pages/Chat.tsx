@@ -54,6 +54,8 @@ const Chat = () => {
       setMessages((prev) => [...prev, message]);
     });
 
+    handleChatContainerScroll()
+
     return () => {
       socket.off('message');
     }
@@ -63,7 +65,13 @@ const Chat = () => {
     if (!messageText) return
 
     console.log("emit send message")
-    const messageData = { text: messageText, senderId: currentUserId, receiverId: selectedUser?._id }
+    const messageData = {
+      text: messageText,
+      date: new Date(),
+
+      senderId: currentUserId,
+      receiverId: selectedUser?._id
+    }
     socket.emit('sendMessage', messageData);
     setMessages((prev) => [...prev, messageData]);
 
@@ -72,6 +80,11 @@ const Chat = () => {
     console.log(response.data)
 
     setMessageText("");
+  }
+
+  function handleChatContainerScroll(){
+
+    if(!chatContainerRef.current) return
 
     chatContainerRef.current.scroll({
       top: chatContainerRef.current.scrollHeight,
@@ -102,16 +115,18 @@ const Chat = () => {
     console.log("current user: ", currentUserId)
     console.log("selected user: ", selectedUserId)
 
-    const msg = response.data.map((i:any) => {
-      let isSenderCurrentUser = i.senderId == currentUserId
+    const conversation = response.data.map((msg: any) => {
+      let isSenderCurrentUser = msg.senderId == currentUserId
       return {
-        text: i.text,
+        text: msg.text,
+        date: msg.createdAt,
+
         senderId: isSenderCurrentUser ? currentUserId : selectedUserId,
         receiverId: isSenderCurrentUser ? selectedUserId : currentUserId,
       }
     })
-    console.log(msg)
-    setMessages(msg)
+    console.log(conversation)
+    setMessages(conversation)
   }
 
 
@@ -120,27 +135,45 @@ const Chat = () => {
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
       </div>
-      <div className="flex w-full max-w-3xl h-[425px] rounded-xl bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
+      <div className="flex w-full max-w-4xl h-[425px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
 
-        <div className="basis-3/4 px-12 pt-8 pb-24">
+        <div className="basis-4/5 px-12 pt-8 pb-24">
           {
             selectedUser ?
               <>
-                <div ref={chatContainerRef} className="border-2 border-[#6841F2] overflow-y-auto rounded-xl h-full py-4 px-2">
+                <div ref={chatContainerRef} className="border-l border-r border-[#6841F2] overflow-y-auto rounded-lg h-full py-4 px-4">
                   {
                     messages && messages.map((messageData, index) => {
 
                       let isMessageBelongsCurrUser = messageData.senderId == currentUserId
                       let isSenderSamePreviousOne = messages[index - 1] ? messageData.senderId == messages[index - 1].senderId : false
                       return (
-                        <p className={`flex items-center my-0.5 ${isMessageBelongsCurrUser ? "justify-end" : "justify-start"}`}>
+                        <div className={`relative flex items-center ${isSenderSamePreviousOne ? "mt-1" : "mt-2"} ${isMessageBelongsCurrUser ? "justify-end" : "justify-start"}`}>
 
                           {
                             !isSenderSamePreviousOne &&
-                            <span className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"}`}>{getUsernameById(messageData.senderId)[0].toUpperCase()}</span>
+                            <div className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"} ${messageData.date ? "mb-3" : "mb-1.5"}`}>{getUsernameById(messageData.senderId)[0].toUpperCase()}</div>
                           }
-                          <span className={`${isMessageBelongsCurrUser ? "rounded-tl-md rounded-bl-md" : "rounded-tr-md rounded-br-md"} ${isSenderSamePreviousOne ? isMessageBelongsCurrUser ? "me-11" : "ms-11" : ""} bg-[#D5CAFF] text-black px-4 text-lg`}>{messageData.text}</span>
-                        </p>
+                          <div className={`leading-[0.5] ${isSenderSamePreviousOne ? isMessageBelongsCurrUser ? "me-11" : "ms-11" : ""} ${isMessageBelongsCurrUser ? "text-right" : "text-left"}`}>
+                            <p className={`bg-[#D5CAFF] text-black px-4 py-1 text-lg ${isMessageBelongsCurrUser ? "rounded-tl-md rounded-bl-md" : "rounded-tr-md rounded-br-md"}`}>{messageData.text}</p>
+                            {
+                              messageData.date &&
+                              <>
+                                <time className="text-[0.55rem] italic -mt-1" dateTime={messageData.date}>
+                                  {new Date(messageData.date).toLocaleTimeString()}
+                                  {
+                                    new Date().toDateString() !== new Date(messageData.date).toDateString()
+                                    && 
+                                    <>
+                                      <br />
+                                      {new Date(messageData.date).toDateString()}
+                                    </>
+                                  }
+                                </time>
+                              </>
+                            }
+                          </div>
+                        </div>
                       )
                     }
                     )
@@ -167,7 +200,7 @@ const Chat = () => {
           }
 
         </div>
-        <div className="basis-1/4 bg-[#472DA6] py-4">
+        <div className="basis-1/5 bg-[#472DA6] py-4">
 
           <h3 className="text-3xl font-bold text-center">Users</h3>
           <div className="mt-2 text-slate-800 font-medium">
