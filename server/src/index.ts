@@ -68,3 +68,9 @@ app.get("/", (req: Request, res: Response) => {
 
 import { user } from "./features/user"
 app.use("/user", user);
+
+import { chat } from "./features/chat"
+app.use("/chat", chat)
+
+import { message } from "./features/message"
+app.use("/message", message)

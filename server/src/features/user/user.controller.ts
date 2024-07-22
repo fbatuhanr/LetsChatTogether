@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express"
 import * as userService from './user.service'
 
 async function getAll(req: Request, res: Response, next: NextFunction) {
@@ -55,4 +55,4 @@ async function remove(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { getAll, get, login, signup, update, remove };
+export { getAll, get, login, signup, update, remove }
