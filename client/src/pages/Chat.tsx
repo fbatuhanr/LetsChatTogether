@@ -24,7 +24,7 @@ const Chat = () => {
   const [messages, setMessages] = useState<Array<any>>([]);
   const [messageText, setMessageText] = useState<string>("");
 
-  const chatContainerRef = useRef(null)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
 
