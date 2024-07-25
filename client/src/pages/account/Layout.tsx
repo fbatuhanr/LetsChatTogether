@@ -32,7 +32,7 @@ export const Layout = () => {
                     <img src={SecureImg} className="w-28" />
                 </div> */}
 
-                <div className="">
+                <div className="w-3/4 mx-auto my-12 px-4 ">
                     <Outlet />
                 </div>
             </div>

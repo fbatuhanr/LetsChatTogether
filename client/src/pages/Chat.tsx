@@ -10,7 +10,7 @@ interface IUser {
   _id: string,
   username: string,
   email: string | null,
-  
+
   createdAt: Date,
   updatedAt: Date,
 
@@ -80,7 +80,7 @@ const Chat = () => {
 
   const sendMessage = async () => {
     if (!messageInput) return
-    if(!selectedUser) return
+    if (!selectedUser) return
 
     console.log("emit send message")
     const messageData: IMessage = {
@@ -100,9 +100,9 @@ const Chat = () => {
     setMessageInput("");
   }
 
-  function handleChatContainerScroll(){
+  function handleChatContainerScroll() {
 
-    if(!chatContainerRef.current) return
+    if (!chatContainerRef.current) return
 
     chatContainerRef.current.scroll({
       top: chatContainerRef.current.scrollHeight,
@@ -110,7 +110,8 @@ const Chat = () => {
     });
   }
 
-  const getUsernameById = (id: string) => users.find(i => i._id == id).username
+  const getUsernameById = (id: string) => users.find(i => i._id == id)?.username
+  const getPhotoById = (id: string) => users.find(i => i._id == id)?.profilePhoto
 
 
   const handleSelectUser = async (user: IUser) => {
@@ -171,8 +172,14 @@ const Chat = () => {
 
                           {
                             !isSenderSamePreviousOne &&
-                            <div className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"} ${messageData.date ? "mb-3" : "mb-1.5"}`}>
-                              {getUsernameById(messageData.senderId)[0].toUpperCase()}
+                            <div className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold overflow-hidden ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"} ${messageData.date ? "mb-3" : "mb-1.5"}`}>
+                              {
+                                getPhotoById(messageData.senderId)
+                                  ?
+                                    <img src={`${process.env.API_URL}/${getPhotoById(messageData.senderId)!}`} />
+                                  :
+                                    getUsernameById(messageData.senderId)![0].toUpperCase()
+                              }
                             </div>
                           }
                           <div className={`leading-[0.5] ${isSenderSamePreviousOne ? isMessageBelongsCurrUser ? "me-11" : "ms-11" : ""} ${isMessageBelongsCurrUser ? "text-right" : "text-left"}`}>
@@ -180,11 +187,11 @@ const Chat = () => {
                             {
                               messageData.date &&
                               <>
-                                <time className="text-[0.55rem] italic -mt-1" dateTime={messageData.date.toDateString()}>
+                                <time className="text-[0.55rem] italic -mt-1" dateTime={(messageData.date).toString()}>
                                   {new Date(messageData.date).toLocaleTimeString()}
                                   {
                                     new Date().toDateString() !== new Date(messageData.date).toDateString()
-                                    && 
+                                    &&
                                     <>
                                       <br />
                                       {new Date(messageData.date).toDateString()}
@@ -235,7 +242,7 @@ const Chat = () => {
                 let isUserOnline = onlineUsers.includes(user._id)
                 let isUserSelected = user._id == selectedUser?._id
                 return (
-                  <div key={index} className={`${isUserOnline ? "text-slate-800 cursor-pointer" : "text-slate-500 italic"} ${isUserSelected ? "border-[#BCA9FF] border-2 bg-[#d2c6ff]" : "bg-[#BCA9FF]"} flex items-center gap-x-2 ps-4 mt-1.5`}
+                  <div key={index} className={`${isUserOnline ? "text-slate-800" : "text-slate-700"} ${isUserSelected ? "border-[#BCA9FF] border-2 bg-[#dbd1ff]" : "bg-[#BCA9FF]"} flex items-center gap-x-2 ps-4 mt-1.5 cursor-pointer`}
                     onClick={() => handleSelectUser(user)}>
                     <FaUserCircle />
                     <span>{user.username} ({isUserOnline ? "online" : "offline"})</span>

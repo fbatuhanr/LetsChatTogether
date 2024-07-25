@@ -37,6 +37,9 @@ const UserSchema = new Schema({
   },
   profilePhoto: {
     type: String
+  },
+  about: {
+    type: String
   }
 },
   {

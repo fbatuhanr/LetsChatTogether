@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAppSelector } from '../../redux/hooks'
 import { useForm, SubmitHandler, Controller } from "react-hook-form"
+import { ErrorMessage } from "@hookform/error-message"
 import axios from 'axios'
 import Datepicker from "tailwind-datepicker-react"
 
@@ -9,7 +10,7 @@ interface IProfileInput {
     surname: string,
     gender: 'male' | 'female' | 'other',
     dateOfBirth?: Date,
-    profilePhoto?: FileList | File | string | null,
+    profilePhoto?: FileList | string | null,
     about: string | null
 }
 export const Profile = () => {
@@ -17,9 +18,9 @@ export const Profile = () => {
     const user = useAppSelector((state) => state.user)
     const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false)
 
-    const { register, control, watch, handleSubmit, reset } = useForm<IProfileInput>()
+    const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<IProfileInput>()
 
-    const onSubmit: SubmitHandler<IProfileInput> = (data) => {
+    const onSubmit: SubmitHandler<IProfileInput> = async (data) => {
 
         console.log(data)
 
@@ -27,18 +28,15 @@ export const Profile = () => {
             ...data
         }
 
-        if (('File' in window && data.profilePhoto instanceof File))
-            newData = { ...newData, profilePhoto: data.profilePhoto }
+        if (('File' in window && data.profilePhoto instanceof FileList))
+            newData = { ...newData, profilePhoto: data.profilePhoto[0] }
 
         console.log(newData)
-        return
 
         const headers = { 'Content-Type': 'multipart/form-data' };
-        axios.put(`${process.env.API_URL}/user/${user.id}`, newData, { headers })
-            .then((response) => {
-                console.log(response.data);
-                window.location.reload();
-            });
+        const response = await axios.put(`${process.env.API_URL}/user/${user.id}`, newData, { headers })
+        console.log(response.data);
+        window.location.reload();
     }
 
     useEffect(() => {
@@ -49,7 +47,7 @@ export const Profile = () => {
 
                 reset({
                     ...response.data,
-                    dateOfBirth: new Date(response.data.dateOfBirth),
+                    dateOfBirth: response.data.dateOfBirth ? new Date(response.data.dateOfBirth) : null,
                 });
 
             } catch (error) {
@@ -60,35 +58,76 @@ export const Profile = () => {
     }, [reset])
 
     const watchProfilePhoto = watch('profilePhoto');
+    useEffect(() => {
+        console.log(watchProfilePhoto)
+    }, [watchProfilePhoto])
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="w-3/4 mx-auto my-12 px-4 flex flex-col gap-y-3 h-full justify-center">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-4 h-full justify-center">
 
-            <div className="flex justify-between gap-x-1">
-                <div className="w-full">
-                    <label htmlFor="name" className="text-2xl font-semibold ps-2">Name</label>
-                    <input type="text" id="name" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200 outline-1 focus:outline-dashed outline-indigo-500" placeholder="Type here..."
-                        {...register("name")}
-                    />
+            <div>
+                <div className="flex justify-between gap-x-2">
+                    <div className="w-full">
+                        <label htmlFor="name" className="text-2xl font-semibold ps-2">Name</label>
+                        <input type="text" id="name" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500" placeholder="Type here..."
+                            {...register('name', {
+                                required: 'Name is required',
+                                pattern: {
+                                    value: /^[A-Za-z]+$/,
+                                    message: 'Name should only contain letters without spaces'
+                                },
+                                minLength: {
+                                    value: 2,
+                                    message: 'Name must be at least 2 characters long'
+                                },
+                                maxLength: {
+                                    value: 50,
+                                    message: 'Name cannot be more than 50 characters long'
+                                }
+                            })}
+                        />
+                    </div>
+                    <div className="w-full">
+                        <label htmlFor="surname" className="text-2xl font-semibold ps-2">Surname</label>
+                        <input type="text" id="surname" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500" placeholder="Type here..."
+                            {...register('surname', {
+                                required: 'Surname is required',
+                                pattern: {
+                                    value: /^[A-Za-z]+$/,
+                                    message: 'Surname should only contain letters without spaces'
+                                },
+                                minLength: {
+                                    value: 2,
+                                    message: 'Surname must be at least 2 characters long'
+                                },
+                                maxLength: {
+                                    value: 50,
+                                    message: 'Surname cannot be more than 50 characters long'
+                                }
+                            })}
+                        />
+                    </div>
                 </div>
-                <div className="w-full">
-                    <label htmlFor="surname" className="text-2xl font-semibold ps-2">Surname</label>
-                    <input type="text" id="surname" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200 outline-1 focus:outline-dashed outline-indigo-500" placeholder="Type here..."
-                        {...register("surname")}
-                    />
+                <div className="text-sm mt-1 px-4">
+                    <ErrorMessage errors={errors} name="name" render={({ message }) => <p>{message}</p>} />
+                    <ErrorMessage errors={errors} name="surname" render={({ message }) => <p>{message}</p>} />
                 </div>
             </div>
 
-            <div className="flex justify-between gap-x-1">
+            <div className="flex justify-between gap-x-2">
                 <div className="w-full">
                     <label htmlFor="gender" className="text-2xl font-semibold ps-2">Gender</label>
                     <select id="gender" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200 outline-1 focus:outline-dashed outline-indigo-500"
-                        {...register('gender')}
+                        {...register('gender', {
+                            required: 'Gender is required'
+                        })}
                     >
+                        <option value="">Choose...</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
                         <option value="other">Other</option>
                     </select>
+                    <ErrorMessage errors={errors} name="gender" render={({ message }) => <p>{message}</p>} />
                 </div>
                 <div className="w-full">
                     <label htmlFor="dateofbirth" className="text-2xl font-semibold ps-2">Date of Birth</label>
@@ -112,7 +151,7 @@ export const Profile = () => {
                                         icons: "",
                                         text: "",
                                         disabledText: "",
-                                        input: "!bg-[#6841f2] text-white border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500",
+                                        input: "!bg-[#6841f2] text-white !border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500",
                                         inputIcon: "!text-white",
                                         selected: "",
                                     }
@@ -126,13 +165,19 @@ export const Profile = () => {
             <div className="flex flex-col gap-y-1">
                 <label htmlFor="profilePhoto" className="text-2xl font-semibold ps-2">Photo</label>
                 <div className="relative">
-                    <input type="file" id="profilePhoto" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300"
+                    <input type="file" id="profilePhoto" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500"
                         {...register("profilePhoto")} multiple={false}
                     />
                     {
-                        watchProfilePhoto &&
+                        watchProfilePhoto?.length &&
                         <div className="absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
-                            <img src={('File' in window && watchProfilePhoto instanceof FileList) ? URL.createObjectURL(watchProfilePhoto[0]) : `${process.env.API_URL}/${watchProfilePhoto}`} className="h-full rounded-r-xl" />
+                            <img className="h-full rounded-r-xl"
+                                src={
+                                    (watchProfilePhoto instanceof FileList)
+                                        ? URL.createObjectURL(watchProfilePhoto[0])
+                                        : `${process.env.API_URL}/${watchProfilePhoto}`
+                                }
+                            />
                         </div>
                     }
                 </div>
@@ -140,9 +185,9 @@ export const Profile = () => {
 
 
             <div className="flex flex-col gap-y-1">
-                <label htmlFor="about" className="text-2xl font-semibold ps-2">About Yourself</label>
-                <textarea id="about" className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    {...register('about', { required: 'Yorum alanı gereklidir' })}
+                <label htmlFor="about" className="text-2xl font-semibold ps-2">About</label>
+                <textarea id="about" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500" placeholder="anything about yourself..."
+                    {...register('about')}
                     rows={4}
                 />
             </div>
