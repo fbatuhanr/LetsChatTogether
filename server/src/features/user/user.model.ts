@@ -16,11 +16,27 @@ const UserSchema = new Schema({
     required: true,
     trim: true
   },
-  dateOfBirth: Date,
-  profilePhoto: String,
   hashPassword: {
     type: String,
     required: true
+  },
+
+
+  name: {
+    type: String
+  },
+  surname: {
+    type: String
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other']
+  },
+  dateOfBirth: {
+    type: Date
+  },
+  profilePhoto: {
+    type: String
   }
 },
   {

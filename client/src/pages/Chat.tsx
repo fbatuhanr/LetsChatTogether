@@ -2,10 +2,27 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaUserCircle } from 'react-icons/fa'
 
 import io from 'socket.io-client';
-import Message from '../components/Message';
 import axios from 'axios';
 import { useAppSelector } from '../redux/hooks';
 import { IoIosSend } from 'react-icons/io';
+
+interface IUser {
+  _id: string,
+  username: string,
+  email: string | null,
+  
+  createdAt: Date,
+  updatedAt: Date,
+
+  profilePhoto: string | null
+}
+interface IMessage {
+  text: string,
+  date: Date | null,
+
+  senderId: string,
+  receiverId: string | null
+}
 
 const Chat = () => {
 
@@ -16,26 +33,26 @@ const Chat = () => {
 
   const [chat, setChat] = useState<string>("");
 
-  const [users, setUsers] = useState<Array<any>>([])
+  const [users, setUsers] = useState<Array<IUser>>([])
   const [onlineUsers, setOnlineUsers] = useState<Array<string>>([])
 
-  const [selectedUser, setSelectedUser] = useState()
+  const [selectedUser, setSelectedUser] = useState<IUser>()
 
-  const [messages, setMessages] = useState<Array<any>>([]);
-  const [messageText, setMessageText] = useState<string>("");
+  const [messages, setMessages] = useState<Array<IMessage>>([]);
+  const [messageInput, setMessageInput] = useState<string>("");
 
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
 
-    const fetchUsersExceptCurrent = async () => {
+    const fetchUsers = async () => {
 
       const response = await axios.get(`${process.env.USER_API_URL}`)
       console.log(response.data);
 
       return response.data
     }
-    fetchUsersExceptCurrent().then(response => setUsers(response));
+    fetchUsers().then(response => setUsers(response));
 
 
     socket.on('users', (users: any) => {
@@ -62,11 +79,12 @@ const Chat = () => {
   }, [messages]);
 
   const sendMessage = async () => {
-    if (!messageText) return
+    if (!messageInput) return
+    if(!selectedUser) return
 
     console.log("emit send message")
-    const messageData = {
-      text: messageText,
+    const messageData: IMessage = {
+      text: messageInput,
       date: new Date(),
 
       senderId: currentUserId,
@@ -75,11 +93,11 @@ const Chat = () => {
     socket.emit('sendMessage', messageData);
     setMessages((prev) => [...prev, messageData]);
 
-    const data = { text: messageText, senderId: currentUserId, chatId: chat }
+    const data = { text: messageInput, senderId: currentUserId, chatId: chat }
     const response = await axios.post(`${process.env.MESSAGE_API_URL}`, data)
     console.log(response.data)
 
-    setMessageText("");
+    setMessageInput("");
   }
 
   function handleChatContainerScroll(){
@@ -95,8 +113,9 @@ const Chat = () => {
   const getUsernameById = (id: string) => users.find(i => i._id == id).username
 
 
-  const handleSelectUser = async (user: any) => {
+  const handleSelectUser = async (user: IUser) => {
 
+    console.log(user)
     setSelectedUser(user)
 
     const data = { firstId: currentUser.id, secondId: user._id }
@@ -143,23 +162,25 @@ const Chat = () => {
               <>
                 <div ref={chatContainerRef} className="border-l border-r border-[#6841F2] overflow-y-auto rounded-lg h-full py-4 px-4">
                   {
-                    messages && messages.map((messageData, index) => {
+                    messages && messages.map((messageData, index: number) => {
 
                       let isMessageBelongsCurrUser = messageData.senderId == currentUserId
                       let isSenderSamePreviousOne = messages[index - 1] ? messageData.senderId == messages[index - 1].senderId : false
                       return (
-                        <div className={`relative flex items-center ${isSenderSamePreviousOne ? "mt-1" : "mt-2"} ${isMessageBelongsCurrUser ? "justify-end" : "justify-start"}`}>
+                        <div key={index} className={`relative flex items-center ${isSenderSamePreviousOne ? "mt-1" : "mt-2"} ${isMessageBelongsCurrUser ? "justify-end" : "justify-start"}`}>
 
                           {
                             !isSenderSamePreviousOne &&
-                            <div className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"} ${messageData.date ? "mb-3" : "mb-1.5"}`}>{getUsernameById(messageData.senderId)[0].toUpperCase()}</div>
+                            <div className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"} ${messageData.date ? "mb-3" : "mb-1.5"}`}>
+                              {getUsernameById(messageData.senderId)[0].toUpperCase()}
+                            </div>
                           }
                           <div className={`leading-[0.5] ${isSenderSamePreviousOne ? isMessageBelongsCurrUser ? "me-11" : "ms-11" : ""} ${isMessageBelongsCurrUser ? "text-right" : "text-left"}`}>
                             <p className={`bg-[#D5CAFF] text-black px-4 py-1 text-lg ${isMessageBelongsCurrUser ? "rounded-tl-md rounded-bl-md" : "rounded-tr-md rounded-br-md"}`}>{messageData.text}</p>
                             {
                               messageData.date &&
                               <>
-                                <time className="text-[0.55rem] italic -mt-1" dateTime={messageData.date}>
+                                <time className="text-[0.55rem] italic -mt-1" dateTime={messageData.date.toDateString()}>
                                   {new Date(messageData.date).toLocaleTimeString()}
                                   {
                                     new Date().toDateString() !== new Date(messageData.date).toDateString()
@@ -182,9 +203,9 @@ const Chat = () => {
                 <div className="border-2 border-[#6841F2] bg-[#6841F2] flex h-16 items-stretch overflow-hidden rounded-xl mt-2">
                   <input
                     type="text"
-                    value={messageText}
+                    value={messageInput}
                     className="text-black text-lg flex-1 ps-4 pe-2 outline-none"
-                    onChange={(e) => setMessageText(e.target.value)}
+                    onChange={(e) => setMessageInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" ? sendMessage() : null}
                     placeholder="Type your message..."
                   />
@@ -206,14 +227,15 @@ const Chat = () => {
           <div className="mt-2 text-slate-800 font-medium">
 
             {
-              users.map((user: any) => {
+              users.map((user: IUser, index: number) => {
 
+                console.log(user.profilePhoto)
                 if (user._id == currentUserId) return // if self then skip this user
 
                 let isUserOnline = onlineUsers.includes(user._id)
                 let isUserSelected = user._id == selectedUser?._id
                 return (
-                  <div className={`${isUserOnline ? "text-slate-800 cursor-pointer" : "text-slate-500 italic"} ${isUserSelected ? "border-[#BCA9FF] border-2 bg-[#d2c6ff]" : "bg-[#BCA9FF]"} flex items-center gap-x-2 ps-4 mt-1.5`}
+                  <div key={index} className={`${isUserOnline ? "text-slate-800 cursor-pointer" : "text-slate-500 italic"} ${isUserSelected ? "border-[#BCA9FF] border-2 bg-[#d2c6ff]" : "bg-[#BCA9FF]"} flex items-center gap-x-2 ps-4 mt-1.5`}
                     onClick={() => handleSelectUser(user)}>
                     <FaUserCircle />
                     <span>{user.username} ({isUserOnline ? "online" : "offline"})</span>

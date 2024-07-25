@@ -36,7 +36,7 @@ const Header: React.FC = () => {
                                     <Link to="/chat">Chat</Link>
                                 </div>
                                 <div className="text-2xl font-semibold">
-                                    <Link to="/profile">Profile</Link>
+                                    <Link to="/account/profile">Account</Link>
                                 </div>
                                 <div className="relative">
                                     <span className="text-[0.65rem] text-[#cccccc] absolute -top-2 -right-2">({user.username})</span>
