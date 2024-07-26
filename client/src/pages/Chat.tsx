@@ -29,7 +29,7 @@ const Chat = () => {
   const currentUser = useAppSelector((state) => state.user)
   const currentUserId = currentUser ? currentUser.id : null
 
-  const socket = useMemo(() => io(`${process.env.API_URL}`, { extraHeaders: { userid: currentUserId } }), []);
+  const socket = useMemo(() => io(`${process.env.API_URL}`, { extraHeaders: { userid: currentUserId } }), [currentUserId]);
 
   const [chat, setChat] = useState<string>("");
 
@@ -61,6 +61,7 @@ const Chat = () => {
     });
     return () => {
       socket.off('users');
+      socket.disconnect();
     };
 
   }, [])

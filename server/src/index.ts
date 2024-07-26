@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
 
   socket.join(`room${userId}`);
 
-  socket.emit("users", socketUsers);
+  io.emit("users", socketUsers);
 
   socket.on('sendMessage', (messageData) => {
     console.log(messageData)
@@ -56,8 +56,8 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', async () => {
     console.log("user disconnected", userId);
-    socketUsers = socketUsers.filter((user: any) => user != userId)
-    socket.emit("users", socketUsers);
+    socketUsers = socketUsers.filter((user: any) => user !== userId)
+    io.emit("users", socketUsers);
   });
 });
 
