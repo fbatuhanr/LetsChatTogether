@@ -1,4 +1,4 @@
-// src/index.ts
+// Import Server Requiremets
 import express, { Express, Request, Response } from "express"
 import { Server } from "socket.io"
 import path from "path"
@@ -6,6 +6,13 @@ import dotenv from "dotenv"
 import mongoose from "mongoose"
 import bodyParser from 'body-parser'
 import cors from "cors"
+
+/* Import Routes */
+import { user } from "./features/user"
+import { chat } from "./features/chat"
+import { message } from "./features/message"
+import { auth } from './features/auth';
+import { errorHandler } from "./middleware/errorHandler"
 
 /* CONFIGURATIONS */
 dotenv.config()
@@ -34,9 +41,7 @@ const expressServer = app.listen(port, () => {
 });
 
 const io = new Server(expressServer, { cors: corsOptions });
-
 let socketUsers: any = []
-
 io.on('connection', (socket) => {
 
   const userId = socket.handshake.headers.userid
@@ -61,16 +66,14 @@ io.on('connection', (socket) => {
   });
 });
 
-
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-import { user } from "./features/user"
 app.use("/user", user);
-
-import { chat } from "./features/chat"
 app.use("/chat", chat)
-
-import { message } from "./features/message"
 app.use("/message", message)
+
+app.use('/auth', auth);
+
+app.use(errorHandler);
