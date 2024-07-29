@@ -1,7 +1,7 @@
-import { MongooseError } from "mongoose";
+import { MongooseError } from "mongoose"
 import User, { IUser } from "./user.model"
 import bcrypt from "bcryptjs"
-import { generateToken } from "../utils";
+import { generateAccessToken, generateRefreshToken, generateToken } from "../utils"
 
 
 type UserProps = {
@@ -13,11 +13,11 @@ type UserProps = {
 }
 
 async function getAll() {
-  return User.find();
+  return User.find()
 }
 
 async function get(id: string) {
-  return User.findOne({ _id: id });
+  return User.findOne({ _id: id })
 }
 
 async function login(data: UserProps) {
@@ -26,22 +26,20 @@ async function login(data: UserProps) {
 
   const result = User.findOne({ username })
     .then((user) => {
-
       if (user && user.comparePassword(password)) {
 
-        const token = generateToken({ _id: user._id, username: user.username });
+        const accessToken = generateAccessToken({username: user.username});
+        const refreshToken = generateRefreshToken({username: user.username});
 
         return {
-          token,
-          id: user._id,
-          username: user.username
+          accessToken,
+          refreshToken
         }
       }
-      return { message: 'Authentication failed. Invalid user or password.' }
     })
     .catch((err) => {
       throw err
-    });
+    })
 
   return result
 
@@ -52,9 +50,9 @@ async function signup(data: UserProps) {
   console.log(data)
 
   const newUser = new User(data)
-  newUser.hashPassword = bcrypt.hashSync(data.password, 10);
+  newUser.hashPassword = bcrypt.hashSync(data.password, 10)
 
-  return newUser.save();
+  return newUser.save()
 }
 
 async function update(id: string, file: any, data: UserProps) {
@@ -65,11 +63,11 @@ async function update(id: string, file: any, data: UserProps) {
   if (file)
     newData = { ...newData, profilePhoto: file.path }
 
-  return User.findOneAndUpdate({ _id: id }, newData);
+  return User.findOneAndUpdate({ _id: id }, newData)
 }
 
 async function remove(id: string) {
-  return User.findByIdAndDelete(id);
+  return User.findByIdAndDelete(id)
 }
 
-export { getAll, get, login, signup, update, remove };
+export { getAll, get, login, signup, update, remove }

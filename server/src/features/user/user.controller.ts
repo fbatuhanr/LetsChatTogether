@@ -21,7 +21,17 @@ async function get(req: Request, res: Response, next: NextFunction) {
 
 async function login(req: Request, res: Response, next: NextFunction) {
   try {
-    res.json(await userService.login(req.body));
+    const result = await userService.login(req.body);
+    if(!result?.accessToken || !result?.refreshToken) return
+
+    res.cookie("refreshToken", result?.refreshToken, {
+      httpOnly: true,
+      secure: false, // Geliştirme için false, üretimde true olmalı
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 gün
+    })
+    res.json(result?.accessToken);
+    
   } catch (err) {
     console.error(`Error while login`, err);
     next(err);
@@ -29,7 +39,6 @@ async function login(req: Request, res: Response, next: NextFunction) {
 }
 async function signup(req: Request, res: Response, next: NextFunction) {
   try {
-    console.log(req.body)
     res.json(await userService.signup(req.body));
   } catch (err) {
     console.error(`Error while creating the list`, err);
@@ -45,6 +54,7 @@ async function update(req: Request, res: Response, next: NextFunction) {
     next(err);
   }
 }
+// https://medium.com/@mohsinogen/simplified-guide-to-setting-up-a-global-error-handler-in-express-js-daf8dd640b69
 
 async function remove(req: Request, res: Response, next: NextFunction) {
   try {
