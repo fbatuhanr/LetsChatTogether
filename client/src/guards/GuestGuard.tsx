@@ -3,9 +3,9 @@ import { Navigate } from "react-router-dom";
 
 export const GuestGuard = ({ children }: { children: React.ReactNode }) => {
 
-    const user = useAppSelector((state) => state.user)
+    const auth = useAppSelector((state) => state.auth)
 
-    if (user.username && user.token) {
+    if (auth.accessToken) {
         return <Navigate to="/" />
     }
 

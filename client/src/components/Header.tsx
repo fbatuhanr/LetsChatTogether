@@ -1,16 +1,16 @@
 import { Link } from "react-router-dom"
-import { useAppDispatch, useAppSelector } from "../redux/hooks"
-import { clearUser } from "../redux/features/UserSlice";
+import { useAppSelector } from "../redux/hooks"
+import useAuthentication from "../hooks/useAuthentication"
 
 const Header: React.FC = () => {
 
-    const user = useAppSelector((state) => state.user)
-    console.log(user)
-    const dispatch = useAppDispatch();
+    const { logoutCall } = useAuthentication()
 
-    const handleLogout = () => {
+    const auth = useAppSelector((state) => state.auth)
+    console.log(auth)
 
-        dispatch(clearUser());
+    const handleLogout = async() => {
+        await logoutCall()
     }
 
     return (
@@ -21,7 +21,7 @@ const Header: React.FC = () => {
                         <Link to="/">Let's Chat Together</Link>
                     </div>
                     {
-                        !user.token || !user.username ?
+                        !auth.accessToken ?
                             <>
                                 <div className="text-2xl font-semibold">
                                     <Link to="/login">Login</Link>
@@ -39,7 +39,7 @@ const Header: React.FC = () => {
                                     <Link to="/account/profile">Account</Link>
                                 </div>
                                 <div className="relative">
-                                    <span className="text-[0.65rem] text-[#cccccc] absolute -top-2 -right-2">({user.username})</span>
+                                    <span className="text-[0.65rem] text-[#cccccc] absolute -top-2 -right-2">()</span>
                                     <button type="button" onClick={handleLogout} className="text-2xl font-semibold text-[#F52525]">Logout</button>
                                 </div>
                             </>

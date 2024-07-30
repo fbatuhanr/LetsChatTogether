@@ -1,7 +1,7 @@
 import { MongooseError } from "mongoose"
 import User, { IUser } from "./user.model"
 import bcrypt from "bcryptjs"
-import { generateAccessToken, generateRefreshToken } from "../../services/auth.service"
+import { generateAccessToken, generateRefreshToken } from "../auth/auth.service"
 
 
 type UserProps = {
@@ -28,8 +28,8 @@ async function login(data: UserProps) {
     .then((user) => {
       if (user && user.comparePassword(password)) {
 
-        const accessToken = generateAccessToken(user._id.toString());
-        const refreshToken = generateRefreshToken(user._id.toString());
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
 
         return { accessToken, refreshToken }
       }
@@ -42,6 +42,8 @@ async function login(data: UserProps) {
     })
 
   return result
+}
+async function logout(){
 
 }
 
@@ -70,4 +72,4 @@ async function remove(id: string) {
   return User.findByIdAndDelete(id)
 }
 
-export { getAll, get, login, signup, update, remove }
+export { getAll, get, login, logout, signup, update, remove }

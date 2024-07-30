@@ -4,8 +4,9 @@ import { Server } from "socket.io"
 import path from "path"
 import dotenv from "dotenv"
 import mongoose from "mongoose"
-import bodyParser from 'body-parser'
 import cors from "cors"
+import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
 
 /* Import Routes */
 import { user } from "./features/user"
@@ -26,13 +27,16 @@ const app: Express = express();
 
 const port = process.env.PORT || 3001;
 const corsOptions = {
-  origin: "http://localhost:5173"
+  origin: "http://localhost:5173",
+  credentials: true
 }
 
 app.use(cors(corsOptions));
 
 app.use(bodyParser.json({ limit: "100mb" }))
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }))
+
+app.use(cookieParser());
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 

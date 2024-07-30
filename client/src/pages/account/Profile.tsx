@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useAppSelector } from '../../redux/hooks'
 import { useForm, SubmitHandler, Controller } from "react-hook-form"
 import { ErrorMessage } from "@hookform/error-message"
-import axios from 'axios'
 import Datepicker from "tailwind-datepicker-react"
+
+import useAxios from '../../hooks/useAxios'
+import { jwtDecode } from "jwt-decode"
 
 interface IProfileInput {
     name: string,
@@ -15,9 +17,15 @@ interface IProfileInput {
 }
 export const Profile = () => {
 
-    const user = useAppSelector((state) => state.user)
-    const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false)
+    const axiosInstance = useAxios()
 
+    const auth = useAppSelector((state) => state.auth)
+    console.log(auth)
+
+    const { userId } = jwtDecode(auth.accessToken)
+    console.log(userId)
+
+    const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false)
     const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<IProfileInput>()
 
     const onSubmit: SubmitHandler<IProfileInput> = async (data) => {
@@ -34,7 +42,7 @@ export const Profile = () => {
         console.log(newData)
 
         const headers = { 'Content-Type': 'multipart/form-data' };
-        const response = await axios.put(`${process.env.API_URL}/user/${user.id}`, newData, { headers })
+        const response = await axiosInstance.put(`${process.env.API_URL}/user/${user.id}`, newData, { headers })
         console.log(response.data);
         window.location.reload();
     }
@@ -42,22 +50,22 @@ export const Profile = () => {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await axios.get(`${process.env.API_URL}/user/${user.id}`)
+                const response = await axiosInstance.get(`${process.env.API_URL}/user/${userId}`)
                 console.log(response.data)
 
                 reset({
                     ...response.data,
-                    dateOfBirth: response.data.dateOfBirth ? new Date(response.data.dateOfBirth) : null,
-                });
+                    dateOfBirth: response.data.dateOfBirth ? new Date(response.data.dateOfBirth) : null
+                })
 
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data:', error)
             }
         }
-        fetchData();
+        fetchData()
     }, [reset])
 
-    const watchProfilePhoto = watch('profilePhoto');
+    const watchProfilePhoto = watch('profilePhoto')
     useEffect(() => {
         console.log(watchProfilePhoto)
     }, [watchProfilePhoto])

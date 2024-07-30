@@ -3,9 +3,9 @@ import { Navigate } from "react-router-dom";
 
 export const UserGuard = ({ children }: { children: React.ReactNode }) => {
 
-    const user = useAppSelector((state) => state.user)
+    const auth = useAppSelector((state) => state.auth)
 
-    if (!user.token || !user.username) {
+    if (!auth.accessToken) {
         return <Navigate to="/login" />
     }
 

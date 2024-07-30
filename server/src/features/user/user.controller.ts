@@ -29,12 +29,12 @@ async function login(req: Request, res: Response, next: NextFunction) {
 
       res.cookie("refreshToken", result.refreshToken, {
         httpOnly: true,
-        secure: false, // Set to false for development, true for production.
+        secure: process.env.NODE_ENV === 'production',
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       })
       return res.status(200).json({
-        message: 'Login successful!',
+        message: 'Login successful!!!',
         accessToken: result.accessToken
       })
     }
@@ -46,6 +46,17 @@ async function login(req: Request, res: Response, next: NextFunction) {
     next(err);
   }
 }
+
+async function logout(req: Request, res: Response, next: NextFunction) {
+  try {
+    await userService.logout(); // Logout işlemi için service fonksiyonunu çağır
+    res.clearCookie('refreshToken'); // Refresh token çerezini temizle
+    return res.status(200).json({ message: 'Logged out successfully' });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function signup(req: Request, res: Response, next: NextFunction) {
   try {
     res.json(await userService.signup(req.body));
@@ -74,4 +85,4 @@ async function remove(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { getAll, get, login, signup, update, remove }
+export { getAll, get, login, logout, signup, update, remove }

@@ -11,14 +11,14 @@ import {
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
-import UserSlice from './features/UserSlice'
+import authSlice from './features/authSlice'
 
 const persistConfig = {
   key: 'persist',
   storage,
 }
 const rootReducer = combineReducers({
-  user: UserSlice
+  auth: authSlice
 })
 
 const makeConfiguredStore = () =>

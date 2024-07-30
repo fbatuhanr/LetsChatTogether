@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
 import { useAppDispatch } from '../redux/hooks';
-import axios from 'axios';
 import { toast } from 'react-toastify';
-import { setUser } from '../redux/features/UserSlice';
+import { setAccessToken, clearAccessToken } from '../redux/features/authSlice';
+import useAxios from './useAxios';
 
 const useAuthentication = () => {
 
+    const axiosInstance = useAxios()
     const dispatch = useAppDispatch();
 
     const loginCall = async (username: string, password: string) => {
@@ -13,24 +13,23 @@ const useAuthentication = () => {
         toast.promise(
             new Promise((resolve, reject) =>
 
-                axios.post(`${process.env.USER_API_URL}/login`, {
+                axiosInstance.post(`${process.env.USER_API_URL}/login`, {
                     username,
                     password
                 })
                     .then((response) => {
-                        console.log(response.data);
-
-                        const { message } = response.data
-                        if (message) {
-                            toast.error(message)
+                        console.log(response);
+                        
+                        if (response.status === 404 || response.status === 500) {
+                            toast.error(response.data.message)
                             reject()
                             return
                         }
-
-                        const { token, id, username } = response.data
-                        dispatch(setUser({ token, id, username }));
-
-                        resolve(true)
+                        if (response.status === 200) {
+                            dispatch(setAccessToken(response.data.accessToken));
+                            toast.success(response.data.message)
+                            resolve(true)
+                        }
                     })
                     .catch((error) => {
                         console.log(error)
@@ -50,7 +49,7 @@ const useAuthentication = () => {
 
         return toast.promise(
             new Promise((resolve, reject) =>
-                axios.post(`${process.env.USER_API_URL}/sign-up`, {
+                axiosInstance.post(`${process.env.USER_API_URL}/sign-up`, {
                     username,
                     email,
                     password
@@ -83,7 +82,13 @@ const useAuthentication = () => {
         )
     }
 
-    return { loginCall, signupCall }
+    const logoutCall = async () => {
+
+        await axiosInstance.post(`${process.env.USER_API_URL}/logout`)
+        dispatch(clearAccessToken());
+    }
+
+    return { loginCall, signupCall, logoutCall }
 }
 
 export default useAuthentication
