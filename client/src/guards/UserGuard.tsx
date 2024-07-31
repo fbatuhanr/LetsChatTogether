@@ -1,14 +1,7 @@
-import { useAppSelector } from "../redux/hooks";
-import { Navigate } from "react-router-dom";
+import withAuthCheck from "./withAuthCheck";
 
-export const UserGuard = ({ children }: { children: React.ReactNode }) => {
+const UserGuard = ({ children }: { children: React.ReactNode }) => {
+  return <>{children}</>;
+};
 
-    const auth = useAppSelector((state) => state.auth)
-
-    if (!auth.accessToken) {
-        return <Navigate to="/login" />
-    }
-
-    return <>{children}</>
-}
-export default UserGuard
+export default withAuthCheck(UserGuard, false, "/login");

@@ -1,5 +1,5 @@
 
-const Footer:React.FC = () => {
+const Footer: React.FC = () => {
     return (
         <footer className="mt-32 bg-gradient-to-t from-[#6841F2] to-[#0D0D0D1a] min-h-[200px]">
             <div className="max-w-4xl px-12 mx-auto">
