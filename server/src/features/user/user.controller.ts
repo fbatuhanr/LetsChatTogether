@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import * as userService from './user.service'
+import { CustomRequest } from "../../middleware/authMiddleware";
+import ms from "ms";
 
 async function getAll(req: Request, res: Response, next: NextFunction) {
   try {
@@ -10,8 +12,13 @@ async function getAll(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function get(req: Request, res: Response, next: NextFunction) {
+async function get(req: CustomRequest, res: Response, next: NextFunction) {
   try {
+    console.log(req.user.userId)
+    console.log(req.params.id)
+    if (req.user.userId !== req.params.id) { // authMiddleware tarafından başarıyla decoded edilmişse req.user'a decoded bilgileri döndürülür.
+      return res.status(403).json({ message: 'Access denied' });
+    }
     res.json(await userService.get(req.params.id));
   } catch (err) {
     console.error(`Error while getting the list`, err);
@@ -29,10 +36,10 @@ async function login(req: Request, res: Response, next: NextFunction) {
 
       res.cookie("refreshToken", result.refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      })
+        secure: process.env.NODE_ENV === 'production', // its true when production and its false development mode
+        sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict", // its none when production mode because server and client maybe based on different domains, its strict when development mode because server and client on same domain (localhost), only ports are different
+        maxAge: ms(process.env.REFRESH_TOKEN_EXPIRATION!)
+      });
       return res.status(200).json({
         message: 'Login successful!!!',
         accessToken: result.accessToken

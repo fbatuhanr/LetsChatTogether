@@ -2,10 +2,12 @@ import { useState } from "react"
 import HumanImg3 from "../../assets/human-3.png"
 
 import useAuthentication from "../../hooks/useAuthentication"
+import { useNavigate } from "react-router-dom"
 
 export const Login: React.FC = () => {
 
-    const { loginCall } = useAuthentication();
+    const { loginCall } = useAuthentication()
+    const navigate = useNavigate()
 
     const [username, setUsername] = useState<string>("")
     const [password, setPassword] = useState<string>("")
@@ -14,6 +16,7 @@ export const Login: React.FC = () => {
         e.preventDefault();
 
         await loginCall(username, password)
+        navigate('/');
     }
     return (
         <form onSubmit={handleSubmit}>

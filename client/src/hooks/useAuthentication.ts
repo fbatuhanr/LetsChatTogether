@@ -1,12 +1,13 @@
-import { useAppDispatch } from '../redux/hooks';
-import { toast } from 'react-toastify';
-import { setAccessToken, clearAccessToken } from '../redux/features/authSlice';
-import useAxios from './useAxios';
+import { useAppDispatch } from '../redux/hooks'
+import { toast } from 'react-toastify'
+import { setAccessToken, clearAccessToken } from '../redux/features/authSlice'
+import useAxios from './useAxios'
 
 const useAuthentication = () => {
 
     const axiosInstance = useAxios()
-    const dispatch = useAppDispatch();
+
+    const dispatch = useAppDispatch()
 
     const loginCall = async (username: string, password: string) => {
 

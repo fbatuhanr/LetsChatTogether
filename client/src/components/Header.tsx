@@ -1,16 +1,18 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useAppSelector } from "../redux/hooks"
 import useAuthentication from "../hooks/useAuthentication"
 
 const Header: React.FC = () => {
 
     const { logoutCall } = useAuthentication()
+    const navigate = useNavigate()
 
     const auth = useAppSelector((state) => state.auth)
     console.log(auth)
 
     const handleLogout = async() => {
         await logoutCall()
+        navigate('/');
     }
 
     return (

@@ -24,9 +24,7 @@ export const Signup: React.FC = () => {
         }
 
         const result = await signupCall(username, email, password)
-        console.log(result)
-        if(result)
-            navigate('/login', { replace: true });
+        if(result)  navigate('/login', { replace: true });
     }
     return (
         <form onSubmit={handleSubmit}>

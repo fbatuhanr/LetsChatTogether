@@ -20,10 +20,8 @@ export const Profile = () => {
     const axiosInstance = useAxios()
 
     const auth = useAppSelector((state) => state.auth)
-    console.log(auth)
-
+    
     const { userId } = jwtDecode(auth.accessToken)
-    console.log(userId)
 
     const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false)
     const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<IProfileInput>()

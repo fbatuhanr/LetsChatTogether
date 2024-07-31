@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useAppStore, useAppDispatch } from "../redux/hooks"
-import { setAccessToken } from "../redux/features/authSlice"
+import { clearAccessToken, setAccessToken } from "../redux/features/authSlice"
 
 
 const useAxios = () => {
@@ -35,8 +35,7 @@ const useAxios = () => {
         },
         async (error) => {
             const originalRequest = error.config
-            console.log(error)
-
+            //console.log(error)
             if (error.response.status === 401 && !originalRequest._retry) {
                 originalRequest._retry = true
 
@@ -47,6 +46,7 @@ const useAxios = () => {
 
                     return axiosInstance(originalRequest)
                 } catch (err) {
+                    dispatch(clearAccessToken());
                     return Promise.reject(err)
                 }
             }
