@@ -72,6 +72,8 @@ io.on('connection', (socket) => {
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
+  console.log('Cookies: ', req.cookies)
+  console.log('Signed Cookies: ', req.signedCookies)
 });
 
 app.use("/user", user);

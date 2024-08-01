@@ -29,7 +29,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const result: any = await userService.login(req.body);
     if (!result)
-      return res.status(404).json({ message: 'Authentication failed. Invalid user or password.' })
+      return res.status(404).json({ message: 'Invalid username or password!' })
 
     if (result.refreshToken && result.accessToken) {
 
@@ -40,7 +40,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
         maxAge: ms(process.env.REFRESH_TOKEN_EXPIRATION!)
       });
       return res.status(200).json({
-        message: 'Login successful!!!',
+        message: 'Login successful!',
         accessToken: result.accessToken
       })
     }

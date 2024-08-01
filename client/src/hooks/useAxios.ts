@@ -18,6 +18,8 @@ const useAxios = () => {
             const state = store.getState()
             const accessToken = state.auth.accessToken
 
+            console.log(accessToken)
+
             if (accessToken) {
                 config.headers["Authorization"] = `Bearer ${accessToken}`
             }
@@ -35,7 +37,7 @@ const useAxios = () => {
         },
         async (error) => {
             const originalRequest = error.config
-            //console.log(error)
+            // console.log(error)
             if (error.response.status === 401 && !originalRequest._retry) {
                 originalRequest._retry = true
 

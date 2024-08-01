@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useAppSelector } from "../redux/hooks"
 import useAuthentication from "../hooks/useAuthentication"
+import { jwtDecode } from "jwt-decode"
+import { DecodedToken } from "../types/decodedToken"
 
 const Header: React.FC = () => {
 
@@ -8,7 +10,7 @@ const Header: React.FC = () => {
     const navigate = useNavigate()
 
     const auth = useAppSelector((state) => state.auth)
-    console.log(auth)
+    const decodedToken = auth?.accessToken ? jwtDecode<DecodedToken>(auth.accessToken) : null
 
     const handleLogout = async () => {
         await logoutCall()
@@ -23,7 +25,7 @@ const Header: React.FC = () => {
                         <Link to="/">Let's Chat Together</Link>
                     </div>
                     {
-                        auth?.accessToken ?
+                        decodedToken ?
                             <>
                                 <div className="text-2xl font-semibold">
                                     <Link to="/chat">Chat</Link>
@@ -32,7 +34,7 @@ const Header: React.FC = () => {
                                     <Link to="/account/profile">Account</Link>
                                 </div>
                                 <div className="relative">
-                                    <span className="text-[0.65rem] text-[#cccccc] absolute -top-2 -right-2">()</span>
+                                    <span className="text-[0.65rem] text-[#cccccc] absolute -top-2 -right-2">({decodedToken.username})</span>
                                     <button type="button" onClick={handleLogout} className="text-2xl font-semibold text-[#F52525]">Logout</button>
                                 </div>
                             </>

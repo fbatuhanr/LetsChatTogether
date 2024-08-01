@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { FaUserCircle } from 'react-icons/fa'
 
-import io from 'socket.io-client';
-import axios from 'axios';
-import { useAppSelector } from '../redux/hooks';
-import { IoIosSend } from 'react-icons/io';
+import io from 'socket.io-client'
+import { IoIosSend } from 'react-icons/io'
+import useAxios from '../hooks/useAxios'
+import { useDecodedToken } from '../hooks/useDecodedToken'
 
 interface IUser {
   _id: string,
@@ -26,8 +26,10 @@ interface IMessage {
 
 const Chat = () => {
 
-  const currentUser = useAppSelector((state) => state.user)
-  const currentUserId = currentUser ? currentUser.id : null
+  const axiosInstance = useAxios()
+  const decodedToken = useDecodedToken()
+
+  const currentUserId = decodedToken.userId
 
   const socket = useMemo(() => io(`${process.env.API_URL}`, { extraHeaders: { userid: currentUserId } }), [currentUserId]);
 
@@ -47,7 +49,7 @@ const Chat = () => {
 
     const fetchUsers = async () => {
 
-      const response = await axios.get(`${process.env.USER_API_URL}`)
+      const response = await axiosInstance.get(`${process.env.USER_API_URL}`)
       console.log(response.data);
 
       return response.data
@@ -95,7 +97,7 @@ const Chat = () => {
     setMessages((prev) => [...prev, messageData]);
 
     const data = { text: messageInput, senderId: currentUserId, chatId: chat }
-    const response = await axios.post(`${process.env.MESSAGE_API_URL}`, data)
+    const response = await axiosInstance.post(`${process.env.MESSAGE_API_URL}`, data)
     console.log(response.data)
 
     setMessageInput("");
@@ -120,8 +122,8 @@ const Chat = () => {
     console.log(user)
     setSelectedUser(user)
 
-    const data = { firstId: currentUser.id, secondId: user._id }
-    const response = await axios.post(`${process.env.CHAT_API_URL}`, data)
+    const data = { firstId: currentUserId, secondId: user._id }
+    const response = await axiosInstance.post(`${process.env.CHAT_API_URL}`, data)
     console.log(response.data);
 
     fetchUsersConversation(response.data._id, user._id)
@@ -131,7 +133,7 @@ const Chat = () => {
 
   const fetchUsersConversation = async (chatId: string, selectedUserId: string) => {
 
-    const response = await axios.get(`${process.env.MESSAGE_API_URL}/${chatId}`)
+    const response = await axiosInstance.get(`${process.env.MESSAGE_API_URL}/${chatId}`)
     console.log(response.data)
     console.log("current user: ", currentUserId)
     console.log("selected user: ", selectedUserId)

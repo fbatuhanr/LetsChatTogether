@@ -28,8 +28,8 @@ async function login(data: UserProps) {
     .then((user) => {
       if (user && user.comparePassword(password)) {
 
-        const accessToken = generateAccessToken(user._id);
-        const refreshToken = generateRefreshToken(user._id);
+        const accessToken = generateAccessToken({userId: user._id, username: user.username});
+        const refreshToken = generateRefreshToken({userId: user._id, username: user.username});
 
         return { accessToken, refreshToken }
       }

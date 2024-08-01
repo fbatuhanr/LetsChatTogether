@@ -1,52 +1,52 @@
 import { useAppDispatch } from '../redux/hooks'
 import { toast } from 'react-toastify'
 import { setAccessToken, clearAccessToken } from '../redux/features/authSlice'
+import axios from 'axios'
 import useAxios from './useAxios'
 
 const useAuthentication = () => {
 
+    const dispatch = useAppDispatch()
     const axiosInstance = useAxios()
 
-    const dispatch = useAppDispatch()
+    const loginCall = (username: string, password: string) => {
 
-    const loginCall = async (username: string, password: string) => {
-
-        toast.promise(
-            new Promise((resolve, reject) =>
-
-                axiosInstance.post(`${process.env.USER_API_URL}/login`, {
-                    username,
-                    password
-                })
-                    .then((response) => {
-                        console.log(response);
-                        
-                        if (response.status === 404 || response.status === 500) {
-                            toast.error(response.data.message)
-                            reject()
-                            return
-                        }
-                        if (response.status === 200) {
-                            dispatch(setAccessToken(response.data.accessToken));
-                            toast.success(response.data.message)
-                            resolve(true)
-                        }
+        return toast.promise(
+            new Promise(async (resolve, reject) => {
+                try {
+                    const response = await axiosInstance.post(`${process.env.USER_API_URL}/login`, {
+                        username,
+                        password
                     })
-                    .catch((error) => {
-                        console.log(error)
-                        toast.error('Request error!')
-                        reject()
-                    })
+
+                    if (response.status === 200) {
+                        dispatch(setAccessToken(response.data.accessToken));
+                        resolve(response.data.message);
+                    }
+                    else {
+                        reject(response.data.message || 'Unknown error');
+                    }
+
+                } catch (error: unknown) {
+                    
+                    if (axios.isAxiosError(error) && error.response) {
+                        reject(error.response.data?.message || 'Request failed')
+                    }
+                    else {
+                        reject('An unexpected error occurred')
+                    }
+                }
+            }
             ),
             {
                 pending: 'Information is being checked...',
-                success: 'Login successful!',
-                error: 'Login failed!'
+                success: { render({ data }) { return `${data}` } },
+                error: { render({ data }) { return typeof data === 'string' ? data : 'Login failed!' } }
             }
         )
     }
 
-    const signupCall = async (username: string, email: string, password: string) => {
+    const signupCall = (username: string, email: string, password: string) => {
 
         return toast.promise(
             new Promise((resolve, reject) =>

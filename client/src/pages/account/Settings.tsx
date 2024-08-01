@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import { useAppSelector } from '../../redux/hooks'
-import { useForm, SubmitHandler, Controller } from "react-hook-form"
+import { useEffect } from 'react'
+import { useForm, SubmitHandler } from "react-hook-form"
 import { ErrorMessage } from "@hookform/error-message"
-import axios from 'axios'
-import Datepicker from "tailwind-datepicker-react"
+
+import { useDecodedToken } from '../../hooks/useDecodedToken'
+import useAxios from '../../hooks/useAxios'
 
 interface ISettingsInput {
     email: string,
@@ -11,14 +11,15 @@ interface ISettingsInput {
 }
 export const Settings = () => {
 
-    const user = useAppSelector((state) => state.user)
+    const axiosInstance = useAxios()
+    const decodedToken = useDecodedToken()
 
     const { register, formState: { errors }, handleSubmit, reset } = useForm<ISettingsInput>()
 
     const onSubmit: SubmitHandler<ISettingsInput> = async (data) => {
         console.log(data)
         try {
-            const response = await axios.put(`${process.env.API_URL}/user/${user.id}`, data)
+            const response = await axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, data)
             console.log(response.data)
             // window.location.reload();
 
@@ -30,7 +31,7 @@ export const Settings = () => {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await axios.get(`${process.env.API_URL}/user/${user.id}`)
+                const response = await axiosInstance.get(`${process.env.API_URL}/user/${decodedToken.userId}`)
                 console.log(response.data)
 
                 reset({
@@ -50,7 +51,7 @@ export const Settings = () => {
 
             <div className="flex flex-col gap-y-1">
                 <label htmlFor="username" className="text-2xl font-semibold ps-2">Username</label>
-                <input type="text" id="username" value={user.username} className="bg-[#402798] border-[#20183F] border-2 rounded-2xl px-6 py-4 disabled:text-[#999999] disabled:cursor-not-allowed" readOnly disabled />
+                <input type="text" id="username" value={decodedToken.username} className="bg-[#402798] border-[#20183F] border-2 rounded-2xl px-6 py-4 disabled:text-[#999999] disabled:cursor-not-allowed" readOnly disabled />
             </div>
 
             <div className="flex flex-col gap-y-1">

@@ -1,27 +1,23 @@
-import React, { useEffect, useState } from 'react'
-import { useAppSelector } from '../../redux/hooks'
+import { useEffect, useState } from 'react'
 import { useForm, SubmitHandler, Controller } from "react-hook-form"
 import { ErrorMessage } from "@hookform/error-message"
 import Datepicker from "tailwind-datepicker-react"
 
 import useAxios from '../../hooks/useAxios'
-import { jwtDecode } from "jwt-decode"
+import { useDecodedToken } from '../../hooks/useDecodedToken'
 
 interface IProfileInput {
     name: string,
     surname: string,
     gender: 'male' | 'female' | 'other',
     dateOfBirth?: Date,
-    profilePhoto?: FileList | string | null,
+    profilePhoto?: File | FileList | string | null,
     about: string | null
 }
 export const Profile = () => {
 
     const axiosInstance = useAxios()
-
-    const auth = useAppSelector((state) => state.auth)
-
-    const { userId }: { userId: string } = auth.accessToken ? jwtDecode(auth.accessToken) : { userId: '' };
+    const decodedToken = useDecodedToken()
 
     const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false)
     const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<IProfileInput>()
@@ -40,7 +36,7 @@ export const Profile = () => {
         console.log(newData)
 
         const headers = { 'Content-Type': 'multipart/form-data' };
-        const response = await axiosInstance.put(`${process.env.API_URL}/user/${user.id}`, newData, { headers })
+        const response = await axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, newData, { headers })
         console.log(response.data);
         window.location.reload();
     }
@@ -48,7 +44,7 @@ export const Profile = () => {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await axiosInstance.get(`${process.env.API_URL}/user/${userId}`)
+                const response = await axiosInstance.get(`${process.env.API_URL}/user/${decodedToken.userId}`)
                 console.log(response.data)
 
                 reset({
@@ -175,7 +171,7 @@ export const Profile = () => {
                         {...register("profilePhoto")} multiple={false}
                     />
                     {
-                        watchProfilePhoto?.length &&
+                        ((watchProfilePhoto instanceof FileList || typeof watchProfilePhoto === 'string') && watchProfilePhoto.length) &&
                         <div className="absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
                             <img className="h-full rounded-r-xl"
                                 src={

@@ -14,9 +14,9 @@ export const Login: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        await loginCall(username, password)
-        navigate('/');
+        
+        const result = await loginCall(username, password)
+        if(result) navigate('/')
     }
     return (
         <form onSubmit={handleSubmit}>
