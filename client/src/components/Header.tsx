@@ -10,7 +10,7 @@ const Header: React.FC = () => {
     const auth = useAppSelector((state) => state.auth)
     console.log(auth)
 
-    const handleLogout = async() => {
+    const handleLogout = async () => {
         await logoutCall()
         navigate('/');
     }
@@ -23,16 +23,7 @@ const Header: React.FC = () => {
                         <Link to="/">Let's Chat Together</Link>
                     </div>
                     {
-                        !auth.accessToken ?
-                            <>
-                                <div className="text-2xl font-semibold">
-                                    <Link to="/login">Login</Link>
-                                </div>
-                                <div className="text-2xl font-semibold">
-                                    <Link to="/signup">Sign up</Link>
-                                </div>
-                            </>
-                            :
+                        auth?.accessToken ?
                             <>
                                 <div className="text-2xl font-semibold">
                                     <Link to="/chat">Chat</Link>
@@ -43,6 +34,15 @@ const Header: React.FC = () => {
                                 <div className="relative">
                                     <span className="text-[0.65rem] text-[#cccccc] absolute -top-2 -right-2">()</span>
                                     <button type="button" onClick={handleLogout} className="text-2xl font-semibold text-[#F52525]">Logout</button>
+                                </div>
+                            </>
+                            :
+                            <>
+                                <div className="text-2xl font-semibold">
+                                    <Link to="/login">Login</Link>
+                                </div>
+                                <div className="text-2xl font-semibold">
+                                    <Link to="/signup">Sign up</Link>
                                 </div>
                             </>
                     }

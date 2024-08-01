@@ -1,10 +1,11 @@
 import express from 'express'
+import authenticateToken from '../../middleware/authMiddleware'
 import * as messageController from './message.controller'
 
 const router = express.Router()
 
-router.post("/", messageController.createMessage);
-router.get("/:chatId", messageController.getMessage);
+router.post("/", authenticateToken, messageController.createMessage);
+router.get("/:chatId", authenticateToken, messageController.getMessage);
 
 
 export default router

@@ -14,8 +14,7 @@ async function getAll(req: Request, res: Response, next: NextFunction) {
 
 async function get(req: CustomRequest, res: Response, next: NextFunction) {
   try {
-    console.log(req.user.userId)
-    console.log(req.params.id)
+    
     if (req.user.userId !== req.params.id) { // authMiddleware tarafından başarıyla decoded edilmişse req.user'a decoded bilgileri döndürülür.
       return res.status(403).json({ message: 'Access denied' });
     }

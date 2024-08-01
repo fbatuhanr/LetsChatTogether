@@ -44,7 +44,7 @@ async function login(data: UserProps) {
   return result
 }
 async function logout(){
-
+  return
 }
 
 async function signup(data: UserProps) {

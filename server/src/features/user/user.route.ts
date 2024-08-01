@@ -1,7 +1,7 @@
-import express from 'express';
+import express from 'express'
+import authenticateToken from '../../middleware/authMiddleware'
+import multer from 'multer'
 import * as userController from './user.controller'
-import multer from 'multer';
-import authenticateToken from '../../middleware/authMiddleware';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -19,12 +19,12 @@ router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.post('/sign-up', userController.signup);
 
-router.get('/', userController.getAll);
+router.get('/', authenticateToken, userController.getAll);
 
 router.get('/:id', authenticateToken, userController.get);
 
-router.put('/:id', upload.single('profilePhoto'), userController.update);
+router.put('/:id', authenticateToken, upload.single('profilePhoto'), userController.update);
 
-router.delete('/:id', userController.remove);
+router.delete('/:id', authenticateToken, userController.remove);
 
 export default router;
