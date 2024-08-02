@@ -17,7 +17,10 @@ async function getAll() {
 }
 
 async function get(id: string) {
-  return User.findOne({ _id: id })
+  return User.findById(id)
+}
+async function getByUsername(username: string) {
+  return User.findOne({ username })
 }
 
 async function login(data: UserProps) {
@@ -72,4 +75,4 @@ async function remove(id: string) {
   return User.findByIdAndDelete(id)
 }
 
-export { getAll, get, login, logout, signup, update, remove }
+export { getAll, get, getByUsername, login, logout, signup, update, remove }

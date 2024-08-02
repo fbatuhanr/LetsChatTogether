@@ -1,16 +1,12 @@
 import { Link, useNavigate } from "react-router-dom"
-import { useAppSelector } from "../redux/hooks"
 import useAuthentication from "../hooks/useAuthentication"
-import { jwtDecode } from "jwt-decode"
-import { DecodedToken } from "../types/decodedToken"
+import { useDecodedToken } from "../hooks/useDecodedToken"
 
 const Header: React.FC = () => {
 
-    const { logoutCall } = useAuthentication()
+    const decodedToken = useDecodedToken()
     const navigate = useNavigate()
-
-    const auth = useAppSelector((state) => state.auth)
-    const decodedToken = auth?.accessToken ? jwtDecode<DecodedToken>(auth.accessToken) : null
+    const { logoutCall } = useAuthentication()
 
     const handleLogout = async () => {
         await logoutCall()
@@ -25,15 +21,20 @@ const Header: React.FC = () => {
                         <Link to="/">Let's Chat Together</Link>
                     </div>
                     {
-                        decodedToken ?
+                        decodedToken?.username ?
                             <>
                                 <div className="text-2xl font-semibold">
                                     <Link to="/chat">Chat</Link>
                                 </div>
                                 <div className="text-2xl font-semibold">
+                                    <Link to={`/user/${decodedToken.username}`} className="underline">
+                                        {decodedToken.username}
+                                    </Link>
+                                </div>
+                                <div className="text-2xl font-semibold">
                                     <Link to="/account/profile">Account</Link>
                                 </div>
-                                <div className="relative">
+                                <div className="relative ml-4">
                                     <span className="text-[0.65rem] text-[#cccccc] absolute -top-2 -right-2">({decodedToken.username})</span>
                                     <button type="button" onClick={handleLogout} className="text-2xl font-semibold text-[#F52525]">Logout</button>
                                 </div>

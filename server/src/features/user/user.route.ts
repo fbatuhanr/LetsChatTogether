@@ -19,8 +19,8 @@ router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.post('/sign-up', userController.signup);
 
+router.get('/search', userController.getByUsername);
 router.get('/', authenticateToken, userController.getAll);
-
 router.get('/:id', authenticateToken, userController.get);
 
 router.put('/:id', authenticateToken, upload.single('profilePhoto'), userController.update);

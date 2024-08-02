@@ -24,6 +24,16 @@ async function get(req: CustomRequest, res: Response, next: NextFunction) {
     next(err);
   }
 }
+async function getByUsername(req: CustomRequest, res: Response, next: NextFunction) {
+  try {
+    console.log(req)
+    const username = req.query.username as string
+    res.json(await userService.getByUsername(username));
+  } catch (err) {
+    console.error(`Error while getByUsername`, err);
+    next(err);
+  }
+}
 
 async function login(req: Request, res: Response, next: NextFunction) {
   try {
@@ -91,4 +101,4 @@ async function remove(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { getAll, get, login, logout, signup, update, remove }
+export { getAll, get, getByUsername, login, logout, signup, update, remove }

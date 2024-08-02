@@ -50,20 +50,25 @@ const Chat = () => {
     const fetchUsers = async () => {
 
       const response = await axiosInstance.get(`${process.env.USER_API_URL}`)
-      console.log(response.data);
-
       return response.data
     }
-    fetchUsers().then(response => setUsers(response));
+    fetchUsers().then(response => setUsers(response))
 
+
+    const activeChats = async () => {
+
+      const response = await axiosInstance.get(`${process.env.CHAT_API_URL}/${currentUserId}`)
+       console.log(response.data)
+    }
+    activeChats()
 
     socket.on('users', (users: any) => {
       console.log(users)
       setOnlineUsers(users)
     });
     return () => {
-      socket.off('users');
-      socket.disconnect();
+      socket.off('users')
+      socket.disconnect()
     };
 
   }, [])
@@ -239,7 +244,6 @@ const Chat = () => {
             {
               users.map((user: IUser, index: number) => {
 
-                console.log(user.profilePhoto)
                 if (user._id == currentUserId) return // if self then skip this user
 
                 let isUserOnline = onlineUsers.includes(user._id)
