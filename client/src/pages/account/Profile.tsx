@@ -14,7 +14,7 @@ interface IProfileInput {
     profilePhoto?: File | FileList | string | null,
     about: string | null
 }
-export const Profile = () => {
+const Profile = () => {
 
     const axiosInstance = useAxios()
     const decodedToken = useDecodedToken()

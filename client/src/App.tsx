@@ -23,7 +23,7 @@ import { GuestGuard, UserGuard } from './guards'
 import Chat from './pages/Chat'
 
 import { Layout as AccountLayout, Profile, Settings } from './pages/account'
-import { UserProfile } from './pages/user'
+import { User } from './pages/user'
 
 function App() {
 
@@ -41,7 +41,7 @@ function App() {
 
               <Route path="/chat" element={<UserGuard><Chat /></UserGuard>} />
 
-              <Route path="/user/:username" element={<UserProfile />} />
+              <Route path="/user/:username" element={<User />} />
 
               <Route path="/account" element={<UserGuard><AccountLayout /></UserGuard>}>
                 <Route path="profile" element={<Profile />} />

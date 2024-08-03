@@ -9,7 +9,7 @@ interface ISettingsInput {
     email: string,
     password: string
 }
-export const Settings = () => {
+const Settings = () => {
 
     const axiosInstance = useAxios()
     const decodedToken = useDecodedToken()
