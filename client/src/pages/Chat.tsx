@@ -6,6 +6,9 @@ import { IoIosSend } from 'react-icons/io'
 import useAxios from '../hooks/useAxios'
 import { useDecodedToken } from '../hooks/useDecodedToken'
 
+import cosmicButterfly from "../assets/background/cosmic-butterfly.png"
+import cosmicButterflyRight from "../assets/background/cosmic-butterfly-right.png"
+
 interface IUser {
   _id: string,
   username: string,
@@ -58,7 +61,7 @@ const Chat = () => {
     const activeChats = async () => {
 
       const response = await axiosInstance.get(`${process.env.CHAT_API_URL}/${currentUserId}`)
-       console.log(response.data)
+      console.log(response.data)
     }
     activeChats()
 
@@ -159,12 +162,11 @@ const Chat = () => {
 
 
   return (
-    <div className="py-8 flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
+    <div className="relative flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
       </div>
-      <div className="flex w-full max-w-4xl h-[425px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
-
+      <div className="z-10 flex w-full max-w-4xl h-[425px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
         <div className="basis-4/5 px-12 pt-8 pb-24">
           {
             selectedUser ?
@@ -184,9 +186,9 @@ const Chat = () => {
                               {
                                 getPhotoById(messageData.senderId)
                                   ?
-                                    <img src={`${process.env.API_URL}/${getPhotoById(messageData.senderId)!}`} />
+                                  <img src={`${process.env.API_URL}/${getPhotoById(messageData.senderId)!}`} />
                                   :
-                                    getUsernameById(messageData.senderId)![0].toUpperCase()
+                                  getUsernameById(messageData.senderId)![0].toUpperCase()
                               }
                             </div>
                           }
@@ -261,7 +263,14 @@ const Chat = () => {
           </div>
 
         </div>
+      </div>
 
+      <div className="absolute top-0 -left-8">
+        <img src={cosmicButterfly} className="w-[40rem] h-auto" />
+      </div>
+
+      <div className="absolute top-0 right-20">
+        <img src={cosmicButterflyRight} className="w-[34rem] h-auto" />
       </div>
     </div>
   )

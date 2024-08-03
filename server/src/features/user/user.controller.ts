@@ -26,7 +26,6 @@ async function get(req: CustomRequest, res: Response, next: NextFunction) {
 }
 async function getByUsername(req: CustomRequest, res: Response, next: NextFunction) {
   try {
-    console.log(req)
     const username = req.query.username as string
     res.json(await userService.getByUsername(username));
   } catch (err) {

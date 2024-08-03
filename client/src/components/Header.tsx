@@ -27,7 +27,7 @@ const Header: React.FC = () => {
                                     <Link to="/chat">Chat</Link>
                                 </div>
                                 <div className="text-2xl font-semibold">
-                                    <Link to={`/user/${decodedToken.username}`} className="underline">
+                                    <Link to={`/user/${decodedToken.username}`}>
                                         {decodedToken.username}
                                     </Link>
                                 </div>

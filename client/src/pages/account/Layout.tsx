@@ -5,7 +5,7 @@ import { IoSettings } from 'react-icons/io5'
 export const Layout = () => {
 
     return (
-        <div className="py-8 flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
+        <div className="flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
             <div>
                 <h1 className="text-5xl font-bold">Account</h1>
             </div>

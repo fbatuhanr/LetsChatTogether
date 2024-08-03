@@ -48,8 +48,6 @@ export const getZodiacSymbol = (sign: ZodiacSign): JSX.Element => {
 
 export const getZodiacSign = (date: Date): ZodiacSign => {
 
-  date = new Date(date)
-
   const day = date.getDate()
   const month = date.getMonth() + 1
 
@@ -67,16 +65,4 @@ export const getZodiacSign = (date: Date): ZodiacSign => {
   if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return ZodiacSign.Pisces;
 
   throw new Error("Invalid date");
-};
-
-
-export const getZodiac = (date: Date): JSX.Element => {
-
-  const zodiacSign = getZodiacSign(date)
-  const zodiacSymbol = getZodiacSymbol(zodiacSign)
-
-  return <div className="flex items-center">
-    <span>{zodiacSymbol}</span>
-    <span>{zodiacSign}</span>
-  </div>
 }

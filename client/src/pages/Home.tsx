@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom'
 const Home: React.FC = () => {
     return (
         <div>
-            <section className="pt-8 px-6 md:pt-0 md:px-12 md:bg-none bg-hero bg-no-repeat bg-[top_right] bg-[length:256px] max-w-6xl mx-auto flex flex-col md:flex-row">
+            <section className="pt-4 px-6 md:pt-0 md:px-12 md:bg-none bg-hero bg-no-repeat bg-[top_right] bg-[length:256px] max-w-6xl mx-auto flex flex-col md:flex-row">
                 <div className="basis-full md:basis-1/2 flex flex-col justify-center md:ps-6">
                     <h3 className="text-3xl font-thin">
                         <Typewriter
