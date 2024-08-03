@@ -1,52 +1,28 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import useAxios from "../../hooks/useAxios";
-import { useDecodedToken } from "../../hooks/useDecodedToken";
-import { calculateAge } from "../../utils/dateUtils";
-import { getZodiac, getZodiacSign, getZodiacSymbol } from "../../utils/zodiacUtils";
-import { getGenderSign } from "../../utils/genderUtils";
+import { useDecodedToken } from "../../hooks/useDecodedToken"
 import MessageImg from "../../assets/message.png"
 
-import { MdCake } from "react-icons/md";
-import Zodiac from "../../components/user/Zodiac";
-import Age from "../../components/user/Age";
-import Gender from "../../components/user/Gender";
-import BirthDate from "../../components/user/BirthDate";
+import { Age, Zodiac, Gender, BirthDate } from "../../components/user"
 
 import cosmicButterFlyLeft from "../../assets/background/cosmic-butterfly-left.png"
 
 import userAvatar from "../../assets/user-avatar.jpg"
+import useFetchUser from "../../hooks/useFetchUser";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import NotFound from "../../components/NotFound";
 
 
 const User = () => {
 
     const { username } = useParams();
-
-    const axiosInstance = useAxios();
     const decodedToken = useDecodedToken()
 
-    const [data, setData] = useState(null)
+    if (!username) return
+    const { data, loading, error } = useFetchUser(username)
 
-    useEffect(() => {
-        const fetchUserByUsername = async () => {
-            try {
-                const response = await axiosInstance.get(`${process.env.USER_API_URL}/search`, {
-                    params: { username }
-                });
-                console.log(response.data)
-
-                setData(response.data)
-
-            } catch (error) {
-                console.error('Error fetching data:', error)
-            }
-        }
-        fetchUserByUsername()
-    }, [username])
-
-
+    if (loading) return <LoadingSpinner />
+    if (!data || error) return <NotFound />
     return (
-        data &&
         <div className="relative flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
             <div>
                 <h1 className="text-5xl font-bold">{username}</h1>

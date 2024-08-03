@@ -5,24 +5,17 @@ import Datepicker from "tailwind-datepicker-react"
 
 import useAxios from '../../hooks/useAxios'
 import { useDecodedToken } from '../../hooks/useDecodedToken'
+import { User } from '../../types/User'
 
-interface IProfileInput {
-    name: string,
-    surname: string,
-    gender: 'male' | 'female' | 'other',
-    dateOfBirth?: Date,
-    profilePhoto?: File | FileList | string | null,
-    about: string | null
-}
 const Profile = () => {
 
     const axiosInstance = useAxios()
     const decodedToken = useDecodedToken()
 
     const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false)
-    const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<IProfileInput>()
+    const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<User>()
 
-    const onSubmit: SubmitHandler<IProfileInput> = async (data) => {
+    const onSubmit: SubmitHandler<User> = async (data) => {
 
         console.log(data)
 

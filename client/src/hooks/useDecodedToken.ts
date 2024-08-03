@@ -1,7 +1,7 @@
-import { useAppSelector } from '../redux/hooks'; // Kendi hook'larınızı doğru yoldan import edin
-import { jwtDecode } from 'jwt-decode';
-import { DecodedToken } from '../types/decodedToken';
-import { defaultDecodedToken } from '../constants/defaultValues';
+import { useAppSelector } from '../redux/hooks'
+import { jwtDecode } from 'jwt-decode'
+import { defaultDecodedToken } from '../constants/defaultValues'
+import { DecodedToken } from '../types/DecodedToken'
 
 export const useDecodedToken = (): DecodedToken => {
     
