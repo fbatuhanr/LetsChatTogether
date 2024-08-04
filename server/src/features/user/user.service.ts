@@ -52,8 +52,6 @@ async function logout(){
 
 async function signup(data: UserProps) {
 
-  console.log(data)
-
   const newUser = new User(data)
   newUser.hashPassword = bcrypt.hashSync(data.password, 10)
 

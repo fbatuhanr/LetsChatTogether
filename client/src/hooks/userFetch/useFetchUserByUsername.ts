@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import useAxios from './useAxios';
-import { User } from '../types/User';
+import useAxios from '../useAxios';
+import { User } from '../../types/User';
 
-const useFetchUser = (username: string) => {
+const useFetchUserByUsername = (username: string) => {
     
   const [data, setData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,4 +30,4 @@ const useFetchUser = (username: string) => {
   return { data, loading, error };
 };
 
-export default useFetchUser;
+export default useFetchUserByUsername

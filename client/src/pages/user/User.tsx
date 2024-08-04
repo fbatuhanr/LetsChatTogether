@@ -7,7 +7,7 @@ import { Age, Zodiac, Gender, BirthDate } from "../../components/user"
 import cosmicButterFlyLeft from "../../assets/background/cosmic-butterfly-left.png"
 
 import userAvatar from "../../assets/user-avatar.jpg"
-import useFetchUser from "../../hooks/useFetchUser";
+import useFetchUser from "../../hooks/userFetch/useFetchUserByUsername";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import NotFound from "../../components/NotFound";
 
