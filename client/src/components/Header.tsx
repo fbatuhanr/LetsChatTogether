@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom"
 import useAuthentication from "../hooks/useAuthentication"
 import { useDecodedToken } from "../hooks/useDecodedToken"
-import { IoIosChatboxes, IoMdChatboxes, IoMdLogOut } from "react-icons/io"
+import { IoIosChatboxes, IoMdChatboxes, IoMdLogIn, IoMdLogOut } from "react-icons/io"
 import { FaUser, FaUsers } from "react-icons/fa"
 import { MdManageAccounts } from "react-icons/md"
 
@@ -19,7 +19,7 @@ const Header: React.FC = () => {
     return (
         <header className="bg-gradient-to-b from-[#4F22F2] to-[#0D0D0D1a] h-[140px] md:h-[130px]">
             <div className="max-w-6xl px-12 mx-auto">
-                <nav className="flex items-center gap-x-7 py-8">
+                <nav className={`flex items-center py-8 ${decodedToken?.username ? "gap-x-7" : "gap-x-4"}`}>
                     <div className="flex-1 text-xl md:text-3xl font-bold">
                         <Link to="/">Let's Chat Together</Link>
                     </div>
@@ -34,19 +34,19 @@ const Header: React.FC = () => {
                                 </div>
                                 <div className="text-2xl font-semibold">
                                     <Link to="/users" className="flex items-center gap-x-1">
-                                        <FaUsers size={25}/>
+                                        <FaUsers size={25} />
                                         Users
                                     </Link>
                                 </div>
                                 <div className="text-2xl font-semibold">
                                     <Link to={`/user/${decodedToken.username}`} className="flex items-center gap-x-0.5">
-                                        <FaUser size={16.5}/>
+                                        <FaUser size={16.5} />
                                         {decodedToken.username}
                                     </Link>
                                 </div>
                                 <div className="text-2xl font-semibold">
                                     <Link to="/account/profile" className="flex items-center gap-x-0">
-                                        <MdManageAccounts size={26}/>
+                                        <MdManageAccounts size={26} />
                                         Account
                                     </Link>
                                 </div>
@@ -61,10 +61,15 @@ const Header: React.FC = () => {
                             :
                             <>
                                 <div className="text-2xl font-semibold">
-                                    <Link to="/login">Login</Link>
+                                    <Link to="/login" className="flex items-center gap-x-1">
+                                        <IoMdLogIn size={26} />
+                                        Login
+                                    </Link>
                                 </div>
                                 <div className="text-2xl font-semibold">
-                                    <Link to="/signup">Sign up</Link>
+                                    <Link to="/signup" className="flex items-center gap-x-0">
+                                        Sign up
+                                    </Link>
                                 </div>
                             </>
                     }
