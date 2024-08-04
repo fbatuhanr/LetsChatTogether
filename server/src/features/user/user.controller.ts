@@ -7,14 +7,30 @@ async function getAll(req: Request, res: Response, next: NextFunction) {
   try {
     res.json(await userService.getAll());
   } catch (err) {
-    console.error(`Error while getting the lists`, err);
+    console.error(`Error while getAll`, err);
+    next(err);
+  }
+}
+async function getAllWithLimitation(req: Request, res: Response, next: NextFunction) {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const result = await userService.getAllWithLimitation(page, limit)
+    if (result)
+      return res.status(200).json(result)
+
+    res.status(500).json({ message: 'Unexpected error occurred.' });
+
+  } catch (err) {
+    console.error(`Error while getAllWithLimitation`, err);
     next(err);
   }
 }
 
 async function get(req: CustomRequest, res: Response, next: NextFunction) {
   try {
-    
+
     if (req.user.userId !== req.params.id) { // authMiddleware tarafından başarıyla decoded edilmişse req.user'a decoded bilgileri döndürülür.
       return res.status(403).json({ message: 'Access denied' });
     }
@@ -30,6 +46,25 @@ async function getByUsername(req: CustomRequest, res: Response, next: NextFuncti
     res.json(await userService.getByUsername(username));
   } catch (err) {
     console.error(`Error while getByUsername`, err);
+    next(err);
+  }
+}
+async function searchUsers(req: Request, res: Response, next: NextFunction) {
+  try {
+    const searchRegex = new RegExp(req.query.query as string, 'i')
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    console.log(req.query)
+
+    const result = await userService.searchUsers(searchRegex, page, limit)
+    if (result)
+      return res.status(200).json(result)
+
+    res.status(500).json({ message: 'Unexpected error occurred.' });
+
+  } catch (err) {
+    console.error(`Error while getAllWithLimitation`, err);
     next(err);
   }
 }
@@ -89,7 +124,6 @@ async function update(req: Request, res: Response, next: NextFunction) {
     next(err);
   }
 }
-// https://medium.com/@mohsinogen/simplified-guide-to-setting-up-a-global-error-handler-in-express-js-daf8dd640b69
 
 async function remove(req: Request, res: Response, next: NextFunction) {
   try {
@@ -100,4 +134,4 @@ async function remove(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { getAll, get, getByUsername, login, logout, signup, update, remove }
+export { getAll, getAllWithLimitation, get, getByUsername, searchUsers, login, logout, signup, update, remove }

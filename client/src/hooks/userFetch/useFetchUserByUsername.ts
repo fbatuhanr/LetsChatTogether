@@ -13,7 +13,7 @@ const useFetchUserByUsername = (username: string) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axiosInstance.get(`${process.env.USER_API_URL}/search`, {
+        const response = await axiosInstance.get(`${process.env.USER_API_URL}/find`, {
           params: { username },
         });
         setData(response.data);
