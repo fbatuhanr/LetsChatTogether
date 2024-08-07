@@ -2,21 +2,19 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import userAvatar from "../../assets/user-avatar.jpg"
 import LoadingSpinner from '../../components/LoadingSpinner'
-import useFetchAllUsers from '../../hooks/userFetch/useFetchAllUsers'
 import useSearchUsers from '../../hooks/userFetch/useSearchUser'
 import { User } from '../../types/User'
+import useDebounce from '../../hooks/useDebounce'
 
 const Users: React.FC = () => {
 
   const [page, setPage] = useState(1)
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("")
   const limit = 4
 
-  const { users, totalPages, loading, error } = searchQuery
-    ? useSearchUsers(searchQuery, page, limit)
-    : useFetchAllUsers(page, limit)
-
-    console.log(users)
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
+  
+  const { users, totalPages, loading, error } = useSearchUsers(debouncedSearchQuery, page, limit)
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value)
@@ -48,7 +46,7 @@ const Users: React.FC = () => {
         !loading &&
         <div className="max-w-6xl w-full mx-auto min-h-72 grid grid-cols-4 gap-4">
           {
-            users && users.map((user:User, index: number) =>
+            users && users.map((user: User, index: number) =>
               <div key={index} className="w-full h-auto pt-6 pb-7 px-2 rounded-sm bg-gradient-to-t from-[#0D0D0D] to-[#472DA6] shadow shadow-[#472DA6]">
                 <div className="relative w-40 h-40 mx-auto rounded-full overflow-hidden p-2 border border-[#cccccc]">
                   <Link to={`/user/${user.username}`}>

@@ -18,7 +18,7 @@ const useAxios = () => {
             const state = store.getState()
             const accessToken = state.auth.accessToken
 
-            console.log(accessToken)
+            // console.log(accessToken)
 
             if (accessToken) {
                 config.headers["Authorization"] = `Bearer ${accessToken}`

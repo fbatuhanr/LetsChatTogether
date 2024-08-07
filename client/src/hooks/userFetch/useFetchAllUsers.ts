@@ -27,7 +27,7 @@ const useFetchAllUsers = (page: number, limit: number) => {
     };
 
     fetchUsers();
-  }, [page]);
+  }, [page, limit]);
 
   return { users, totalPages, loading, error };
 };
