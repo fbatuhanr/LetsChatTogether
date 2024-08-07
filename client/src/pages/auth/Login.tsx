@@ -1,22 +1,24 @@
 import { useState } from "react"
 import HumanImg3 from "../../assets/human-3.png"
 
-import useAuthentication from "../../hooks/useAuthentication"
-import { useNavigate } from "react-router-dom"
+import useAuthentication from "../../hooks/api/useAuthentication"
+import { toast } from "react-toastify"
 
 export const Login: React.FC = () => {
 
     const { loginCall } = useAuthentication()
-    const navigate = useNavigate()
 
     const [username, setUsername] = useState<string>("")
     const [password, setPassword] = useState<string>("")
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        const result = await loginCall(username, password)
-        if(result) navigate('/')
+
+        toast.promise(loginCall(username, password), {
+            pending: 'Information is being checked...',
+            success: { render: ({ data }) => `${data}` },
+            error: { render: ({ data }) => `${data}` }
+        })
     }
     return (
         <form onSubmit={handleSubmit}>

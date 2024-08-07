@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom"
-import useAuthentication from "../hooks/useAuthentication"
+import useAuthentication from "../hooks/api/useAuthentication"
 import { useDecodedToken } from "../hooks/useDecodedToken"
-import { IoIosChatboxes, IoMdChatboxes, IoMdLogIn, IoMdLogOut } from "react-icons/io"
+import { IoIosChatboxes, IoMdLogIn, IoMdLogOut } from "react-icons/io"
 import { FaUser, FaUsers } from "react-icons/fa"
 import { MdManageAccounts } from "react-icons/md"
 

@@ -24,6 +24,7 @@ import Chat from './pages/Chat'
 
 import { Layout as AccountLayout, Profile, Settings } from './pages/account'
 import { User, Users } from './pages/user'
+import Friends from './pages/account/Friends'
 
 function App() {
 
@@ -46,6 +47,7 @@ function App() {
               <Route path="/user/:username" element={<User />} />
 
               <Route path="/account" element={<UserGuard><AccountLayout /></UserGuard>}>
+                <Route path="friends" element={<Friends />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="settings" element={<Settings />} />
               </Route>

@@ -4,11 +4,11 @@ import { User } from '../../types/User';
 
 const useFetchUserByUsername = (username: string) => {
     
+  const axiosInstance = useAxios();
+  
   const [data, setData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-
-  const axiosInstance = useAxios();
 
   useEffect(() => {
     const fetchUserData = async () => {

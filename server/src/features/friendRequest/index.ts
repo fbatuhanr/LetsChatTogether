@@ -1,0 +1,1 @@
+export { default as friendRequest } from "./friendRequest.route"

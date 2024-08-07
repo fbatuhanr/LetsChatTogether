@@ -17,22 +17,15 @@ async function getAll() {
 }
 
 async function getAllWithLimitation(page: number, limit: number) {
-  try {
-    const totalUsers = await User.countDocuments();
 
-    const users = await User.find()
-      .skip((page - 1) * limit)
-      .limit(limit);
+  const totalUsers = await User.countDocuments();
+  const users = await User.find().skip((page - 1) * limit).limit(limit);
+  if (!users) return false
 
-    return {
-      totalPages: Math.ceil(totalUsers / limit),
-      currentPage: page,
-      users
-    }
-
-  } catch (error) {
-    console.error(error)
-    return false
+  return {
+    totalPages: Math.ceil(totalUsers / limit),
+    currentPage: page,
+    users
   }
 }
 
@@ -43,35 +36,23 @@ async function getByUsername(username: string) {
   return User.findOne({ username })
 }
 async function searchUsers(searchRegex: RegExp, page: number, limit: number) {
-  try {
-    const users = await User.find({
-      $or: [
-        { username: { $regex: searchRegex } },
-        { name: { $regex: searchRegex } },
-        { surname: { $regex: searchRegex } },
-        { $expr: { $regexMatch: { input: { $concat: ["$name", " ", "$surname"] }, regex: searchRegex } } }
-      ]
-    })
-      .skip((page - 1) * limit)
-      .limit(limit);
 
-    const totalUsers = await User.countDocuments({
-      $or: [
-        { username: { $regex: searchRegex } },
-        { name: { $regex: searchRegex } },
-        { surname: { $regex: searchRegex } },
-        { $expr: { $regexMatch: { input: { $concat: ["$name", " ", "$surname"] }, regex: searchRegex } } }
-      ]
-    });
+  const findPattern = {
+    $or: [
+      { username: { $regex: searchRegex } },
+      { name: { $regex: searchRegex } },
+      { surname: { $regex: searchRegex } },
+      { $expr: { $regexMatch: { input: { $concat: ["$name", " ", "$surname"] }, regex: searchRegex } } }
+    ]
+  }
+  const totalUsers = await User.countDocuments(findPattern);
+  const users = await User.find(findPattern).skip((page - 1) * limit).limit(limit);
+  if (!users) return false
 
-    return {
-      totalPages: Math.ceil(totalUsers / limit),
-      currentPage: page,
-      users,
-    }
-  } catch (error) {
-    console.error(error)
-    return false
+  return {
+    totalPages: Math.ceil(totalUsers / limit),
+    currentPage: page,
+    users,
   }
 }
 
@@ -79,24 +60,13 @@ async function login(data: UserProps) {
 
   const { username, password } = data
 
-  const result = User.findOne({ username })
-    .then((user) => {
-      if (user && user.comparePassword(password)) {
+  const user = await User.findOne({ username })
+  if (!user) return false
+  if (!user.comparePassword(password)) return false
 
-        const accessToken = generateAccessToken({ userId: user._id, username: user.username });
-        const refreshToken = generateRefreshToken({ userId: user._id, username: user.username });
-
-        return { accessToken, refreshToken }
-      }
-      else {
-        return false
-      }
-    })
-    .catch((err) => {
-      throw err
-    })
-
-  return result
+  const accessToken = generateAccessToken({ userId: user._id, username: user.username });
+  const refreshToken = generateRefreshToken({ userId: user._id, username: user.username });
+  return { accessToken, refreshToken }
 }
 async function logout() {
   return
@@ -107,10 +77,11 @@ async function signup(data: UserProps) {
   const newUser = new User(data)
   newUser.hashPassword = bcrypt.hashSync(data.password, 10)
 
-  return newUser.save()
+  const savedUser = await newUser.save();
+  return savedUser ? true : false
 }
 
-async function update(id: string, file: any, data: UserProps) {
+function update(id: string, file: any, data: UserProps) {
 
   let newData = {
     ...data
@@ -121,7 +92,7 @@ async function update(id: string, file: any, data: UserProps) {
   return User.findOneAndUpdate({ _id: id }, newData)
 }
 
-async function remove(id: string) {
+function remove(id: string) {
   return User.findByIdAndDelete(id)
 }
 

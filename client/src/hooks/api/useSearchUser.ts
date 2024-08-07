@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react'
 import useAxios from '../useAxios'
 import { User } from '../../types/User'
-import axios from 'axios'
 
 const useSearchUsers = (query: string, page: number, limit: number) => {
+
+    const axiosInstance = useAxios();
 
     const [users, setUsers] = useState<User[] | null>(null)
 
     const [totalPages, setTotalPages] = useState(0)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<Error | null>(null)
-
-    const axiosInstance = useAxios();
 
     useEffect(() => {
 

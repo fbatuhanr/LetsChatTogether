@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { FaUser } from 'react-icons/fa'
+import { FaUser, FaUsers } from 'react-icons/fa'
 import { IoSettings } from 'react-icons/io5'
 
 import cosmicButterflyLeft from "../../assets/background/cosmic-butterfly-left.png"
@@ -16,6 +16,12 @@ const Layout = () => {
 
                 <nav className="w-full bg-[#29156C]">
                     <ul className="flex justify-around h-full text-xl [&>li]:px-5 [&>li]:py-4 text-[#B8B8B8] [&_a:hover]:text-white  [&_a.active]:text-white font-outfit font-bold">
+                        <li className="rounded-tl-xl">
+                            <NavLink to="/account/friends" className="flex justify-center items-center gap-x-1.5">
+                                <span><FaUsers className="text-lg"/></span>
+                                <span>Friends</span>
+                            </NavLink>
+                        </li>
                         <li className="rounded-tl-xl">
                             <NavLink to="/account/profile" className="flex justify-center items-center gap-x-1.5">
                                 <span><FaUser className="text-lg" /></span>
@@ -35,7 +41,7 @@ const Layout = () => {
                     <img src={SecureImg} className="w-28" />
                 </div> */}
 
-                <div className="w-3/4 mx-auto my-12 px-4 ">
+                <div className="w-4/5 mx-auto my-12 px-4 ">
                     <Outlet />
                 </div>
             </div>

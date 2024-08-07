@@ -2,7 +2,7 @@ import { useState } from "react"
 import HumanImg3 from "../../assets/human-3.png"
 import { toast } from "react-toastify"
 
-import useAuthentication from "../../hooks/useAuthentication"
+import useAuthentication from "../../hooks/api/useAuthentication"
 import { useNavigate } from "react-router-dom"
 
 export const Signup: React.FC = () => {
@@ -22,9 +22,16 @@ export const Signup: React.FC = () => {
             toast.error("Passwords are not matching!")
             return
         }
-
-        const result = await signupCall(username, email, password)
-        if(result)  navigate('/login', { replace: true });
+        toast.promise(signupCall(username, email, password), {
+            pending: 'Information is being checked...',
+            success: {
+                render: ({ data }) => {
+                    navigate("/login")
+                    return `${data}`;
+                }
+            },
+            error: { render: ({ data }) => `${data}` }
+        })
     }
     return (
         <form onSubmit={handleSubmit}>

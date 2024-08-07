@@ -4,13 +4,13 @@ import { User } from '../../types/User';
 
 const useFetchAllUsers = (page: number, limit: number) => {
 
+  const axiosInstance = useAxios();
+
   const [users, setUsers] = useState<User[] | null>(null);
 
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-
-  const axiosInstance = useAxios();
 
   useEffect(() => {
     const fetchUsers = async () => {

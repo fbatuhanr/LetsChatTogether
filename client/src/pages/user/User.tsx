@@ -7,21 +7,23 @@ import { Age, Zodiac, Gender, BirthDate } from "../../components/user"
 import cosmicButterFlyLeft from "../../assets/background/cosmic-butterfly-left.png"
 
 import userAvatar from "../../assets/user-avatar.jpg"
-import useFetchUser from "../../hooks/userFetch/useFetchUserByUsername";
+import useFetchUser from "../../hooks/api/useFetchUserByUsername";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import NotFound from "../../components/NotFound";
+import { defaultFetchUser } from "../../constants/defaultValues";
+import FriendRequestButton from "../../components/FriendRequestButton";
 
 
 const User = () => {
 
     const { username } = useParams();
-    const decodedToken = useDecodedToken()
 
-    if (!username) return
-    const { data, loading, error } = useFetchUser(username)
+    const decodedToken = useDecodedToken()
+    const { data, loading, error } = username ? useFetchUser(username) : defaultFetchUser
 
     if (loading) return <LoadingSpinner />
     if (!data || error) return <NotFound />
+    
     return (
         <div className="relative flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
             <div>
@@ -61,20 +63,14 @@ const User = () => {
                     </div>
 
                     <div className="mt-6 mb-12">
-                        <p>
+                        <p className="p-2">
                             {data.about}
                         </p>
                     </div>
 
                     {
                         decodedToken.username !== username &&
-
-                        <div className="text-center">
-                            <button className="ps-10 pe-14 py-3 text-2xl font-bold border border-[#0D0D0D] bg-[#F2D541] rounded-full [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] relative">
-                                Friend Request
-                                <img src={MessageImg} className="absolute w-20 h-auto -top-5 -right-8" />
-                            </button>
-                        </div>
+                        <FriendRequestButton senderId={decodedToken.userId} receiverId={data._id} />
                     }
                 </div>
             </div>

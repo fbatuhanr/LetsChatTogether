@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import userAvatar from "../../assets/user-avatar.jpg"
-import LoadingSpinner from '../../components/LoadingSpinner'
-import useSearchUsers from '../../hooks/userFetch/useSearchUser'
+import LoadingSpinnerPage from '../../components/LoadingSpinnerPage'
+import useSearchUsers from '../../hooks/api/useSearchUser'
 import { User } from '../../types/User'
 import useDebounce from '../../hooks/useDebounce'
 
@@ -40,7 +40,7 @@ const Users: React.FC = () => {
       </div>
 
       {
-        loading && <LoadingSpinner />
+        loading && <LoadingSpinnerPage />
       }
       {
         !loading &&

@@ -1,4 +1,4 @@
-import express from 'express'
+import { Router } from 'express'
 import authenticateToken from '../../middleware/authMiddleware'
 import multer from 'multer'
 import * as userController from './user.controller'
@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-const router = express.Router();
+const router = Router();
 
 router.post('/login', userController.login);
 router.post('/logout', userController.logout);

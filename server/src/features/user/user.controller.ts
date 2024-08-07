@@ -74,26 +74,22 @@ async function login(req: Request, res: Response, next: NextFunction) {
     const result: any = await userService.login(req.body);
     if (!result)
       return res.status(404).json({ message: 'Invalid username or password!' })
+    if (!result.refreshToken || !result.accessToken)
+      return res.status(500).json({ message: 'Unexpected error occurred.' });
 
-    if (result.refreshToken && result.accessToken) {
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // its true when production and its false development mode
+      sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict", // its none when production mode because server and client maybe based on different domains, its strict when development mode because server and client on same domain (localhost), only ports are different
+      maxAge: ms(process.env.REFRESH_TOKEN_EXPIRATION!)
+    });
+    return res.status(200).json({
+      message: 'Login successful!',
+      accessToken: result.accessToken
+    })
 
-      res.cookie("refreshToken", result.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // its true when production and its false development mode
-        sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict", // its none when production mode because server and client maybe based on different domains, its strict when development mode because server and client on same domain (localhost), only ports are different
-        maxAge: ms(process.env.REFRESH_TOKEN_EXPIRATION!)
-      });
-      return res.status(200).json({
-        message: 'Login successful!',
-        accessToken: result.accessToken
-      })
-    }
-
-    res.status(500).json({ message: 'Unexpected error occurred.' });
-
-  } catch (err) {
-    console.error(`Error while login`, err);
-    next(err);
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -109,10 +105,14 @@ async function logout(req: Request, res: Response, next: NextFunction) {
 
 async function signup(req: Request, res: Response, next: NextFunction) {
   try {
-    res.json(await userService.signup(req.body));
-  } catch (err) {
-    console.error(`Error while creating the list`, err);
-    next(err);
+    const isSignedUp = await userService.signup(req.body);
+    if (isSignedUp) {
+      return res.status(201).json({ message: 'Signup successful!' });
+    } else {
+      return res.status(500).json({ message: 'Signup failed!' });
+    }
+  } catch (error) {
+    next(error)
   }
 }
 
