@@ -13,6 +13,7 @@ import { user } from "./features/user"
 import { chat } from "./features/chat"
 import { message } from "./features/message"
 import { friendRequest } from "./features/friendRequest"
+import { friend } from "./features/friend"
 import { auth } from './features/auth';
 import errorHandler from "./middleware/errorHandler"
 
@@ -80,6 +81,7 @@ app.use("/chat", chat)
 app.use("/message", message)
 
 app.use("/friend-request", friendRequest)
+app.use("/friend", friend)
 
 app.use('/auth', auth);
 

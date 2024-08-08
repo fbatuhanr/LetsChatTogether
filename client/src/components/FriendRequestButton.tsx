@@ -1,51 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import useFriendRequest from '../hooks/api/useFriendRequest'
+import React, { useEffect } from 'react';
+import useFriendRequest, { RequestStatus } from '../hooks/api/useFriendship'
 import MessageImg from "../assets/message.png"
 import { toast } from 'react-toastify';
-import LoadingSpinner from './LoadingSpinner';
 
 interface FriendRequestButtonProps {
-    senderId: string;
-    receiverId: string;
-}
-enum FriendRequestStatus {
-    Pending = 'pending',
-    Accepted = 'accepted',
-    Rejected = 'rejected',
+    senderId: string,
+    receiverId: string
 }
 
 const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({ senderId, receiverId }) => {
 
     const {
-        getFriendRequest, sendFriendRequest, cancelFriendRequest, removeFriend,
-        loading
+        requestStatusBetweenUsers,
+        getRequestStatusBetweenUsers,
+
+        removeFriend,
+        sendRequest,
+        acceptRequest,
+        cancelRequest
     } = useFriendRequest();
 
-    const [status, setStatus] = useState<FriendRequestStatus | null>(null);
-
-    const fetchStatus = async () => {
-        try {
-            const request = await getFriendRequest(senderId, receiverId) as FriendRequestStatus
-            setStatus(request)
-        }
-        catch (err) {
-            console.log(err)
-        }
-    };
-
     useEffect(() => {
-        fetchStatus();
+        getRequestStatusBetweenUsers(senderId, receiverId)
     }, []);
 
     const handleClick = async () => {
         let methodToCall;
 
-        if (status === FriendRequestStatus.Pending) {
-            methodToCall = () => cancelFriendRequest(senderId, receiverId);
-        } else if (status === FriendRequestStatus.Accepted) {
+        if (requestStatusBetweenUsers?.status === RequestStatus.Pending) {
+            methodToCall = () => cancelRequest(senderId, receiverId);
+        } else if (requestStatusBetweenUsers?.status === RequestStatus.Accepted) {
             methodToCall = () => removeFriend(senderId, receiverId);
-        } else if (status === FriendRequestStatus.Rejected || !status) {
-            methodToCall = () => sendFriendRequest(senderId, receiverId);
+        } else if (requestStatusBetweenUsers?.status === RequestStatus.Rejected || requestStatusBetweenUsers?.status === RequestStatus.None) {
+            methodToCall = () => sendRequest(senderId, receiverId);
         } else {
             console.error('Unknown status');
             return;
@@ -57,44 +44,62 @@ const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({ senderId, rec
                 success: { render: ({ data }) => `${data}` },
                 error: { render: ({ data }) => `${data}` }
             });
-            fetchStatus();
+            getRequestStatusBetweenUsers(senderId, receiverId)
         } catch (error) {
             console.error('Error:', error);
         }
     };
 
+    const handleAcceptRequest = async () => {
+
+        await toast.promise(acceptRequest(senderId, receiverId), {
+            pending: 'Request sending...',
+            success: { render: ({ data }) => `${data}` },
+            error: { render: ({ data }) => `${data}` }
+        });
+        getRequestStatusBetweenUsers(senderId, receiverId)
+    }
+
     const getButtonText = () => {
 
-        if (status === FriendRequestStatus.Pending) {
+        if (requestStatusBetweenUsers?.status === RequestStatus.Pending) {
             return 'Cancel Request';
-        } else if (status === FriendRequestStatus.Accepted) {
+        } else if (requestStatusBetweenUsers?.status === RequestStatus.Accepted) {
             return 'Remove Friend';
-        } else if (status === FriendRequestStatus.Rejected || !status) {
+        } else if (requestStatusBetweenUsers?.status === RequestStatus.Rejected || requestStatusBetweenUsers?.status === RequestStatus.None) {
             return 'Friend Request';
         }
     }
 
     const getButtonClasses = () => {
 
-        if (status === FriendRequestStatus.Pending) {
+        if (requestStatusBetweenUsers?.status === RequestStatus.Pending) {
             return 'bg-yellow-600 text-gray-200';
-        } else if (status === FriendRequestStatus.Accepted) {
+        } else if (requestStatusBetweenUsers?.status === RequestStatus.Accepted) {
             return 'bg-red-500';
-        } else if (status === FriendRequestStatus.Rejected || !status) {
+        } else if (requestStatusBetweenUsers?.status === RequestStatus.Rejected || requestStatusBetweenUsers?.status === RequestStatus.None) {
             return 'bg-yellow-400';
         }
     }
 
-    if(loading) return <LoadingSpinner />
     return (
-        <div className="text-center">
+        requestStatusBetweenUsers &&
+        <div className="flex justify-around">
             <button
                 className={`ps-8 pe-12 py-2 text-xl font-bold rounded-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#251562] shadow-sm relative ${getButtonClasses()}`}
-                onClick={handleClick}
-            >
+                onClick={handleClick}>
                 {getButtonText()}
                 <img src={MessageImg} className="absolute w-16 h-auto -top-4 -right-6" alt="Message Icon" />
             </button>
+            {
+                (requestStatusBetweenUsers.status === RequestStatus.Pending && !requestStatusBetweenUsers.isSender) &&
+                <button
+                    className="ps-8 pe-12 py-2 text-xl font-bold rounded-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#251562] shadow-sm relative bg-green-600 text-white"
+                    onClick={handleAcceptRequest}>
+                    Accept Request
+                    <img src={MessageImg} className="absolute w-16 h-auto -top-4 -right-6" alt="Message Icon" />
+                </button>
+            }
         </div>
     );
 };

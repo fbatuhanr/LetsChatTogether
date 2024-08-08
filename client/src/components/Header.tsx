@@ -45,7 +45,7 @@ const Header: React.FC = () => {
                                     </Link>
                                 </div>
                                 <div className="text-2xl font-semibold">
-                                    <Link to="/account/profile" className="flex items-center gap-x-0">
+                                    <Link to="/account/friends" className="flex items-center gap-x-0">
                                         <MdManageAccounts size={26} />
                                         Account
                                     </Link>

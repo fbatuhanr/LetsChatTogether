@@ -92,7 +92,6 @@ async function login(req: Request, res: Response, next: NextFunction) {
     next(error)
   }
 }
-
 async function logout(req: Request, res: Response, next: NextFunction) {
   try {
     await userService.logout(); // Logout işlemi için service fonksiyonunu çağır
@@ -102,7 +101,6 @@ async function logout(req: Request, res: Response, next: NextFunction) {
     next(error);
   }
 }
-
 async function signup(req: Request, res: Response, next: NextFunction) {
   try {
     const isSignedUp = await userService.signup(req.body);
@@ -124,7 +122,6 @@ async function update(req: Request, res: Response, next: NextFunction) {
     next(err);
   }
 }
-
 async function remove(req: Request, res: Response, next: NextFunction) {
   try {
     res.json(await userService.remove(req.params.id));

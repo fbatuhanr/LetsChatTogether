@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import { useDecodedToken } from "../../hooks/useDecodedToken"
-import MessageImg from "../../assets/message.png"
 
 import { Age, Zodiac, Gender, BirthDate } from "../../components/user"
 
