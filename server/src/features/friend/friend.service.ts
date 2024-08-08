@@ -3,7 +3,7 @@ import FriendRequest from '../friendRequest/friendRequest.model'
 
 async function getUserFriends(userId: string) {
 
-    return User.findById(userId).populate('friends', 'username').select('friends')
+    return User.findById(userId).populate('friends', 'username profilePhoto').select('username profilePhoto friends')
 }
 
 async function removeUserFriend(userId: string, friendId: string) {

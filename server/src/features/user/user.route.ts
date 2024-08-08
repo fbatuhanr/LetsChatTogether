@@ -20,7 +20,8 @@ router.post('/logout', userController.logout);
 router.post('/sign-up', userController.signup);
 
 router.get('/find', userController.getByUsername);
-router.get('/search', authenticateToken, userController.searchUsers);
+router.get('/search', userController.searchUsers);
+
 router.get('/', authenticateToken, userController.getAllWithLimitation);
 router.get('/:id', authenticateToken, userController.get);
 

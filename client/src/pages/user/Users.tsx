@@ -13,7 +13,7 @@ const Users: React.FC = () => {
   const limit = 4
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
-  
+
   const { users, totalPages, loading, error } = useSearchUsers(debouncedSearchQuery, page, limit)
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,23 +28,16 @@ const Users: React.FC = () => {
       </div>
 
       <div className="max-w-2xl w-full flex items-center gap-x-2">
-        {/* <div>
-          <h2>Search</h2>
-        </div> */}
-        <div className="flex-1">
-          <input type="text" placeholder="Search users by name, surname or username..." className="w-full p-3 bg-[#472DA6] rounded"
-            value={searchQuery} onChange={handleSearchChange}
-          />
-        </div>
-        {/* <button className="p-2 bg-[#472DA6] rounded">Find</button> */}
+        <input type="text" placeholder="Search users by name, surname or username..." className="w-full px-6 py-3 text-lg bg-[#472DA6] rounded"
+          value={searchQuery} onChange={handleSearchChange}
+        />
       </div>
-
       {
         loading && <LoadingSpinnerPage />
       }
       {
         !loading &&
-        <div className="max-w-6xl w-full mx-auto min-h-72 grid grid-cols-4 gap-4">
+        <div className="max-w-6xl w-full mx-auto px-12 min-h-72 grid grid-cols-4 gap-4">
           {
             users && users.map((user: User, index: number) =>
               <div key={index} className="w-full h-auto pt-6 pb-7 px-2 rounded-sm bg-gradient-to-t from-[#0D0D0D] to-[#472DA6] shadow shadow-[#472DA6]">

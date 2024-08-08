@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useAxios from '../useAxios';
 import axios from 'axios';
+import { IFriend } from '../../types/User';
 
 export enum RequestStatus {
     None = 'none',
@@ -17,16 +18,29 @@ const useFriendship = () => {
 
     const axiosInstance = useAxios();
 
-    const [friends, setFriends] = useState<[] | null>([])
+    const [friends, setFriends] = useState<Array<IFriend> | null>([])
     const [incomingRequests, setIncomingRequests] = useState<[] | null>(null)
     const [outgoingRequests, setOutgoingRequests] = useState<[] | null>(null)
     const [requestStatusBetweenUsers, setRequestStatusBetweenUsers] = useState<FriendRequestStatus | null>(null)
 
-    const getFriends = async (userId: string) => {
+    const getFriends = async (userId: string, includeUser: boolean = false) => {
         try {
             const response = await axiosInstance.get(`${process.env.API_URL}/friend/${userId}`)
             if (response.status === 200) {
-                setFriends(response.data.friends)
+                if (!includeUser) {
+                    setFriends(response.data.friends)
+                }
+                else {
+                    const friendsWithUser = [
+                        {
+                            _id: response.data._id,
+                            username: response.data.username,
+                            profilePhoto: response.data.profilePhoto ? response.data.profilePhoto : null
+                        },
+                        ...response.data.friends
+                    ];
+                    setFriends(friendsWithUser)
+                }
             }
             else {
                 console.error('Unexpected response status!')

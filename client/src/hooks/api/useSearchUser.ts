@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import useAxios from '../useAxios'
 import { User } from '../../types/User'
+import { useDecodedToken } from '../useDecodedToken';
 
 const useSearchUsers = (query: string, page: number, limit: number) => {
-
+    
     const axiosInstance = useAxios();
 
+    const decodedToken = useDecodedToken()
     const [users, setUsers] = useState<User[] | null>(null)
 
     const [totalPages, setTotalPages] = useState(0)
@@ -21,7 +23,7 @@ const useSearchUsers = (query: string, page: number, limit: number) => {
             setLoading(true)
             try {
                 const response = await axiosInstance.get(`${process.env.USER_API_URL}/search`, {
-                    params: { query, page, limit },
+                    params: { query, page, limit, currUserId: decodedToken.userId },
                     signal
                 })
                 setUsers(response.data.users);

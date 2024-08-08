@@ -8,17 +8,9 @@ import { useDecodedToken } from '../hooks/useDecodedToken'
 
 import cosmicButterfly from "../assets/background/cosmic-butterfly.png"
 import cosmicButterflyRight from "../assets/background/cosmic-butterfly-right.png"
+import useFriendship from '../hooks/api/useFriendship'
+import { IFriend } from '../types/User'
 
-interface IUser {
-  _id: string,
-  username: string,
-  email: string | null,
-
-  createdAt: Date,
-  updatedAt: Date,
-
-  profilePhoto: string | null
-}
 interface IMessage {
   text: string,
   date: Date | null,
@@ -38,10 +30,11 @@ const Chat = () => {
 
   const [chat, setChat] = useState<string>("");
 
-  const [users, setUsers] = useState<Array<IUser>>([])
+  const { friends, getFriends } = useFriendship()
+
   const [onlineUsers, setOnlineUsers] = useState<Array<string>>([])
 
-  const [selectedUser, setSelectedUser] = useState<IUser>()
+  const [selectedUser, setSelectedUser] = useState<IFriend>()
 
   const [messages, setMessages] = useState<Array<IMessage>>([]);
   const [messageInput, setMessageInput] = useState<string>("");
@@ -49,14 +42,8 @@ const Chat = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-
-    const fetchUsers = async () => {
-
-      const response = await axiosInstance.get(`${process.env.USER_API_URL}`)
-      return response.data
-    }
-    fetchUsers().then(response => setUsers(response))
-
+    
+    getFriends(currentUserId, true)
 
     const activeChats = async () => {
 
@@ -121,11 +108,13 @@ const Chat = () => {
     });
   }
 
-  const getUsernameById = (id: string) => users.find(i => i._id == id)?.username
-  const getPhotoById = (id: string) => users.find(i => i._id == id)?.profilePhoto
+  const getUsernameById = (id: string) => friends?.find(i => i._id == id)?.username
+  const getPhotoById = (id: string) => friends?.find(i => i._id == id)?.profilePhoto
 
+  console.log(friends);
+  
 
-  const handleSelectUser = async (user: IUser) => {
+  const handleSelectUser = async (user: IFriend) => {
 
     console.log(user)
     setSelectedUser(user)
@@ -159,8 +148,7 @@ const Chat = () => {
     console.log(conversation)
     setMessages(conversation)
   }
-
-
+  
   return (
     <div className="relative flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
       <div>
@@ -179,7 +167,6 @@ const Chat = () => {
                       let isSenderSamePreviousOne = messages[index - 1] ? messageData.senderId == messages[index - 1].senderId : false
                       return (
                         <div key={index} className={`relative flex items-center ${isSenderSamePreviousOne ? "mt-1" : "mt-2"} ${isMessageBelongsCurrUser ? "justify-end" : "justify-start"}`}>
-
                           {
                             !isSenderSamePreviousOne &&
                             <div className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold overflow-hidden ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"} ${messageData.date ? "mb-3" : "mb-1.5"}`}>
@@ -244,7 +231,7 @@ const Chat = () => {
           <div className="mt-2 text-slate-800 font-medium">
 
             {
-              users.map((user: IUser, index: number) => {
+              friends && friends.map((user: IUser, index: number) => {
 
                 if (user._id == currentUserId) return // if self then skip this user
 

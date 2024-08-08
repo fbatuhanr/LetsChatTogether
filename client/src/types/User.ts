@@ -8,3 +8,8 @@ export interface User {
     profilePhoto?: File | FileList | string | null,
     about?: string | null
 }
+export interface IFriend {
+  _id: string,
+  username: string,
+  profilePhoto?: string | null
+}

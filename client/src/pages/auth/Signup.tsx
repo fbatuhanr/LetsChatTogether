@@ -3,7 +3,8 @@ import HumanImg3 from "../../assets/human-3.png"
 import { toast } from "react-toastify"
 
 import useAuthentication from "../../hooks/api/useAuthentication"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import Button from "../../components/general/clickable/Button"
 
 export const Signup: React.FC = () => {
 
@@ -39,8 +40,8 @@ export const Signup: React.FC = () => {
                 <div>
                     <h1 className="text-5xl font-bold">Sign up</h1>
                 </div>
-                <div className="relative w-11/12 md:w-full max-w-3xl h-[550px] px-4 md:px-8 rounded-xl bg-gradient-to-br from-[#4F22F2] to-[#20183F]">
-                    <div className="md:ps-24 w-full px-1 md:w-3/4 flex flex-col gap-y-3 h-full justify-center">
+                <div className="relative w-11/12 md:w-full max-w-3xl min-h-[525px] px-4 md:px-8 rounded-xl bg-gradient-to-br from-[#4F22F2] to-[#20183F]">
+                    <div className="md:ps-24 w-full px-1 py-10 md:w-3/4 flex flex-col gap-y-3 h-full justify-center">
                         <div className="flex flex-col gap-y-1">
                             <label htmlFor="username" className="text-2xl font-semibold ps-2">Username</label>
                             <input type="text" className="bg-[#0D0D0D] rounded-2xl px-6 py-4" placeholder="type here..."
@@ -73,9 +74,10 @@ export const Signup: React.FC = () => {
                                 required
                             />
                         </div>
-                        <button type="submit" className="mt-4 bg-[#DBBA12] rounded-2xl py-3 text-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D]">
-                            Submit
-                        </button>
+
+                        <Button text="Sign up" color="primary" size="2xl" innerHeight={3} className="mt-2" />
+
+                        <p className="mt-1 underline"><Link to="/login">Already have an account? Login</Link></p>
                     </div>
                     <div className="absolute top-16 -right-20 -mr-0.5">
                         <img src={HumanImg3} className="w-56" />

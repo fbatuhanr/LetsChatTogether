@@ -35,16 +35,30 @@ async function get(id: string) {
 async function getByUsername(username: string) {
   return User.findOne({ username })
 }
-async function searchUsers(searchRegex: RegExp, page: number, limit: number) {
-
+async function searchUsers(searchRegex: RegExp, page: number, limit: number, currUserId: string) {
+  
+  const excludeUserId = currUserId || "000000000000000000000000"
   const findPattern = {
-    $or: [
-      { username: { $regex: searchRegex } },
-      { name: { $regex: searchRegex } },
-      { surname: { $regex: searchRegex } },
-      { $expr: { $regexMatch: { input: { $concat: ["$name", " ", "$surname"] }, regex: searchRegex } } }
+    $and: [
+      {
+        $or: [
+          { username: { $regex: searchRegex } },
+          { name: { $regex: searchRegex } },
+          { surname: { $regex: searchRegex } },
+          {
+            $expr: {
+              $regexMatch: {
+                input: { $concat: ["$name", " ", "$surname"] },
+                regex: searchRegex
+              }
+            }
+          }
+        ]
+      },
+      { _id: { $ne: excludeUserId } }
     ]
-  }
+  };
+
   const totalUsers = await User.countDocuments(findPattern);
   const users = await User.find(findPattern).skip((page - 1) * limit).limit(limit);
   if (!users) return false

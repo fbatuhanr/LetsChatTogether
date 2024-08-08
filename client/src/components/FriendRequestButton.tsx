@@ -86,7 +86,7 @@ const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({ senderId, rec
         requestStatusBetweenUsers &&
         <div className="flex justify-around">
             <button
-                className={`ps-8 pe-12 py-2 text-xl font-bold rounded-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#251562] shadow-sm relative ${getButtonClasses()}`}
+                className={`ps-8 pe-12 py-2 text-xl font-bold rounded-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#211a3c] shadow-md relative ${getButtonClasses()}`}
                 onClick={handleClick}>
                 {getButtonText()}
                 <img src={MessageImg} className="absolute w-16 h-auto -top-4 -right-6" alt="Message Icon" />
@@ -94,7 +94,7 @@ const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({ senderId, rec
             {
                 (requestStatusBetweenUsers.status === RequestStatus.Pending && !requestStatusBetweenUsers.isSender) &&
                 <button
-                    className="ps-8 pe-12 py-2 text-xl font-bold rounded-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#251562] shadow-sm relative bg-green-600 text-white"
+                    className="ps-8 pe-12 py-2 text-xl font-bold rounded-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#211a3c] shadow-md relative bg-green-600 text-white"
                     onClick={handleAcceptRequest}>
                     Accept Request
                     <img src={MessageImg} className="absolute w-16 h-auto -top-4 -right-6" alt="Message Icon" />

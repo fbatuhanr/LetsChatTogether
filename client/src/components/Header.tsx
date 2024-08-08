@@ -60,6 +60,12 @@ const Header: React.FC = () => {
                             </>
                             :
                             <>
+                                <div className="text-2xl font-semibold mr-4">
+                                    <Link to="/users" className="flex items-center gap-x-1">
+                                        <FaUsers size={25} />
+                                        Users
+                                    </Link>
+                                </div>
                                 <div className="text-2xl font-semibold">
                                     <Link to="/login" className="flex items-center gap-x-1">
                                         <IoMdLogIn size={26} />

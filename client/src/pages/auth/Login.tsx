@@ -3,6 +3,8 @@ import HumanImg3 from "../../assets/human-3.png"
 
 import useAuthentication from "../../hooks/api/useAuthentication"
 import { toast } from "react-toastify"
+import { Link } from "react-router-dom"
+import Button from "../../components/general/clickable/Button"
 
 export const Login: React.FC = () => {
 
@@ -44,9 +46,10 @@ export const Login: React.FC = () => {
                                 required
                             />
                         </div>
-                        <button type="submit" className="mt-4 bg-[#DBBA12] rounded-2xl py-3 text-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D]">
-                            Submit
-                        </button>
+
+                        <Button text="Login" color="primary" size="2xl" innerHeight={3} className="mt-2" />
+
+                        <p className="mt-1 underline"><Link to="/signup">No account yet? Sign up</Link></p>
                     </div>
                     <div className="absolute top-4 -right-24 mr-2 md:-right-20 md:-mr-0.5">
                         <img src={HumanImg3} className="w-56" />

@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useDecodedToken } from "../../hooks/useDecodedToken"
 
 import { Age, Zodiac, Gender, BirthDate } from "../../components/user"
@@ -15,23 +15,22 @@ import FriendRequestButton from "../../components/FriendRequestButton";
 
 const User = () => {
 
-    const { username } = useParams();
+    const { username } = useParams()
 
     const decodedToken = useDecodedToken()
     const { data, loading, error } = username ? useFetchUser(username) : defaultFetchUser
 
     if (loading) return <LoadingSpinner />
     if (!data || error) return <NotFound />
-    
+
     return (
-        <div className="relative flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
+        <div className="relative flex flex-col gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
             <div>
                 <h1 className="text-5xl font-bold">{username}</h1>
             </div>
-            <div className="relative z-10 w-full max-w-3xl min-h-[400px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
-                <div className="w-3/4 mx-auto my-12 px-4">
-
-                    <div className="flex items-center">
+            <div className="z-10 w-11/12 md:w-full max-w-3xl min-h-[400px] px-4 md:px-8 rounded-xl bg-gradient-to-br from-[#4F22F2] to-[#20183F] border-[#3a1da2] border">
+                <div className="w-11/12 mx-auto px-4 py-10">
+                    <div className="flex items-center px-8">
                         <div className="w-40 h-40 rounded-full overflow-hidden p-2 border-2 border-[#472DA6]">
                             <img src={data.profilePhoto ? `${process.env.API_URL}/${data.profilePhoto}` : userAvatar} width="100%" height="auto" className="scale-125" />
                         </div>
@@ -60,16 +59,25 @@ const User = () => {
                             </div>
                         </div>
                     </div>
-
-                    <div className="mt-6 mb-12">
-                        <p className="p-2">
-                            {data.about}
+                    <div className="mt-6 mb-10 px-2">
+                        <p className="p-4 bg-[#20183F] bg-opacity-20 rounded shadow-xl">
+                            {
+                                data.about
+                                    ? data.about
+                                    : "There is no about information..."
+                            }
                         </p>
                     </div>
-
                     {
-                        decodedToken.username !== username &&
-                        <FriendRequestButton senderId={decodedToken.userId} receiverId={data._id} />
+                        decodedToken.userId ?
+                            decodedToken.username !== username &&
+                            <FriendRequestButton senderId={decodedToken.userId} receiverId={data._id} />
+                            :
+                            <div className="text-center py-2">
+                                <Link to="/login" className="bg-[#6841F2] px-8 py-2.5 rounded-2xl text-xl font-semibold [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#211a3c] shadow-md">
+                                    Join Now to Add Friends and Message!
+                                </Link>
+                            </div>
                     }
                 </div>
             </div>

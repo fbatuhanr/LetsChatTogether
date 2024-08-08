@@ -6,9 +6,8 @@ import ms from "ms";
 async function getAll(req: Request, res: Response, next: NextFunction) {
   try {
     res.json(await userService.getAll());
-  } catch (err) {
-    console.error(`Error while getAll`, err);
-    next(err);
+  } catch (error) {
+    next(error);
   }
 }
 async function getAllWithLimitation(req: Request, res: Response, next: NextFunction) {
@@ -22,9 +21,8 @@ async function getAllWithLimitation(req: Request, res: Response, next: NextFunct
 
     res.status(500).json({ message: 'Unexpected error occurred.' });
 
-  } catch (err) {
-    console.error(`Error while getAllWithLimitation`, err);
-    next(err);
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -35,37 +33,36 @@ async function get(req: CustomRequest, res: Response, next: NextFunction) {
       return res.status(403).json({ message: 'Access denied' });
     }
     res.json(await userService.get(req.params.id));
-  } catch (err) {
-    console.error(`Error while getting the list`, err);
-    next(err);
+  } catch (error) {
+    next(error)
   }
 }
 async function getByUsername(req: CustomRequest, res: Response, next: NextFunction) {
   try {
     const username = req.query.username as string
     res.json(await userService.getByUsername(username));
-  } catch (err) {
-    console.error(`Error while getByUsername`, err);
-    next(err);
+  } catch (error) {
+    next(error)
   }
 }
 async function searchUsers(req: Request, res: Response, next: NextFunction) {
   try {
     const searchRegex = new RegExp(req.query.query as string, 'i')
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-
-    console.log(req.query)
-
-    const result = await userService.searchUsers(searchRegex, page, limit)
+    const page = parseInt(req.query.page as string) || 1
+    const limit = parseInt(req.query.limit as string) || 10
+    
+    const currUserId = req.query.currUserId as string
+    console.log("null mu?: ", currUserId)
+    console.log(currUserId)
+    
+    const result = await userService.searchUsers(searchRegex, page, limit, currUserId)
     if (result)
       return res.status(200).json(result)
 
     res.status(500).json({ message: 'Unexpected error occurred.' });
 
-  } catch (err) {
-    console.error(`Error while getAllWithLimitation`, err);
-    next(err);
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -117,17 +114,15 @@ async function signup(req: Request, res: Response, next: NextFunction) {
 async function update(req: Request, res: Response, next: NextFunction) {
   try {
     res.json(await userService.update(req.params.id, req.file, req.body));
-  } catch (err) {
-    console.error(`Error while updating the list`, err);
-    next(err);
+  } catch (error) {
+    next(error);
   }
 }
 async function remove(req: Request, res: Response, next: NextFunction) {
   try {
     res.json(await userService.remove(req.params.id));
-  } catch (err) {
-    console.error(`Error while deleting the list`, err);
-    next(err);
+  } catch (error) {
+    next(error);
   }
 }
 
