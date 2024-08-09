@@ -29,6 +29,7 @@
     "socket.io-client": "^4.7.5",
     "sort-by": "^1.2.0",
     "tailwind-datepicker-react": "^1.4.3",
+    "tailwind-scrollbar": "^3.1.0",
     "typewriter-effect": "^2.21.0"
   },
   "devDependencies": {

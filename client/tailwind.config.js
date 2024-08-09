@@ -20,7 +20,7 @@ export default {
         'cosmic-butterfly-original': "url('/src/assets/background/cosmic-butterfly-original.png')",
         'cosmic-butterfly': "url('/src/assets/background/cosmic-butterfly.png')",
         'cosmic-butterfly-right': "url('/src/assets/background/cosmic-butterfly-right.png')",
-        'cosmic-butterfly-left': "url('/src/assets/background/cosmic-butterfly-left.png')",
+        'cosmic-butterfly-left': "url('/src/assets/background/cosmic-butterfly-left.png')"
       },
       fontFamily: {
         "outfit": ['Outfit', 'sans-serif'],
@@ -28,6 +28,8 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar')
+  ]
 }
 

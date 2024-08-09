@@ -10,6 +10,8 @@ import cosmicButterfly from "../assets/background/cosmic-butterfly.png"
 import cosmicButterflyRight from "../assets/background/cosmic-butterfly-right.png"
 import useFriendship from '../hooks/api/useFriendship'
 import { IFriend } from '../types/User'
+import Button from '../components/general/clickable/Button'
+import { Link } from 'react-router-dom'
 
 interface IMessage {
   text: string,
@@ -42,7 +44,7 @@ const Chat = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    
+
     getFriends(currentUserId, true)
 
     const activeChats = async () => {
@@ -112,7 +114,7 @@ const Chat = () => {
   const getPhotoById = (id: string) => friends?.find(i => i._id == id)?.profilePhoto
 
   console.log(friends);
-  
+
 
   const handleSelectUser = async (user: IFriend) => {
 
@@ -148,18 +150,23 @@ const Chat = () => {
     console.log(conversation)
     setMessages(conversation)
   }
-  
+
   return (
-    <div className="relative flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
+    <div className="relative flex flex-col gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
       </div>
-      <div className="z-10 flex w-full max-w-4xl h-[425px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
-        <div className="basis-4/5 px-12 pt-8 pb-24">
+      <div className="z-10 flex w-full max-w-4xl h-[440px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
+        <div className="basis-4/5 px-12 pt-4 pb-36">
           {
             selectedUser ?
               <>
-                <div ref={chatContainerRef} className="border-l border-r border-[#6841F2] overflow-y-auto rounded-lg h-full py-4 px-4">
+                <div className="flex justify-between px-4 py-2.5 border-[#6841F2] border-b-2 text-lg">
+                  <Link to={`/user/${selectedUser.username}`}>View Profile</Link>
+                  <Link to="/account/friends">Manage Friends</Link>
+                  <Link to={`/user/${selectedUser.username}`} className="text-red-600">Delete All Chat</Link>
+                </div>
+                <div ref={chatContainerRef} className="mt-2 mb-2 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg h-full">
                   {
                     messages && messages.map((messageData, index: number) => {
 
@@ -204,7 +211,7 @@ const Chat = () => {
                     )
                   }
                 </div>
-                <div className="border-2 border-[#6841F2] bg-[#6841F2] flex h-16 items-stretch overflow-hidden rounded-xl mt-2">
+                <div className="border-2 border-[#6841F2] bg-[#6841F2] flex h-14 items-stretch overflow-hidden rounded-xl">
                   <input
                     type="text"
                     value={messageInput}
@@ -227,11 +234,10 @@ const Chat = () => {
         </div>
         <div className="basis-1/5 bg-[#472DA6] py-4">
 
-          <h3 className="text-3xl font-bold text-center">Users</h3>
+          <h3 className="text-3xl font-bold text-center">Friends</h3>
           <div className="mt-2 text-slate-800 font-medium">
-
             {
-              friends && friends.map((user: IUser, index: number) => {
+              friends && friends.map((user: IFriend, index: number) => {
 
                 if (user._id == currentUserId) return // if self then skip this user
 
@@ -246,9 +252,10 @@ const Chat = () => {
               }
               )
             }
-
           </div>
-
+          <div>
+            <h4 className="text-2xl font-bold text-center">Start New Conversation</h4>
+          </div>
         </div>
       </div>
 
