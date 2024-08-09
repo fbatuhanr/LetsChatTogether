@@ -19,4 +19,13 @@ async function getMessage(data: any) {
     return await Message.find({ chatId })
 }
 
-export { createMessage, getMessage }
+async function deleteMessage(messageId: string) {
+
+    const message = await Message.findById(messageId);
+    if (!message) throw new Error('Message not found!')
+
+    await Message.findByIdAndDelete(messageId)
+    // await Message.findByIdAndUpdate(messageId, { text: "message has been removed"})
+}
+
+export { createMessage, getMessage, deleteMessage }

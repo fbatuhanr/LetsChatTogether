@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom"
-import { ClickableProps, colorAdjustment } from "../../../types/clickable"
+import { Link } from 'react-router-dom'
+import { ClickableProps, colorAdjustment } from './clickable.types'
 
 const LinkButton: React.FC<ClickableProps> = ({ text, iconBegin, iconEnd, target, onClick, disabled, color, size, outlined, uppercased, innerWidth, innerHeight, className }) => {
 

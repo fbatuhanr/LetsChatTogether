@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import useAxios from '../useAxios'
-import { User } from '../../types/User'
+import { UserProps } from '../../types/User.types'
 import { useDecodedToken } from '../useDecodedToken';
 
 const useSearchUsers = (query: string, page: number, limit: number) => {
@@ -8,7 +8,7 @@ const useSearchUsers = (query: string, page: number, limit: number) => {
     const axiosInstance = useAxios();
 
     const decodedToken = useDecodedToken()
-    const [users, setUsers] = useState<User[] | null>(null)
+    const [users, setUsers] = useState<UserProps[] | null>(null)
 
     const [totalPages, setTotalPages] = useState(0)
     const [loading, setLoading] = useState(true)
@@ -37,7 +37,7 @@ const useSearchUsers = (query: string, page: number, limit: number) => {
             } finally {
                 setLoading(false)
             }
-        };
+        }
         fetchUsers()
 
         return () => {

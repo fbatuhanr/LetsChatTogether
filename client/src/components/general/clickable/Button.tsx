@@ -1,4 +1,4 @@
-import { ClickableProps, colorAdjustment } from "../../../types/clickable"
+import { ClickableProps, colorAdjustment } from './clickable.types'
 
 const Button: React.FC<ClickableProps> = ({ text, iconBegin, iconEnd, notSubmit, onClick, disabled, color, size, outlined, uppercased, innerWidth, innerHeight, className }) => {
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useAxios from '../useAxios';
-import { User } from '../../types/User';
+import { User } from '../../types/User.types';
 
 const useFetchAllUsers = (page: number, limit: number) => {
 

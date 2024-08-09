@@ -1,69 +1,252 @@
-import { useState } from 'react'
-import useAxios from '../useAxios'
-import axios from 'axios'
+// src/hooks/useChat.ts
+import { useEffect, useMemo, useRef, useState } from 'react';
+import io from 'socket.io-client';
+import useAxios from '../useAxios';
+import { FriendProps } from '../../types/User.types';
+import { MessageProps } from '../../types/Message.types';
+import Swal from 'sweetalert2'
+import { toast } from 'react-toastify';
 
-const useChat = () => {
+const useChat = (currentUserId: string, currentUsername: string) => {
 
     const axiosInstance = useAxios();
 
-    const [chat, setChat] = useState()
+    const socket = useMemo(
+        () => io(`${process.env.API_URL}`, { extraHeaders: { userid: currentUserId } }),
+        [currentUserId]
+    );
 
-    const getChats = async (userId: string, includeUser: boolean = false) => {
+    const [chat, setChat] = useState<string | null>(null);
+
+    const [onlineUsers, setOnlineUsers] = useState<Array<string> | null>(null);
+    const [targetUser, setTargetUser] = useState<FriendProps | null>(null);
+
+    const [messages, setMessages] = useState<Array<MessageProps>>([]);
+    const [messageInput, setMessageInput] = useState<string>("");
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        /*const activeChats = async () => {
+            const response = await axiosInstance.get(`${process.env.CHAT_API_URL}/${currentUserId}`);
+            console.log(response.data);
+        };
+        activeChats();*/
+
+        socket.on('users', (users: any) => {
+            console.log(users)
+            setOnlineUsers(users)
+        })
+        socket.on('chatDeleted', (data: any) => {
+
+            console.log("CHAT DELETED!")
+
+            const { chatId, deleteBy } = data
+
+            if (currentUsername !== deleteBy) {
+                toast.warning(`${deleteBy} has cleared the entire chat history between you two!`, {
+                    autoClose: 4000,
+                    pauseOnHover: true
+                });
+            }
+
+            setChat((prev) => {
+
+                if (chatId !== prev) {
+                    return prev;
+                }
+    
+                setMessages([]);
+                setTargetUser(null);
+                setMessageInput("");
+    
+                return null;
+            });
+
+        })
+
+        socket.on('messageDeleted', (messageId: string) => {
+            console.log("MESSAGE DELETED!")
+
+            setMessages((prev) => prev.filter(message => message._id !== messageId));
+        })
+
+        return () => {
+            socket.off('users')
+            socket.off('chatDeleted')
+            socket.off('messageDeleted')
+
+            socket.disconnect();
+        }
+    }, []);
+
+    useEffect(() => {
+        socket.on('message', (message: any) => {
+            console.log(message);
+            setMessages((prev) => [...prev, message]);
+        });
+
+        scrollChatContainerToBottom();
+
+        return () => {
+            socket.off('message');
+        };
+    }, [messages]);
+
+    const handleSendMessage = async () => {
+
+        if (!messageInput || !targetUser) return;
+
+        const data = {
+            text: messageInput,
+            senderId:
+                currentUserId,
+            chatId: chat
+        }
+        setMessageInput("");
+
+        const response = await axiosInstance.post(`${process.env.MESSAGE_API_URL}`, data);
+        console.log(response.data);
+
+        const { _id, text, createdAt } = response.data
+        const messageData: MessageProps = {
+            _id,
+            text,
+            date: createdAt,
+            senderId: currentUserId,
+            receiverId: targetUser?._id
+        };
+
+        socket.emit('sendMessage', messageData);
+        setMessages((prev) => [...prev, messageData]);
+    }
+
+    const handleSelectUser = async (user: FriendProps) => {
+
+        setTargetUser(user);
+
+        const data = { firstId: currentUserId, secondId: user._id };
+        const response = await axiosInstance.post(`${process.env.CHAT_API_URL}`, data);
+        console.log(response.data);
+
+        fetchUsersConversations(response.data._id, user._id);
+        setChat(response.data._id);
+    };
+
+    const fetchUsersConversations = async (chatId: string, selectedUserId: string) => {
+
+        const response = await axiosInstance.get(`${process.env.MESSAGE_API_URL}/${chatId}`);
+        const conversation = response.data.map((msg: any) => {
+            const isSenderCurrentUser = msg.senderId === currentUserId;
+            return {
+                _id: msg._id,
+                text: msg.text,
+                date: msg.createdAt,
+                senderId: isSenderCurrentUser ? currentUserId : selectedUserId,
+                receiverId: isSenderCurrentUser ? selectedUserId : currentUserId,
+            };
+        });
+
+        setMessages(conversation);
+    };
+
+    const scrollChatContainerToBottom = () => {
+        if (!chatContainerRef.current) return;
+
+        chatContainerRef.current.scroll({
+            top: chatContainerRef.current.scrollHeight,
+            behavior: 'smooth',
+        });
+    };
+
+
+    const logla = () => {
+        console.log("aktif chat: ", chat);
+
+    }
+
+    const handleDeleteChat = async () => {
+
+        if (!chat) return
+
+        logla()
+
         try {
-            const response = await axiosInstance.get(`${process.env.API_URL}/friend/${userId}`)
-            if (response.status === 200) {
-                if (!includeUser) {
-                    setFriends(response.data.friends)
-                }
-                else {
-                    const friendsWithUser = [
-                        {
-                            _id: response.data._id,
-                            username: response.data.username,
-                            profilePhoto: response.data.profilePhoto ? response.data.profilePhoto : null
-                        },
-                        ...response.data.friends
-                    ];
-                    setFriends(friendsWithUser)
-                }
-            }
-            else {
-                console.error('Unexpected response status!')
-            }
+            const result = await Swal.fire({
+                title: `Do you want to delete all conversations and chat with ${targetUser?.username}?`,
+                text: 'This action cannot be undone!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                showLoaderOnConfirm: true, // Show loader
+                preConfirm: async () => {
+                    // Send API request
+                    try {
+                        const response = await axiosInstance.delete(`${process.env.CHAT_API_URL}/${chat}`, {
+                            data: { deleteBy: currentUsername }
+                        });
+                        if (response.status !== 200) {
+                            throw new Error('An error occurred during the delete operation.');
+                        }
+                    } catch (error: any) {
+                        Swal.showValidationMessage(error.message || 'An error occurred during the delete operation.');
+                        return false;
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading() // Prevent closing popup by clicking outside while loading
+            });
 
-        } catch (error) {
-            if (axios.isAxiosError(error) && error.response) {
-                setFriends(null)
-                console.log(error.response.data?.message || 'Request failed!')
+            if (result.isConfirmed) {
+                Swal.fire(
+                    'Deleted!',
+                    'Chat has been deleted successfully.',
+                    'success'
+                )
+                logla()
             }
-            else {
-                console.error('An unexpected error occurred!')
-            }
+        } catch (error: any) {
+            Swal.fire(
+                'Error!',
+                error.message || 'An error occurred during the delete operation.',
+                'error'
+            );
         }
     }
 
+    const handleDeleteMessage = async (messageId: string) => {
 
-    const deleteChat = (userId: string, friendId: string) => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const response = await axiosInstance.delete(`${process.env.API_URL}/friend/${userId}/${friendId}`);
-                if (response.status === 200)
-                    resolve(response.data.message)
-                else
-                    reject(response.data.message)
+        if (!messageId) return
 
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response)
-                    reject(error.response.data?.message || 'Request failed!')
-                else
-                    reject('An unexpected error occurred!')
-
+        try {
+            const response = await axiosInstance.delete(`${process.env.MESSAGE_API_URL}/${messageId}`);
+            if (response.status !== 200) {
+                throw new Error('An error occurred during the delete operation.');
             }
-        })
+        } catch (error: any) {
+
+        }
     }
+
     return {
-        deleteChat
+        chat,
+        chatContainerRef,
+
+        onlineUsers,
+        targetUser,
+
+        messages,
+
+        messageInput,
+        setMessageInput,
+
+        handleSelectUser,
+        handleSendMessage,
+
+        handleDeleteChat,
+        handleDeleteMessage
     };
 };
 
-export default useChat
+export default useChat;

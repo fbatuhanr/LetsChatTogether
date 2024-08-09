@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import useAxios from '../useAxios';
 import axios from 'axios';
-import { IFriend } from '../../types/User';
+import { FriendProps } from '../../types/User.types';
 
 export enum RequestStatus {
     None = 'none',
@@ -14,19 +14,20 @@ export interface FriendRequestStatus {
     isSender?: boolean,
     status: RequestStatus
 }
-const useFriendship = () => {
+const useFriendship = (currentUserId: string) => {
 
     const axiosInstance = useAxios();
 
-    const [friends, setFriends] = useState<Array<IFriend> | null>([])
+    const [friends, setFriends] = useState<Array<FriendProps> | null>([])
     const [incomingRequests, setIncomingRequests] = useState<[] | null>(null)
     const [outgoingRequests, setOutgoingRequests] = useState<[] | null>(null)
     const [requestStatusBetweenUsers, setRequestStatusBetweenUsers] = useState<FriendRequestStatus | null>(null)
 
-    const getFriends = async (userId: string, includeUser: boolean = false) => {
+    const getFriends = async (includeUser: boolean = false) => {
         try {
-            const response = await axiosInstance.get(`${process.env.API_URL}/friend/${userId}`)
+            const response = await axiosInstance.get(`${process.env.API_URL}/friend/${currentUserId}`)
             if (response.status === 200) {
+                console.log(response.data)
                 if (!includeUser) {
                     setFriends(response.data.friends)
                 }
@@ -56,10 +57,10 @@ const useFriendship = () => {
             }
         }
     }
-
-    const getIncomingRequests = async (userId: string) => {
+    
+    const getIncomingRequests = async () => {
         try {
-            const response = await axiosInstance.get(`${process.env.API_URL}/friend-request/incoming/${userId}`)
+            const response = await axiosInstance.get(`${process.env.API_URL}/friend-request/incoming/${currentUserId}`)
             if (response.status === 200) {
                 setIncomingRequests(response.data)
             }
@@ -77,9 +78,9 @@ const useFriendship = () => {
             }
         }
     }
-    const getOutgoingRequests = async (userId: string) => {
+    const getOutgoingRequests = async () => {
         try {
-            const response = await axiosInstance.get(`${process.env.API_URL}/friend-request/outgoing/${userId}`)
+            const response = await axiosInstance.get(`${process.env.API_URL}/friend-request/outgoing/${currentUserId}`)
             if (response.status === 200) {
                 setOutgoingRequests(response.data)
             }
@@ -97,10 +98,13 @@ const useFriendship = () => {
             }
         }
     }
-    const getRequestStatusBetweenUsers = async (senderId: string, receiverId: string) => {
+    const getRequestStatusBetweenUsers = async (targetUserId: string) => {
         try {
             const response = await axiosInstance.get(`${process.env.API_URL}/friend-request/status`, {
-                params: { senderId, receiverId }
+                params: { 
+                    senderId: currentUserId, 
+                    receiverId: targetUserId 
+                }
             });
             if (response.status === 200) {
                 setRequestStatusBetweenUsers(response.data)
@@ -120,10 +124,10 @@ const useFriendship = () => {
     }
 
 
-    const removeFriend = (userId: string, friendId: string) => {
+    const removeFriend = (targetUserId: string) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axiosInstance.delete(`${process.env.API_URL}/friend/${userId}/${friendId}`);
+                const response = await axiosInstance.delete(`${process.env.API_URL}/friend/${currentUserId}/${targetUserId}`);
                 if (response.status === 200)
                     resolve(response.data.message)
                 else
@@ -138,12 +142,12 @@ const useFriendship = () => {
             }
         })
     }
-    const sendRequest = (senderId: string, receiverId: string) => {
+    const sendRequest = (targetUserId: string) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const response = await axiosInstance.post(`${process.env.API_URL}/friend-request/send`, {
-                    senderId,
-                    receiverId
+                    senderId: currentUserId,
+                    receiverId: targetUserId
                 });
                 if (response.status === 201)
                     resolve(response.data.message)
@@ -159,11 +163,12 @@ const useFriendship = () => {
             }
         })
     }
-    const acceptRequest = async (senderId: string, receiverId: string) => {
+    const acceptRequest = async (targetUserId: string) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const response = await axiosInstance.put(`${process.env.API_URL}/friend-request/accept`, {
-                    senderId, receiverId
+                    senderId: currentUserId, 
+                    receiverId: targetUserId
                 })
                 if (response.status === 201)
                     resolve(response.data.message)
@@ -179,11 +184,14 @@ const useFriendship = () => {
             }
         })
     }
-    const cancelRequest = (senderId: string, receiverId: string) => {
+    const cancelRequest = (targetUserId: string) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const response = await axiosInstance.delete(`${process.env.API_URL}/friend-request/cancel`, {
-                    data: { senderId, receiverId }
+                    data: { 
+                        senderId: currentUserId, 
+                        receiverId: targetUserId 
+                    }
                 });
                 if (response.status === 200)
                     resolve(response.data.message)

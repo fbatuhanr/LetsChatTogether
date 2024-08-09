@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import * as messageService from './message.service'
+import { getIO } from "../../socket";
 
 async function createMessage(req: Request, res: Response, next: NextFunction) {
     try {
@@ -15,5 +16,20 @@ async function getMessage(req: Request, res: Response, next: NextFunction) {
         next(err);
     }
 }
+async function deleteMessage(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { messageId } = req.params
+        
+        await messageService.deleteMessage(messageId)
+        
+        const io = getIO()
+        io.emit('messageDeleted', messageId)
 
-export { createMessage, getMessage }
+        res.status(200).json({ message: 'Message deleted successfully.' })
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+export { createMessage, getMessage, deleteMessage }

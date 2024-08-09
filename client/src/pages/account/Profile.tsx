@@ -5,7 +5,7 @@ import Datepicker from "tailwind-datepicker-react"
 
 import useAxios from '../../hooks/useAxios'
 import { useDecodedToken } from '../../hooks/useDecodedToken'
-import { User } from '../../types/User'
+import { User } from '../../types/User.types'
 
 const Profile = () => {
 

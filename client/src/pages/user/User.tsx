@@ -71,7 +71,7 @@ const User = () => {
                     {
                         decodedToken.userId ?
                             decodedToken.username !== username &&
-                            <FriendRequestButton senderId={decodedToken.userId} receiverId={data._id} />
+                            <FriendRequestButton targetUserId={data._id} />
                             :
                             <div className="text-center py-2">
                                 <Link to="/login" className="bg-[#6841F2] px-8 py-2.5 rounded-2xl text-xl font-semibold [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#211a3c] shadow-md">

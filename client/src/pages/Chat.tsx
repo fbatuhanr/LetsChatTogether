@@ -1,155 +1,98 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { FaUserCircle } from 'react-icons/fa'
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
-import io from 'socket.io-client'
+import { FaUserCircle } from 'react-icons/fa'
 import { IoIosSend } from 'react-icons/io'
-import useAxios from '../hooks/useAxios'
-import { useDecodedToken } from '../hooks/useDecodedToken'
 
 import cosmicButterfly from "../assets/background/cosmic-butterfly.png"
 import cosmicButterflyRight from "../assets/background/cosmic-butterfly-right.png"
+
+import { useDecodedToken } from '../hooks/useDecodedToken'
 import useFriendship from '../hooks/api/useFriendship'
-import { IFriend } from '../types/User'
-import Button from '../components/general/clickable/Button'
-import { Link } from 'react-router-dom'
+import useChat from '../hooks/api/useChat'
 
-interface IMessage {
-  text: string,
-  date: Date | null,
+import { FriendProps } from '../types/User.types'
+import { MessageProps } from '../types/Message.types'
+import { MdCancel } from 'react-icons/md'
 
-  senderId: string,
-  receiverId: string | null
-}
 
 const Chat = () => {
 
-  const axiosInstance = useAxios()
   const decodedToken = useDecodedToken()
-
   const currentUserId = decodedToken.userId
+  const currentUsername = decodedToken.username
 
-  const socket = useMemo(() => io(`${process.env.API_URL}`, { extraHeaders: { userid: currentUserId } }), [currentUserId]);
+  const { friends, getFriends } = useFriendship(currentUserId)
 
-  const [chat, setChat] = useState<string>("");
+  const {
+    chatContainerRef,
+    onlineUsers,
+    targetUser,
+    messages,
+    messageInput,
+    setMessageInput,
+    handleSendMessage,
+    handleSelectUser,
 
-  const { friends, getFriends } = useFriendship()
+    handleDeleteChat,
+    handleDeleteMessage
+  } = useChat(currentUserId, currentUsername);
 
-  const [onlineUsers, setOnlineUsers] = useState<Array<string>>([])
-
-  const [selectedUser, setSelectedUser] = useState<IFriend>()
-
-  const [messages, setMessages] = useState<Array<IMessage>>([]);
-  const [messageInput, setMessageInput] = useState<string>("");
-
-  const chatContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-
-    getFriends(currentUserId, true)
-
-    const activeChats = async () => {
-
-      const response = await axiosInstance.get(`${process.env.CHAT_API_URL}/${currentUserId}`)
-      console.log(response.data)
-    }
-    activeChats()
-
-    socket.on('users', (users: any) => {
-      console.log(users)
-      setOnlineUsers(users)
-    });
-    return () => {
-      socket.off('users')
-      socket.disconnect()
-    };
-
+    getFriends(true)
   }, [])
 
-  useEffect(() => {
-    socket.on('message', (message: any) => {
-      console.log(message)
-      setMessages((prev) => [...prev, message]);
-    });
-
-    handleChatContainerScroll()
-
-    return () => {
-      socket.off('message');
-    }
-  }, [messages]);
-
-  const sendMessage = async () => {
-    if (!messageInput) return
-    if (!selectedUser) return
-
-    console.log("emit send message")
-    const messageData: IMessage = {
-      text: messageInput,
-      date: new Date(),
-
-      senderId: currentUserId,
-      receiverId: selectedUser?._id
-    }
-    socket.emit('sendMessage', messageData);
-    setMessages((prev) => [...prev, messageData]);
-
-    const data = { text: messageInput, senderId: currentUserId, chatId: chat }
-    const response = await axiosInstance.post(`${process.env.MESSAGE_API_URL}`, data)
-    console.log(response.data)
-
-    setMessageInput("");
-  }
-
-  function handleChatContainerScroll() {
-
-    if (!chatContainerRef.current) return
-
-    chatContainerRef.current.scroll({
-      top: chatContainerRef.current.scrollHeight,
-      behavior: "smooth"
-    });
-  }
-
-  const getUsernameById = (id: string) => friends?.find(i => i._id == id)?.username
-  const getPhotoById = (id: string) => friends?.find(i => i._id == id)?.profilePhoto
-
-  console.log(friends);
+  const getUsernameById = (id: string) => friends?.find((i) => i._id === id)?.username;
+  const getPhotoById = (id: string) => friends?.find((i) => i._id === id)?.profilePhoto;
 
 
-  const handleSelectUser = async (user: IFriend) => {
+  const renderMessageHeader = (messageData: MessageProps, isMessageBelongsCurrUser: boolean, isSenderSamePreviousOne: boolean) => {
+    
+    const deleteMessageButton = 
+      <button className={`mb-2 mx-1 ${isMessageBelongsCurrUser ? "order-first" : "order-last"}`}
+        onClick={() => handleDeleteMessage(messageData._id)}>
+        <MdCancel size={18} color='#ee3e2c' opacity={0.5}/>
+      </button>
 
-    console.log(user)
-    setSelectedUser(user)
+    if (isSenderSamePreviousOne) return isMessageBelongsCurrUser ? deleteMessageButton : null
 
-    const data = { firstId: currentUserId, secondId: user._id }
-    const response = await axiosInstance.post(`${process.env.CHAT_API_URL}`, data)
-    console.log(response.data);
+    const profilePic = getPhotoById(messageData.senderId);
+    const initials = getUsernameById(messageData.senderId)?.[0].toUpperCase();
+    const avatarClasses = `w-10 h-10 leading-9 text-xl text-center rounded-full overflow-hidden ${isMessageBelongsCurrUser ? 'order-1 ml-1 border-2' : 'mr-1'} ${messageData.date ? 'mb-3' : 'mb-1.5'}`;
+    const bgColor = `bg-[#4F22F2]`;
 
-    fetchUsersConversation(response.data._id, user._id)
+    return (
+      <>
+        {isMessageBelongsCurrUser && deleteMessageButton}
+        <div className={`${avatarClasses} ${bgColor}`}>
+          {profilePic ? (
+            <img src={`${process.env.API_URL}/${profilePic}`} alt="Profile" />
+          ) : (
+            initials
+          )}
+        </div>
+      </>
+    );
+  };
+  const renderMessageDate = (date?: Date | null) => {
+    if (!date) return null;
 
-    setChat(response.data._id)
-  }
+    const messageDate = new Date(date);
+    const isDifferentDay = new Date().toDateString() !== messageDate.toDateString();
 
-  const fetchUsersConversation = async (chatId: string, selectedUserId: string) => {
-
-    const response = await axiosInstance.get(`${process.env.MESSAGE_API_URL}/${chatId}`)
-    console.log(response.data)
-    console.log("current user: ", currentUserId)
-    console.log("selected user: ", selectedUserId)
-
-    const conversation = response.data.map((msg: any) => {
-      let isSenderCurrentUser = msg.senderId == currentUserId
-      return {
-        text: msg.text,
-        date: msg.createdAt,
-
-        senderId: isSenderCurrentUser ? currentUserId : selectedUserId,
-        receiverId: isSenderCurrentUser ? selectedUserId : currentUserId,
-      }
-    })
-    console.log(conversation)
-    setMessages(conversation)
-  }
+    return (
+      <time className="text-[0.55rem] italic -mt-1" dateTime={messageDate.toString()}>
+        {messageDate.toLocaleTimeString()}
+        {isDifferentDay && (
+          <>
+            <br />
+            {messageDate.toDateString()}
+          </>
+        )}
+      </time>
+    );
+  };
 
   return (
     <div className="relative flex flex-col gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
@@ -159,57 +102,37 @@ const Chat = () => {
       <div className="z-10 flex w-full max-w-4xl h-[440px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
         <div className="basis-4/5 px-12 pt-4 pb-36">
           {
-            selectedUser ?
+            targetUser ?
               <>
                 <div className="flex justify-between px-4 py-2.5 border-[#6841F2] border-b-2 text-lg">
-                  <Link to={`/user/${selectedUser.username}`}>View Profile</Link>
+                  <Link to={`/user/${targetUser.username}`}>View Profile</Link>
                   <Link to="/account/friends">Manage Friends</Link>
-                  <Link to={`/user/${selectedUser.username}`} className="text-red-600">Delete All Chat</Link>
+                  <button onClick={handleDeleteChat} className="text-red-600">Delete Chat</button>
                 </div>
-                <div ref={chatContainerRef} className="mt-2 mb-2 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg h-full">
-                  {
-                    messages && messages.map((messageData, index: number) => {
+                <div
+                  ref={chatContainerRef}
+                  className="mt-2 mb-2 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg h-full"
+                >
+                  {messages.map((messageData: MessageProps, index) => {
+                    const isMessageBelongsCurrUser = messageData.senderId === currentUserId;
+                    const isSenderSamePreviousOne = index > 0 && messageData.senderId === messages[index - 1].senderId;
 
-                      let isMessageBelongsCurrUser = messageData.senderId == currentUserId
-                      let isSenderSamePreviousOne = messages[index - 1] ? messageData.senderId == messages[index - 1].senderId : false
-                      return (
-                        <div key={index} className={`relative flex items-center ${isSenderSamePreviousOne ? "mt-1" : "mt-2"} ${isMessageBelongsCurrUser ? "justify-end" : "justify-start"}`}>
-                          {
-                            !isSenderSamePreviousOne &&
-                            <div className={`w-10 h-10 leading-9 text-xl text-center rounded-full bg-[#4F22F2] font-bold overflow-hidden ${isMessageBelongsCurrUser ? "order-last ml-1 border-2" : "mr-1"} ${messageData.date ? "mb-3" : "mb-1.5"}`}>
-                              {
-                                getPhotoById(messageData.senderId)
-                                  ?
-                                  <img src={`${process.env.API_URL}/${getPhotoById(messageData.senderId)!}`} />
-                                  :
-                                  getUsernameById(messageData.senderId)![0].toUpperCase()
-                              }
-                            </div>
-                          }
-                          <div className={`leading-[0.5] ${isSenderSamePreviousOne ? isMessageBelongsCurrUser ? "me-11" : "ms-11" : ""} ${isMessageBelongsCurrUser ? "text-right" : "text-left"}`}>
-                            <p className={`bg-[#D5CAFF] text-black px-4 py-1 text-lg ${isMessageBelongsCurrUser ? "rounded-tl-md rounded-bl-md" : "rounded-tr-md rounded-br-md"}`}>{messageData.text}</p>
-                            {
-                              messageData.date &&
-                              <>
-                                <time className="text-[0.55rem] italic -mt-1" dateTime={(messageData.date).toString()}>
-                                  {new Date(messageData.date).toLocaleTimeString()}
-                                  {
-                                    new Date().toDateString() !== new Date(messageData.date).toDateString()
-                                    &&
-                                    <>
-                                      <br />
-                                      {new Date(messageData.date).toDateString()}
-                                    </>
-                                  }
-                                </time>
-                              </>
-                            }
-                          </div>
+                    return (
+                      <div key={index}
+                        className={`relative flex items-center ${isSenderSamePreviousOne ? 'mt-1' : 'mt-2'} ${isMessageBelongsCurrUser ? 'justify-end' : 'justify-start'}`}>
+
+                        {renderMessageHeader(messageData, isMessageBelongsCurrUser, isSenderSamePreviousOne)}
+
+                        <div className={`leading-[0.5] ${isSenderSamePreviousOne ? (isMessageBelongsCurrUser ? 'me-11' : 'ms-11') : ''} ${isMessageBelongsCurrUser ? 'text-right' : 'text-left'}`}>
+                          <p className={`bg-[#D5CAFF] text-black px-4 py-1 text-lg ${isMessageBelongsCurrUser ? 'rounded-tl-md rounded-bl-md' : 'rounded-tr-md rounded-br-md'}`}>
+                            {messageData.text}
+                          </p>
+                          {renderMessageDate(messageData.date)}
                         </div>
-                      )
-                    }
-                    )
-                  }
+
+                      </div>
+                    );
+                  })}
                 </div>
                 <div className="border-2 border-[#6841F2] bg-[#6841F2] flex h-14 items-stretch overflow-hidden rounded-xl">
                   <input
@@ -217,17 +140,21 @@ const Chat = () => {
                     value={messageInput}
                     className="text-black text-lg flex-1 ps-4 pe-2 outline-none"
                     onChange={(e) => setMessageInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" ? sendMessage() : null}
+                    onKeyDown={(e) => e.key === "Enter" ? handleSendMessage() : null}
                     placeholder="Type your message..."
                   />
-                  <button onClick={sendMessage} className="w-1/6 text-center hover:bg-[#472DA6]">
+                  <button onClick={handleSendMessage} className="w-1/6 text-center hover:bg-[#472DA6]">
                     <IoIosSend className="text-3xl mx-auto" />
                   </button>
                 </div>
               </>
               :
-              <h2 className="text-center text-2xl text-slate-300">
-                Please select a user for starting conversation
+              <h2 className="mt-8 text-center text-3xl text-slate-300">
+                {
+                  (friends && friends?.length > 1) 
+                  ? "Please select a friend for starting conversation"
+                  : "You don't have any friends, add new friends to start chatting!"
+                }
               </h2>
           }
 
@@ -237,12 +164,12 @@ const Chat = () => {
           <h3 className="text-3xl font-bold text-center">Friends</h3>
           <div className="mt-2 text-slate-800 font-medium">
             {
-              friends && friends.map((user: IFriend, index: number) => {
+              friends && friends.map((user: FriendProps, index: number) => {
 
                 if (user._id == currentUserId) return // if self then skip this user
 
-                let isUserOnline = onlineUsers.includes(user._id)
-                let isUserSelected = user._id == selectedUser?._id
+                let isUserOnline = onlineUsers ? onlineUsers.includes(user._id) : false
+                let isUserSelected = user._id == targetUser?._id
                 return (
                   <div key={index} className={`${isUserOnline ? "text-slate-800" : "text-slate-700"} ${isUserSelected ? "border-[#BCA9FF] border-2 bg-[#dbd1ff]" : "bg-[#BCA9FF]"} flex items-center gap-x-2 ps-4 mt-1.5 cursor-pointer`}
                     onClick={() => handleSelectUser(user)}>
@@ -254,7 +181,7 @@ const Chat = () => {
             }
           </div>
           <div>
-            <h4 className="text-2xl font-bold text-center">Start New Conversation</h4>
+            <h4 className="text-2xl font-bold text-center">&nbsp;</h4>
           </div>
         </div>
       </div>

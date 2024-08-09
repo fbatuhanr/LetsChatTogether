@@ -10,8 +10,8 @@ function getIncomingRequests(userId: string) {
 async function acceptRequest(senderId: string, receiverId: string) {
 
   await FriendRequest.findOneAndUpdate({ $or: [{ sender: senderId, receiver: receiverId }, { sender: receiverId, receiver: senderId }] }, { status: 'accepted' })
-  await User.findByIdAndUpdate(senderId, { $push: { friends: receiverId } })
-  await User.findByIdAndUpdate(receiverId, { $push: { friends: senderId } })
+  await User.findByIdAndUpdate(senderId, { $addToSet: { friends: receiverId } })
+  await User.findByIdAndUpdate(receiverId, { $addToSet: { friends: senderId } })
 
   return true
 }

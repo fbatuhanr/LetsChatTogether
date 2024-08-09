@@ -17,4 +17,4 @@ export const useDecodedToken = (): DecodedToken => {
         console.error('Error decoding token:', error);
         return defaultDecodedToken;
     }
-};
+}

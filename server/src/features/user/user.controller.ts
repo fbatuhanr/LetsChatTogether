@@ -52,8 +52,6 @@ async function searchUsers(req: Request, res: Response, next: NextFunction) {
     const limit = parseInt(req.query.limit as string) || 10
     
     const currUserId = req.query.currUserId as string
-    console.log("null mu?: ", currUserId)
-    console.log(currUserId)
     
     const result = await userService.searchUsers(searchRegex, page, limit, currUserId)
     if (result)

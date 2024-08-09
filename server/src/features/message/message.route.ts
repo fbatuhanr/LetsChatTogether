@@ -7,5 +7,7 @@ const router = Router()
 router.post("/", authenticateToken, messageController.createMessage);
 router.get("/:chatId", authenticateToken, messageController.getMessage);
 
+router.delete("/:messageId", authenticateToken, messageController.deleteMessage)
+
 
 export default router

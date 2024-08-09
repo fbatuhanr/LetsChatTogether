@@ -1,12 +1,14 @@
-import mongoose, { Schema, model, InferSchemaType } from 'mongoose'
+import mongoose, { Schema, model } from 'mongoose'
 
 const ChatSchema = new Schema(
     {
-        members: Array
+        members: [
+            { type: Schema.Types.ObjectId, ref: 'User', required: true }
+        ]
     },
     {
         timestamps: true
     }
-)
+);
 
-export default model("Chat", ChatSchema);
+export default model('Chat', ChatSchema)

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import useFriendship from '../../hooks/api/useFriendship'
 import { useDecodedToken } from '../../hooks/useDecodedToken'
 
@@ -9,7 +9,8 @@ import { IoIosChatboxes } from 'react-icons/io';
 import { toast } from 'react-toastify';
 
 const Friends = () => {
-    
+
+    const [isLoading, setIsLoading] = useState(false);
     const decodedToken = useDecodedToken()
 
     const {
@@ -24,45 +25,56 @@ const Friends = () => {
         removeFriend,
         acceptRequest,
         cancelRequest
-    } = useFriendship();
+    } = useFriendship(decodedToken.userId);
 
     useEffect(() => {
-        getFriends(decodedToken.userId)
-        getIncomingRequests(decodedToken.userId)
-        getOutgoingRequests(decodedToken.userId)
+        getFriends()
+        getIncomingRequests()
+        getOutgoingRequests()
     }, []);
 
-    const handleAcceptRequest = async (senderId: string, receiverId: string) => {
+    const handleAcceptRequest = async (targetUserId: string) => {
+        if (isLoading) return
 
-        await toast.promise(acceptRequest(senderId, receiverId), {
+        setIsLoading(true)
+        await toast.promise(acceptRequest(targetUserId), {
             pending: 'Request sending...',
             success: { render: ({ data }) => `${data}` },
             error: { render: ({ data }) => `${data}` }
         });
+        setIsLoading(false)
 
-        getIncomingRequests(decodedToken.userId)
-        getFriends(decodedToken.userId)
-    }
-    const handleCancelSentRequest = async (senderId: string, receiverId: string) => {
+        getIncomingRequests()
+        getFriends()
+    };
 
-        await toast.promise(cancelRequest(senderId, receiverId), {
+    const handleCancelSentRequest = async (targetUserId: string) => {
+        if (isLoading) return
+
+        setIsLoading(true)
+        await toast.promise(cancelRequest(targetUserId), {
             pending: 'Request sending...',
             success: { render: ({ data }) => `${data}` },
             error: { render: ({ data }) => `${data}` }
         });
+        setIsLoading(false)
 
-        getOutgoingRequests(decodedToken.userId)
-    }
-    const handleRemoveFriend = async(userId: string, friendId: string) => {
+        getOutgoingRequests()
+    };
 
-        await toast.promise(removeFriend(userId, friendId), {
+    const handleRemoveFriend = async (targetUserId: string) => {
+        if (isLoading) return
+
+        setIsLoading(true)
+        await toast.promise(removeFriend(targetUserId), {
             pending: 'Request sending...',
             success: { render: ({ data }) => `${data}` },
             error: { render: ({ data }) => `${data}` }
         });
+        setIsLoading(false)
 
-        getFriends(decodedToken.userId)
-    }
+        getFriends()
+    };
 
     return (
         <div className="w-full grid grid-cols-3 gap-4">
@@ -78,8 +90,10 @@ const Friends = () => {
                                         <FaEye className="text-lg text-white mt-0.5" />
                                     </Link>
                                     <div className="flex items-center gap-x-1.5">
-                                        <button><IoIosChatboxes className="text-xl text-white" /></button>
-                                        <button onClick={() => handleRemoveFriend(decodedToken.userId, friend._id)}>
+                                        <Link to="/chat">
+                                            <IoIosChatboxes className="text-xl text-white" />
+                                        </Link>
+                                        <button onClick={() => handleRemoveFriend(friend._id)}>
                                             <FaTrash className="text-sm text-red-500" />
                                         </button>
                                     </div>
@@ -100,7 +114,7 @@ const Friends = () => {
                                         {request.sender.username}
                                     </Link>
                                     <div className="flex items-center gap-x-1.5">
-                                        <button onClick={() => handleAcceptRequest(request.sender._id, decodedToken.userId)}>
+                                        <button onClick={() => handleAcceptRequest(request.sender._id)}>
                                             <FaCircleCheck className="text-2xl text-[#0dd112]" />
                                         </button>
                                         <button>
@@ -124,7 +138,7 @@ const Friends = () => {
                                         {request.receiver.username}
                                     </Link>
                                     <div className="flex items-center gap-x-1.5">
-                                        <button onClick={() => handleCancelSentRequest(decodedToken.userId, request.receiver._id)}><FaCircleXmark className="text-2xl text-[#f33825]" /></button>
+                                        <button onClick={() => handleCancelSentRequest(request.receiver._id)}><FaCircleXmark className="text-2xl text-[#f33825]" /></button>
                                     </div>
                                 </li>
                             )

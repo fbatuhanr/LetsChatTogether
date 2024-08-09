@@ -2,13 +2,15 @@ import React, { useEffect } from 'react';
 import useFriendRequest, { RequestStatus } from '../hooks/api/useFriendship'
 import MessageImg from "../assets/message.png"
 import { toast } from 'react-toastify';
+import { useDecodedToken } from '../hooks/useDecodedToken';
 
 interface FriendRequestButtonProps {
-    senderId: string,
-    receiverId: string
+    targetUserId: string;
 }
 
-const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({ senderId, receiverId }) => {
+const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({ targetUserId }) => {
+
+    const decodedToken = useDecodedToken()
 
     const {
         requestStatusBetweenUsers,
@@ -18,21 +20,21 @@ const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({ senderId, rec
         sendRequest,
         acceptRequest,
         cancelRequest
-    } = useFriendRequest();
+    } = useFriendRequest(decodedToken.userId);
 
     useEffect(() => {
-        getRequestStatusBetweenUsers(senderId, receiverId)
+        getRequestStatusBetweenUsers(targetUserId)
     }, []);
 
     const handleClick = async () => {
         let methodToCall;
 
         if (requestStatusBetweenUsers?.status === RequestStatus.Pending) {
-            methodToCall = () => cancelRequest(senderId, receiverId);
+            methodToCall = () => cancelRequest(targetUserId);
         } else if (requestStatusBetweenUsers?.status === RequestStatus.Accepted) {
-            methodToCall = () => removeFriend(senderId, receiverId);
+            methodToCall = () => removeFriend(targetUserId);
         } else if (requestStatusBetweenUsers?.status === RequestStatus.Rejected || requestStatusBetweenUsers?.status === RequestStatus.None) {
-            methodToCall = () => sendRequest(senderId, receiverId);
+            methodToCall = () => sendRequest(targetUserId);
         } else {
             console.error('Unknown status');
             return;
@@ -44,7 +46,7 @@ const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({ senderId, rec
                 success: { render: ({ data }) => `${data}` },
                 error: { render: ({ data }) => `${data}` }
             });
-            getRequestStatusBetweenUsers(senderId, receiverId)
+            getRequestStatusBetweenUsers(targetUserId)
         } catch (error) {
             console.error('Error:', error);
         }
@@ -52,12 +54,12 @@ const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({ senderId, rec
 
     const handleAcceptRequest = async () => {
 
-        await toast.promise(acceptRequest(senderId, receiverId), {
+        await toast.promise(acceptRequest(targetUserId), {
             pending: 'Request sending...',
             success: { render: ({ data }) => `${data}` },
             error: { render: ({ data }) => `${data}` }
         });
-        getRequestStatusBetweenUsers(senderId, receiverId)
+        getRequestStatusBetweenUsers(targetUserId)
     }
 
     const getButtonText = () => {

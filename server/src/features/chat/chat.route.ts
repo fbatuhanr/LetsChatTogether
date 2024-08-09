@@ -4,9 +4,11 @@ import * as chatController from './chat.controller'
 
 const router = Router()
 
-router.post("/", authenticateToken, chatController.createChat);
-router.get("/:userId", authenticateToken, chatController.findUserChats);
-router.get("/find/:firstId/:secondId", authenticateToken, chatController.findChat);
+router.post("/", authenticateToken, chatController.createChat)
+router.get("/:userId", authenticateToken, chatController.findUserChats)
+router.get("/find/:firstId/:secondId", authenticateToken, chatController.findChat)
+
+router.delete("/:chatId", authenticateToken, chatController.deleteChat)
 
 
 export default router

@@ -28,6 +28,7 @@
     "redux-thunk": "^3.1.0",
     "socket.io-client": "^4.7.5",
     "sort-by": "^1.2.0",
+    "sweetalert2": "^11.12.4",
     "tailwind-datepicker-react": "^1.4.3",
     "tailwind-scrollbar": "^3.1.0",
     "typewriter-effect": "^2.21.0"

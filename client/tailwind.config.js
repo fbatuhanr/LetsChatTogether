@@ -11,7 +11,7 @@ export default {
         'hero': "url('/src/assets/hero.png')",
         'blur-ellipse': "url('/src/assets/ellipse.png')",
         'blur-ellipse-small': "url('/src/assets/ellipse-small.png')",
-        
+
         'sunset-on-venus': "url('/src/assets/background/sunset-on-venus.png')",
         'poseidons-realm': "url('/src/assets/background/poseidons-realm.png')",
         'fragment-of-saturn': "url('/src/assets/background/fragment-of-saturn.png')",
@@ -29,7 +29,15 @@ export default {
     },
   },
   plugins: [
-    require('tailwind-scrollbar')
+    require('tailwind-scrollbar'),
+    function ({ addBase }) {
+      addBase({
+        'button, [type="button"], [type="reset"], [type="submit"]': {
+          backgroundColor: 'initial', // Tailwind'in varsayılan 'transparent' yerine 'initial' kullanabilirsiniz
+          backgroundImage: 'none',    // İsteğe bağlı, varsayılan stilin önüne geçer
+        }
+      })
+    }
   ]
 }
 
