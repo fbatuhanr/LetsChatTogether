@@ -5,7 +5,8 @@ import Datepicker from "tailwind-datepicker-react"
 
 import useAxios from '../../hooks/useAxios'
 import { useDecodedToken } from '../../hooks/useDecodedToken'
-import { User } from '../../types/User.types'
+import { UserProps } from '../../types/User.types'
+import Button from '../../components/general/clickable/Button'
 
 const Profile = () => {
 
@@ -15,7 +16,7 @@ const Profile = () => {
     const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false)
     const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<User>()
 
-    const onSubmit: SubmitHandler<User> = async (data) => {
+    const onSubmit: SubmitHandler<UserProps> = async (data) => {
 
         console.log(data)
 
@@ -187,9 +188,7 @@ const Profile = () => {
                 />
             </div>
 
-            <button type="submit" className="w-full mt-4 bg-[#DBBA12] rounded-2xl py-3 text-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D]">
-                Update
-            </button>
+            <Button text="Update" color="primary" innerHeight={3} size="2xl" uppercased className="mt-2"/>
         </form>
     )
 }

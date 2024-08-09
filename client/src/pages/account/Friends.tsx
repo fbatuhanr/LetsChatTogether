@@ -77,14 +77,14 @@ const Friends = () => {
     };
 
     return (
-        <div className="w-full grid grid-cols-3 gap-4">
+        <div className="w-full grid lg:grid-cols-3 gap-4">
             <div>
                 <h3 className="border-b mb-4 px-2 text-xl">Active Friends</h3>
                 <div className="px-1">
                     <ul>
                         {
                             friends && friends.map((friend: any, index: number) =>
-                                <li key={index} className="flex justify-between items-center text-xl my-0.5 ps-4 pe-2 py-0.5 bg-black bg-opacity-20 rounded-xl">
+                                <li key={index} className="flex justify-between items-center text-xl my-1 ps-4 pe-2 py-1 bg-black bg-opacity-20 rounded-xl">
                                     <Link to={`/user/${friend.username}`} className="flex items-center gap-x-1">
                                         {friend.username}
                                         <FaEye className="text-lg text-white mt-0.5" />
@@ -109,7 +109,7 @@ const Friends = () => {
                     <ul>
                         {
                             incomingRequests && incomingRequests.map((request: any, index: number) =>
-                                <li key={index} className="flex justify-between items-center text-xl ps-4 pe-2 py-0.5 bg-black bg-opacity-20 rounded-xl">
+                                <li key={index} className="flex justify-between items-center text-xl my-1 ps-4 pe-2 py-1 bg-black bg-opacity-20 rounded-xl">
                                     <Link to={`/user/${request.sender.username}`}>
                                         {request.sender.username}
                                     </Link>
@@ -133,7 +133,7 @@ const Friends = () => {
                     <ul>
                         {
                             outgoingRequests && outgoingRequests.map((request: any, index: number) =>
-                                <li key={index} className="flex justify-between items-center text-xl my-0.5 ps-4 pe-2 py-0.5 bg-black bg-opacity-20 rounded-xl">
+                                <li key={index} className="flex justify-between items-center text-xl my-1 ps-4 pe-2 py-1 bg-black bg-opacity-20 rounded-xl">
                                     <Link to={`/user/${request.receiver.username}`}>
                                         {request.receiver.username}
                                     </Link>

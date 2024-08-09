@@ -4,6 +4,7 @@ import { ErrorMessage } from "@hookform/error-message"
 
 import { useDecodedToken } from '../../hooks/useDecodedToken'
 import useAxios from '../../hooks/useAxios'
+import Button from '../../components/general/clickable/Button'
 
 interface ISettingsInput {
     email: string,
@@ -70,9 +71,7 @@ const Settings = () => {
                 </div>
             </div>
 
-            <button type="submit" className="w-full mt-4 bg-[#DBBA12] rounded-2xl py-3 text-2xl [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D]">
-                Update
-            </button>
+            <Button text="Update" color="primary" innerHeight={3} size="2xl" uppercased className="mt-2"/>
         </form>
     )
 }

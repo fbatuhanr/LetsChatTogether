@@ -1,6 +1,6 @@
 const Footer: React.FC = () => {
     return (
-        <footer className=" mt-28 bg-gradient-to-t from-[#6841F2] to-[#0D0D0D1a] min-h-[200px]">
+        <footer className="mt-14 lg:mt-28 bg-gradient-to-t from-[#6841F2] to-[#0D0D0D1a] min-h-[200px]">
             <div className="max-w-4xl px-12 mx-auto">
                 <nav className="pt-16 pb-8 flex flex-col gap-y-12 md:flex-row md:gap-x-8 justify-between">
                     <div>

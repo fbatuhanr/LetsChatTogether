@@ -24,10 +24,10 @@ const Users: React.FC = () => {
   return (
     <div className="relative flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
       <div>
-        <h1 className="text-5xl font-bold">Users</h1>
+        <h1 className="text-5xl font-bold">Users ({users?.length ? users?.length : 0})</h1>
       </div>
 
-      <div className="max-w-2xl w-full flex items-center gap-x-2">
+      <div className="max-w-2xl w-full px-8 lg:px-0 flex items-center gap-x-2">
         <input type="text" placeholder="Search users by name, surname or username..." className="w-full px-6 py-3 text-lg bg-[#472DA6] rounded"
           value={searchQuery} onChange={handleSearchChange}
         />
@@ -37,10 +37,10 @@ const Users: React.FC = () => {
       }
       {
         !loading &&
-        <div className="max-w-6xl w-full mx-auto px-12 min-h-72 grid grid-cols-4 gap-4">
+        <div className="max-w-6xl w-full mx-auto px-4 lg:px-12 min-h-72 grid grid-cols-2 lg:grid-cols-4 gap-4">
           {
             users && users.map((user: UserProps, index: number) =>
-              <div key={index} className="w-full h-auto pt-6 pb-7 px-2 rounded-sm bg-gradient-to-t from-[#0D0D0D] to-[#472DA6] shadow shadow-[#472DA6]">
+              <div key={index} className="w-full h-auto pt-6 pb-7 px-1 lg:px-2 rounded-sm bg-gradient-to-t from-[#0D0D0D] to-[#472DA6] shadow shadow-[#472DA6]">
                 <div className="relative w-40 h-40 mx-auto rounded-full overflow-hidden p-2 border border-[#cccccc]">
                   <Link to={`/user/${user.username}`}>
                     <img src={user.profilePhoto ? `${process.env.API_URL}/${user.profilePhoto}` : userAvatar} width="100%" height="auto" className="scale-125" />

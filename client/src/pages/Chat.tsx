@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-import { FaUserCircle } from 'react-icons/fa'
-import { IoIosSend } from 'react-icons/io'
+import { FaCircle } from 'react-icons/fa'
+import { IoIosChatboxes, IoIosSend } from 'react-icons/io'
 
 import cosmicButterfly from "../assets/background/cosmic-butterfly.png"
 import cosmicButterflyRight from "../assets/background/cosmic-butterfly-right.png"
@@ -14,6 +14,7 @@ import useChat from '../hooks/api/useChat'
 import { FriendProps } from '../types/User.types'
 import { MessageProps } from '../types/Message.types'
 import { MdCancel } from 'react-icons/md'
+import { textClip } from '../utils/textUtils'
 
 
 const Chat = () => {
@@ -48,11 +49,11 @@ const Chat = () => {
 
 
   const renderMessageHeader = (messageData: MessageProps, isMessageBelongsCurrUser: boolean, isSenderSamePreviousOne: boolean) => {
-    
-    const deleteMessageButton = 
+
+    const deleteMessageButton =
       <button className={`mb-2 mx-1 ${isMessageBelongsCurrUser ? "order-first" : "order-last"}`}
         onClick={() => handleDeleteMessage(messageData._id)}>
-        <MdCancel size={18} color='#ee3e2c' opacity={0.5}/>
+        <MdCancel size={18} color='#ee3e2c' opacity={0.5} />
       </button>
 
     if (isSenderSamePreviousOne) return isMessageBelongsCurrUser ? deleteMessageButton : null
@@ -95,24 +96,21 @@ const Chat = () => {
   };
 
   return (
-    <div className="relative flex flex-col gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
+    <div className="px-2 lg:px-0 relative flex flex-col gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
       </div>
-      <div className="z-10 flex w-full max-w-4xl h-[440px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
-        <div className="basis-4/5 px-12 pt-4 pb-36">
+      <div className="z-10 flex flex-col lg:flex-row w-full max-w-4xl h-[550px] lg:h-[450px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
+        <div className="h-full px-2 pt-2 lg:w-[77%] lg:px-12 lg:pt-4 lg:pb-36">
           {
             targetUser ?
               <>
                 <div className="flex justify-between px-4 py-2.5 border-[#6841F2] border-b-2 text-lg">
-                  <Link to={`/user/${targetUser.username}`}>View Profile</Link>
+                  <Link to={`/user/${targetUser.username}`}>View "{targetUser.username}"</Link>
                   <Link to="/account/friends">Manage Friends</Link>
                   <button onClick={handleDeleteChat} className="text-red-600">Delete Chat</button>
                 </div>
-                <div
-                  ref={chatContainerRef}
-                  className="mt-2 mb-2 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg h-full"
-                >
+                <div ref={chatContainerRef} className="h-60 lg:h-72 mt-2 mb-2 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg">
                   {messages.map((messageData: MessageProps, index) => {
                     const isMessageBelongsCurrUser = messageData.senderId === currentUserId;
                     const isSenderSamePreviousOne = index > 0 && messageData.senderId === messages[index - 1].senderId;
@@ -151,19 +149,19 @@ const Chat = () => {
               :
               <h2 className="mt-8 text-center text-3xl text-slate-300">
                 {
-                  (friends && friends?.length > 1) 
-                  ? "Please select a friend for starting conversation"
-                  : "You don't have any friends, add new friends to start chatting!"
+                  (friends && friends?.length > 1)
+                    ? "Please select a friend for starting conversation"
+                    : "You don't have any friends, add new friends to start chatting!"
                 }
               </h2>
           }
 
         </div>
-        <div className="basis-1/5 bg-[#472DA6] py-4">
+        <div className="order-first py-4 lg:w-[23%] lg:order-last bg-[#472DA6]">
 
-          <h3 className="text-3xl font-bold text-center">Friends</h3>
-          <div className="mt-2 text-slate-800 font-medium">
-            {
+          <h3 className="px-4 text-3xl font-bold lg:text-center">Friends ({friends?.length ? friends?.length-1 : 0})</h3>
+          <div className="px-16 lg:px-0 mt-2 max-h-24 lg:max-h-none font-medium overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          {
               friends && friends.map((user: FriendProps, index: number) => {
 
                 if (user._id == currentUserId) return // if self then skip this user
@@ -171,17 +169,20 @@ const Chat = () => {
                 let isUserOnline = onlineUsers ? onlineUsers.includes(user._id) : false
                 let isUserSelected = user._id == targetUser?._id
                 return (
-                  <div key={index} className={`${isUserOnline ? "text-slate-800" : "text-slate-700"} ${isUserSelected ? "border-[#BCA9FF] border-2 bg-[#dbd1ff]" : "bg-[#BCA9FF]"} flex items-center gap-x-2 ps-4 mt-1.5 cursor-pointer`}
+                  <div key={index} className={`flex items-center justify-evenly lg:justify-center lg:gap-x-1 ps-4 lg:ps-0 pt-1.5 pb-1 mt-1.5 rounded lg:rounded-none cursor-pointer ${isUserOnline ? "text-slate-800" : "text-slate-700"} ${isUserSelected ? "bg-[#e3dbff] font-semibold" : "bg-[#BCA9FF]"}`}
                     onClick={() => handleSelectUser(user)}>
-                    <FaUserCircle />
-                    <span>{user.username} ({isUserOnline ? "online" : "offline"})</span>
+                    <div className="flex items-center gap-x-1.5">
+                    {isUserOnline ? <FaCircle size={17} className="text-green-600" /> : <FaCircle size={17} className="text-red-600" />}
+                      <span className={`${isUserSelected ? 'text-xl underline' : 'text-lg'}`}>{textClip(user.username, 8)}</span>
+                      <span className="text-xs lg:text-xs mt-1">({isUserOnline ? "online" : "offline"})</span>
+                    </div>
+                    <div>
+                      <IoIosChatboxes size={24} className={`${isUserOnline ? "text-slate-800" : "text-slate-700"}`} />
+                    </div>
                   </div>)
               }
               )
             }
-          </div>
-          <div>
-            <h4 className="text-2xl font-bold text-center">&nbsp;</h4>
           </div>
         </div>
       </div>
