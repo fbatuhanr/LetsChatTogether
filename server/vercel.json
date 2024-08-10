@@ -19,20 +19,13 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "src/index.ts",
-            "methods": [
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "PATCH",
-                "OPTIONS"
-            ],
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": "true",
-                "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-            }
+            "dest": "src/index.ts"
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/socket.io",
+            "destination": "https://lets-chat-together-server.vercel.app/socket.io"
         }
     ]
 }
