@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import useAxios from '../useAxios';
-import { User } from '../../types/User.types';
+import { UserProps } from '../../types/User.types';
 
 const useFetchUserByUsername = (username: string) => {
     
   const axiosInstance = useAxios();
   
-  const [data, setData] = useState<User | null>(null);
+  const [data, setData] = useState<UserProps | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 

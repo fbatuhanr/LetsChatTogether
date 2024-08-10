@@ -1,4 +1,3 @@
-import { useState } from "react"
 import HumanImg3 from "../../assets/human-3.png"
 import { toast } from "react-toastify"
 

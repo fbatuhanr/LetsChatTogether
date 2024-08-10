@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import useAxios from '../useAxios';
-import { User } from '../../types/User.types';
+import { UserProps } from '../../types/User.types';
 
 const useFetchAllUsers = (page: number, limit: number) => {
 
   const axiosInstance = useAxios();
 
-  const [users, setUsers] = useState<User[] | null>(null);
+  const [users, setUsers] = useState<UserProps[] | null>(null);
 
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);

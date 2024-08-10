@@ -15,7 +15,7 @@ const Users: React.FC = () => {
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
 
-  const { users, totalUsers, totalPages, loading, error } = useSearchUsers(debouncedSearchQuery, page, limit)
+  const { users, totalUsers, totalPages, loading } = useSearchUsers(debouncedSearchQuery, page, limit)
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value)

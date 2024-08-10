@@ -1,6 +1,4 @@
 import React from 'react'
-import { MdCake } from 'react-icons/md'
-import { calculateAge } from '../../utils/dateUtils'
 import { getGenderSign } from '../../utils/genderUtils'
 
 type GenderProps = {
