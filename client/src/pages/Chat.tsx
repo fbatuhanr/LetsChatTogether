@@ -107,7 +107,7 @@ const Chat = () => {
               <>
                 <div className="flex justify-between lg:px-4 py-2.5 border-[#6841F2] border-b-2 text-base lg:text-lg">
                   <Link to={`/user/${targetUser.username}`} className="bg-[#0D0D0D] bg-opacity-50 rounded px-2 py-1">
-                    View {targetUser.username}
+                    View {textClip(targetUser.username, 8)}
                   </Link>
                   <Link to="/account/friends" className="bg-[#0D0D0D] bg-opacity-50 rounded px-2 py-1">
                     Manage Friends
