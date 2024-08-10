@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode'
 import { defaultDecodedToken } from '../constants/defaultValues'
 import { DecodedToken } from '../types/DecodedToken'
 
-export const useDecodedToken = (): DecodedToken => {
+export const useDecodedToken = () => {
     
     const auth = useAppSelector((state) => state.auth);
 
