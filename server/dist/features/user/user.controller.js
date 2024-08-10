@@ -120,7 +120,7 @@ function login(req, res, next) {
             res.cookie("refreshToken", result.refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production', // its true when production and its false development mode
-                sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict", // its none when production mode because server and client maybe based on different domains, its strict when development mode because server and client on same domain (localhost), only ports are different
+                sameSite: "none",
                 maxAge: (0, ms_1.default)(process.env.REFRESH_TOKEN_EXPIRATION)
             });
             return res.status(200).json({
