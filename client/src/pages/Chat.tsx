@@ -116,7 +116,7 @@ const Chat = () => {
                     Delete Chat
                   </button>
                 </div>
-                <div ref={chatContainerRef} className="h-60 lg:h-72 mt-2 mb-2 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg">
+                <div ref={chatContainerRef} className="h-[18.5rem] lg:h-72 mt-2 mb-2 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg">
                   {messages.map((messageData: MessageProps, index) => {
                     const isMessageBelongsCurrUser = messageData.senderId === currentUserId;
                     const isSenderSamePreviousOne = index > 0 && messageData.senderId === messages[index - 1].senderId;
@@ -167,10 +167,10 @@ const Chat = () => {
           }
 
         </div>
-        <div className="order-first py-4 lg:w-[23%] lg:order-last bg-[#472DA6]">
+        <div className="order-first py-2 lg:py-4 lg:w-[23%] lg:order-last bg-[#472DA6]">
 
-          <h3 className="px-4 text-3xl font-bold lg:text-center">Friends ({friends?.length ? friends?.length - 1 : 0})</h3>
-          <div className="px-16 lg:px-0 mt-2 max-h-24 lg:max-h-none font-medium overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <h3 className="px-4 text-2xl lg:text-3xl font-bold lg:text-center">Friends ({friends?.length ? friends?.length - 1 : 0})</h3>
+          <div className="px-16 lg:px-0 mt-2 h-24 max-h-24 lg:h-auto lg:max-h-none font-medium overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             {
               friends && friends.map((user: FriendProps, index: number) => {
 
