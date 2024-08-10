@@ -1,12 +1,12 @@
 import { Server } from 'socket.io';
 
 let io: Server;
-let socketUsers: string[] = []; // Kullanıcıların listesi
+let socketUsers: string[] = [];
 
 export const initializeSocket = (server: any) => {
   io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: process.env.CORS_ORIGIN || "http://localhost:5173",
       credentials: true
     }
   });
