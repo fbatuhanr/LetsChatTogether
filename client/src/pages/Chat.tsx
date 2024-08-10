@@ -100,15 +100,21 @@ const Chat = () => {
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
       </div>
-      <div className="z-10 flex flex-col lg:flex-row w-full max-w-4xl h-[550px] lg:h-[450px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
+      <div className="z-10 flex flex-col lg:flex-row w-full max-w-4xl h-[600px] lg:h-[450px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
         <div className="h-full px-2 pt-2 lg:w-[77%] lg:px-12 lg:pt-4 lg:pb-36">
           {
             targetUser ?
               <>
-                <div className="flex justify-between px-4 py-2.5 border-[#6841F2] border-b-2 text-lg">
-                  <Link to={`/user/${targetUser.username}`}>View "{targetUser.username}"</Link>
-                  <Link to="/account/friends">Manage Friends</Link>
-                  <button onClick={handleDeleteChat} className="text-red-600">Delete Chat</button>
+                <div className="flex justify-between lg:px-4 py-2.5 border-[#6841F2] border-b-2 text-base lg:text-lg">
+                  <Link to={`/user/${targetUser.username}`} className="bg-[#0D0D0D] bg-opacity-50 rounded px-2 py-1">
+                    View {targetUser.username}
+                  </Link>
+                  <Link to="/account/friends" className="bg-[#0D0D0D] bg-opacity-50 rounded px-2 py-1">
+                    Manage Friends
+                  </Link>
+                  <button onClick={handleDeleteChat} className="text-red-600 bg-[#0D0D0D] bg-opacity-50 rounded px-2 py-1">
+                    Delete Chat
+                  </button>
                 </div>
                 <div ref={chatContainerRef} className="h-60 lg:h-72 mt-2 mb-2 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg">
                   {messages.map((messageData: MessageProps, index) => {
@@ -152,10 +158,10 @@ const Chat = () => {
                   (friends && friends?.length > 1)
                     ? <p>Please select a friend for starting conversation</p>
                     :
-                      <Link to="/users">
-                        <p>You don't have any friends!</p>
-                        <p><span className="text-white">add new friends</span> to start chatting</p>
-                      </Link>
+                    <Link to="/users">
+                      <p>You don't have any friends!</p>
+                      <p><span className="text-white">add new friends</span> to start chatting</p>
+                    </Link>
                 }
               </div>
           }
