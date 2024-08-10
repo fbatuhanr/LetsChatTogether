@@ -11,6 +11,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import NotFound from "../../components/NotFound";
 import { defaultFetchUser } from "../../constants/defaultValues";
 import FriendRequestButton from "../../components/FriendRequestButton";
+import LinkButton from "../../components/general/clickable/LinkButton";
 
 
 const User = () => {
@@ -21,7 +22,7 @@ const User = () => {
     const { data, loading, error } = username ? useFetchUser(username) : defaultFetchUser
 
     if (loading) return <LoadingSpinner />
-    if (!data || error) return <NotFound />
+    if (!data || error) return <NotFound optionalAltText="Sorry, we can't find that user. You'll find lots to explore on the home page." backToHomeButton/>
 
     return (
         <div className="px-2 lg:px-0 relative flex flex-col gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
@@ -70,8 +71,9 @@ const User = () => {
                     </div>
                     {
                         decodedToken.userId ?
-                            decodedToken.username !== username &&
-                            <FriendRequestButton targetUserId={data._id} />
+                            decodedToken.username === username
+                                ? <LinkButton text="Edit Profile" target="/account/profile" size="2xl" innerHeight={2}/>
+                                : <FriendRequestButton targetUserId={data._id} />
                             :
                             <div className="text-center py-2">
                                 <Link to="/login" className="bg-[#6841F2] px-8 py-2.5 rounded-2xl text-xl font-semibold [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#211a3c] shadow-md">

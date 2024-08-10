@@ -24,6 +24,6 @@ export const colorAdjustment = (color?: string | null, outlined?: boolean) => {
         return `bg-transparent ${outlined && "border border-yellow-600 hover:border-yellow-500"}`
   
       default:
-        return `text-white bg-yellow-400 hover:text-gray-200 hover:bg-yellow-500 ${outlined && "border border-yellow-600 hover:border-yellow-400"}`
+        return `text-white bg-yellow-400 hover:text-gray-200 hover:bg-yellow-500 shadow-md shadow-[#211a3c] [text-shadow:1px_1px_2px_var(--tw-shadow-color)] ${outlined && "border border-yellow-600 hover:border-yellow-400"}`
     }
 }

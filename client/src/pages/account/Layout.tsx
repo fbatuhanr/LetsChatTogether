@@ -41,7 +41,7 @@ const Layout = () => {
                     <img src={SecureImg} className="w-28" />
                 </div> */}
 
-                <div className="w-full lg:w-4/5 mx-auto my-12 px-4">
+                <div className="w-full lg:w-[91%] mx-auto my-12 px-4">
                     <Outlet />
                 </div>
             </div>

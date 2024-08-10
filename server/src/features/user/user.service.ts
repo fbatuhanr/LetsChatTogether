@@ -1,5 +1,6 @@
-import { MongooseError } from "mongoose"
 import User, { IUser } from "./user.model"
+import FriendRequest from "../friendRequest/friendRequest.model"
+
 import bcrypt from "bcryptjs"
 import { generateAccessToken, generateRefreshToken } from "../auth/auth.service"
 
@@ -36,7 +37,7 @@ async function getByUsername(username: string) {
   return User.findOne({ username })
 }
 async function searchUsers(searchRegex: RegExp, page: number, limit: number, currUserId: string) {
-  
+
   const excludeUserId = currUserId || "000000000000000000000000"
   const findPattern = {
     $and: [
@@ -66,6 +67,7 @@ async function searchUsers(searchRegex: RegExp, page: number, limit: number, cur
   return {
     totalPages: Math.ceil(totalUsers / limit),
     currentPage: page,
+    totalUsers,
     users,
   }
 }
@@ -92,7 +94,28 @@ async function signup(data: UserProps) {
   newUser.hashPassword = bcrypt.hashSync(data.password, 10)
 
   const savedUser = await newUser.save();
-  return savedUser ? true : false
+
+  /* her yeni kullanici icin admin'i karsilikli olarak otomatik arkadas ekleme  */
+  const adminUser = await User.findOne({ username: 'admin' });
+  if (adminUser) {
+    const newFriendRequest = new FriendRequest({
+      sender: savedUser._id,
+      receiver: adminUser._id,
+      status: 'accepted',
+    });
+    await newFriendRequest.save();
+
+    await User.updateOne(
+      { _id: adminUser._id },
+      { $addToSet: { friends: savedUser._id } }
+    )
+    await User.updateOne(
+      { _id: savedUser._id },
+      { $addToSet: { friends: adminUser._id } }
+    )
+  }
+
+  return savedUser ? true : false;
 }
 
 function update(id: string, file: any, data: UserProps) {

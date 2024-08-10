@@ -1,15 +1,35 @@
-import { useState } from "react"
 import HumanImg3 from "../../assets/human-3.png"
 
 import useAuthentication from "../../hooks/api/useAuthentication"
 import { toast } from "react-toastify"
 import { Link } from "react-router-dom"
 import Button from "../../components/general/clickable/Button"
+import { SubmitHandler, useForm } from "react-hook-form"
+import { ErrorMessage } from "@hookform/error-message"
+
+interface LoginProps {
+    username: string;
+    password: string;
+}
 
 export const Login: React.FC = () => {
 
     const { loginCall } = useAuthentication()
 
+    const { register, formState: { errors }, handleSubmit } = useForm<LoginProps>()
+
+    const onSubmit: SubmitHandler<LoginProps> = async (data) => {
+
+        toast.promise(loginCall(data.username, data.password), {
+            pending: 'Information is being checked...',
+            success: { render: ({ data }) => `${data}` },
+            error: { render: ({ data }) => `${data}` }
+        })
+    }
+
+
+    /*
+    --- WITHOUT react-hook-form
     const [username, setUsername] = useState<string>("")
     const [password, setPassword] = useState<string>("")
 
@@ -21,35 +41,37 @@ export const Login: React.FC = () => {
             success: { render: ({ data }) => `${data}` },
             error: { render: ({ data }) => `${data}` }
         })
-    }
+    }*/
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-y-6 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat">
                 <div>
                     <h1 className="text-5xl font-bold">Login</h1>
                 </div>
-                <div className="relative w-11/12 md:w-full max-w-3xl h-[400px] px-4 md:px-8 rounded-xl bg-gradient-to-br from-[#4F22F2] to-[#20183F]">
-                    <div className="md:ps-24 w-full px-1 md:w-3/4 flex flex-col gap-y-3 h-full justify-center">
+                <div className="relative w-11/12 md:w-full max-w-3xl h-[440px] px-4 md:px-8 rounded-xl bg-gradient-to-br from-[#4F22F2] to-[#20183F]">
+                    <div className="md:ps-24 w-full px-1 md:w-3/4 flex flex-col gap-y-2 h-full justify-center">
                         <div className="flex flex-col gap-y-1">
                             <label htmlFor="username" className="text-2xl font-semibold ps-2">Username</label>
                             <input type="text" className="bg-[#0D0D0D] rounded-2xl px-6 py-4" placeholder="type here..."
-                                onChange={(e) => setUsername(e.target.value)}
-                                value={username}
-                                required
+                                {...register("username", { required: "Username is required" })}
                             />
+                            <div className="text-sm px-4 min-h-5">
+                                <ErrorMessage errors={errors} name="username" render={({ message }) => <p>{message}</p>} />
+                            </div>
                         </div>
                         <div className="flex flex-col gap-y-1">
                             <label htmlFor="password" className="text-2xl font-semibold ps-2">Password</label>
                             <input type="password" className="bg-[#0D0D0D] rounded-2xl px-6 py-4" placeholder="type here..."
-                                onChange={(e) => setPassword(e.target.value)}
-                                value={password}
-                                required
+                                {...register("password", { required: "Password is required" })}
                             />
+                            <div className="text-sm px-4 min-h-5">
+                                <ErrorMessage errors={errors} name="password" render={({ message }) => <p>{message}</p>} />
+                            </div>
                         </div>
 
                         <Button text="Login" color="primary" size="2xl" innerHeight={3} className="mt-2" />
 
-                        <p className="mt-1 underline"><Link to="/signup">No account yet? Sign up</Link></p>
+                        <p className="mt-2 underline"><Link to="/signup">No account yet? Sign up</Link></p>
                     </div>
                     <div className="absolute top-4 -right-24 mr-2 md:-right-20 md:-mr-0.5">
                         <img src={HumanImg3} className="w-56" />

@@ -6,13 +6,21 @@ import StatsImg from "../assets/stats.png"
 import PhoneImg from "../assets/phone.png"
 import HumanImg2 from "../assets/human-2.png"
 import MessageImg from "../assets/message.png"
+import poseidonsRealm from "../assets/background/poseidons-realm.png"
+import cosmicButterflyLeft from "../assets/background/cosmic-butterfly.png"
+
 import { Link } from 'react-router-dom'
+import { useDecodedToken } from '../hooks/useDecodedToken'
+import { FaUsers } from 'react-icons/fa'
 
 const Home: React.FC = () => {
+
+    const decodedToken = useDecodedToken()
+
     return (
         <div>
-            <section className="pt-4 px-6 md:pt-0 md:px-12 md:bg-none bg-hero bg-no-repeat bg-[top_right] bg-[length:256px] max-w-6xl mx-auto flex flex-col md:flex-row">
-                <div className="basis-full md:basis-1/2 flex flex-col justify-center md:ps-6">
+            <section className="relative max-w-6xl mx-auto flex flex-col md:flex-row pt-4 px-6 md:pt-0 md:px-12">
+                <div className="basis-full md:basis-1/2 flex flex-col justify-center md:ps-6 z-20">
                     <h3 className="text-3xl font-thin">
                         <Typewriter
                             onInit={(typewriter) => {
@@ -34,12 +42,24 @@ const Home: React.FC = () => {
                         Embark on a journey of connection <br className="hidden md:block" />
                         and discovery with Let's Chat Together.
                     </h2>
-                    <Link to="/signup" className="[text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-[210px] py-2 text-center mt-8 md:mt-12 border border-[#000000] bg-[#6841F2] rounded-3xl text-2xl font-semibold">
-                        Join Now
-                    </Link>
+                    {
+                        decodedToken.userId ?
+                            <Link to="/users" className="flex items-center justify-center gap-x-2 [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-[225px] py-2 text-center mt-8 md:mt-12 border border-[#000000] bg-[#6841F2] rounded-3xl text-2xl font-semibold">
+                                Browse Users
+                                <FaUsers size={25} className="mt-1" />
+                            </Link>
+                            :
+                            <Link to="/signup" className="[text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-[210px] py-2 text-center mt-8 md:mt-12 border border-[#000000] bg-[#6841F2] rounded-3xl text-2xl font-semibold">
+                                Join Now
+                            </Link>
+                    }
                 </div>
-                <div className="hidden md:block md:basis-1/2 p-8">
-                    <img src={HeroImg} width="100%" height="auto" />
+                <div className="absolute -top-8 p-10 md:relative md:basis-1/2 md:p-8 z-10">
+                    <img src={HeroImg} width="100%" height="auto" className="opacity-75 md:opacity-100" />
+                </div>
+
+                <div className="absolute top-40 left-0 right-0 md:-top-6 md:right-auto">
+                    <img src={poseidonsRealm} className="w-[24rem] md:w-[36rem] md:mx-auto h-auto opacity-20 md:opacity-50" />
                 </div>
             </section>
 
@@ -89,12 +109,23 @@ const Home: React.FC = () => {
                 </div>
             </section>
 
-            <section className="mt-32 max-w-6xl px-4 md:px-12 mx-auto py-12 md:py-24 flex justify-center">
-                <div className="basis-full flex justify-center items-center bg-blur-ellipse bg-[length:350px] bg-no-repeat md:bg-[center_left_18rem] bg-[center_center]">
-                    <Link to="/signup" className="[text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-3/4 relative py-6 md:py-8 border border-[#0D0D0D] ps-14 md:ps-28 mx-auto bg-[#F2D541] text-2xl md:text-4xl font-bold rounded-full">
-                        Start Free Today
-                        <img src={MessageImg} className="absolute w-32 md:w-44 -top-9 -right-3 md:-top-12 md:-right-8" />
-                    </Link>
+            <section className="relative mt-32 max-w-6xl px-4 md:px-12 mx-auto py-12 md:py-24 flex justify-center bg-blur-ellipse bg-[length:210px] md:bg-[length:300px] bg-no-repeat md:bg-[center_right_6rem] bg-[center_right_-2em]">
+                <div className="basis-full flex justify-center items-center z-10">
+                    {
+                        decodedToken.userId ?
+                            <Link to="/chat" className="[text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-3/4 relative py-6 md:py-8 border border-[#0D0D0D] ps-14 md:ps-28 mx-auto bg-[#F2D541] text-2xl md:text-4xl font-bold rounded-full">
+                                Start Chatting Now
+                                <img src={MessageImg} className="absolute w-32 md:w-44 -top-9 -right-3 md:-top-12 md:-right-8" />
+                            </Link>
+                            :
+                            <Link to="/signup" className="[text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-3/4 relative py-6 md:py-8 border border-[#0D0D0D] ps-14 md:ps-28 mx-auto bg-[#F2D541] text-2xl md:text-4xl font-bold rounded-full">
+                                Start Free Today
+                                <img src={MessageImg} className="absolute w-32 md:w-44 -top-9 -right-3 md:-top-12 md:-right-8" />
+                            </Link>
+                    }
+                </div>
+                <div className="absolute -top-32 -left-16 md:-top-48 md:left-0">
+                    <img src={cosmicButterflyLeft} className="w-[25rem] md:w-[40rem] h-auto opacity-40 md:opacity-60" />
                 </div>
             </section>
         </div>

@@ -111,7 +111,13 @@ async function signup(req: Request, res: Response, next: NextFunction) {
 
 async function update(req: Request, res: Response, next: NextFunction) {
   try {
-    res.json(await userService.update(req.params.id, req.file, req.body));
+    
+    const updatedUser = await userService.update(req.params.id, req.file, req.body)
+    if (!updatedUser) 
+      return res.status(404).json({ message: 'An error occurred during the update.' })
+    
+    return res.status(201).json({ message: 'Successfully updated!' })
+
   } catch (error) {
     next(error);
   }

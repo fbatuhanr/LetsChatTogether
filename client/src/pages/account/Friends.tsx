@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { FaEye, FaTrash } from 'react-icons/fa';
 import { IoIosChatboxes } from 'react-icons/io';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 const Friends = () => {
 
@@ -65,6 +66,19 @@ const Friends = () => {
     const handleRemoveFriend = async (targetUserId: string) => {
         if (isLoading) return
 
+        const swalResult = await Swal.fire({
+            title: 'Do you want to remove your friend?',
+            text: 'This action cannot be undone!',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No, cancel!',
+        })
+        if(!swalResult.isConfirmed) 
+            return
+
         setIsLoading(true)
         await toast.promise(removeFriend(targetUserId), {
             pending: 'Request sending...',
@@ -77,24 +91,24 @@ const Friends = () => {
     };
 
     return (
-        <div className="w-full grid lg:grid-cols-3 gap-4">
+        <div className="w-full grid lg:grid-cols-[1fr_1.3fr_1fr] gap-4">
             <div>
-                <h3 className="border-b mb-4 px-2 text-xl">Active Friends</h3>
+                <h3 className="border-b mb-4 px-2 text-xl">Active Friends ({friends?.length ? friends.length : 0})</h3>
                 <div className="px-1">
                     <ul>
                         {
                             friends && friends.map((friend: any, index: number) =>
-                                <li key={index} className="flex justify-between items-center text-xl my-1 ps-4 pe-2 py-1 bg-black bg-opacity-20 rounded-xl">
+                                <li key={index} className="flex justify-between items-center text-xl my-1 ps-4 pe-2.5 py-1 bg-black bg-opacity-20 rounded-xl">
                                     <Link to={`/user/${friend.username}`} className="flex items-center gap-x-1">
                                         {friend.username}
                                         <FaEye className="text-lg text-white mt-0.5" />
                                     </Link>
-                                    <div className="flex items-center gap-x-1.5">
+                                    <div className="flex items-center gap-x-2">
                                         <Link to="/chat">
                                             <IoIosChatboxes className="text-xl text-white" />
                                         </Link>
                                         <button onClick={() => handleRemoveFriend(friend._id)}>
-                                            <FaTrash className="text-sm text-red-500" />
+                                            <FaTrash className="text-sm text-red-600" />
                                         </button>
                                     </div>
                                 </li>
@@ -104,7 +118,7 @@ const Friends = () => {
                 </div>
             </div>
             <div>
-                <h3 className="border-b mb-4 px-2 text-xl">Received Requests</h3>
+                <h3 className="border-b mb-4 px-2 text-xl">Received Requests ({incomingRequests?.length ? incomingRequests.length : 0})</h3>
                 <div className="px-1">
                     <ul>
                         {
@@ -128,7 +142,7 @@ const Friends = () => {
                 </div>
             </div>
             <div>
-                <h3 className="border-b mb-4 px-2 text-xl">Sent Requests</h3>
+                <h3 className="border-b mb-4 px-2 text-xl">Sent Requests ({outgoingRequests?.length ? outgoingRequests.length : 0})</h3>
                 <div className="px-1">
                     <ul>
                         {

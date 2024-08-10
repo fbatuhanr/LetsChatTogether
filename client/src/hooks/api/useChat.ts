@@ -158,23 +158,15 @@ const useChat = (currentUserId: string, currentUsername: string) => {
         });
     };
 
-
-    const logla = () => {
-        console.log("aktif chat: ", chat);
-
-    }
-
     const handleDeleteChat = async () => {
 
         if (!chat) return
-
-        logla()
 
         try {
             const result = await Swal.fire({
                 title: `Do you want to delete all conversations and chat with ${targetUser?.username}?`,
                 text: 'This action cannot be undone!',
-                icon: 'warning',
+                icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
@@ -204,7 +196,6 @@ const useChat = (currentUserId: string, currentUsername: string) => {
                     'Chat has been deleted successfully.',
                     'success'
                 )
-                logla()
             }
         } catch (error: any) {
             Swal.fire(

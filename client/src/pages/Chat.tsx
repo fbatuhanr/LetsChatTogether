@@ -147,21 +147,25 @@ const Chat = () => {
                 </div>
               </>
               :
-              <h2 className="mt-8 text-center text-3xl text-slate-300">
+              <div className="mt-8 text-center text-3xl text-slate-300">
                 {
                   (friends && friends?.length > 1)
-                    ? "Please select a friend for starting conversation"
-                    : "You don't have any friends, add new friends to start chatting!"
+                    ? <p>Please select a friend for starting conversation</p>
+                    :
+                      <Link to="/users">
+                        <p>You don't have any friends!</p>
+                        <p><span className="text-white">add new friends</span> to start chatting</p>
+                      </Link>
                 }
-              </h2>
+              </div>
           }
 
         </div>
         <div className="order-first py-4 lg:w-[23%] lg:order-last bg-[#472DA6]">
 
-          <h3 className="px-4 text-3xl font-bold lg:text-center">Friends ({friends?.length ? friends?.length-1 : 0})</h3>
+          <h3 className="px-4 text-3xl font-bold lg:text-center">Friends ({friends?.length ? friends?.length - 1 : 0})</h3>
           <div className="px-16 lg:px-0 mt-2 max-h-24 lg:max-h-none font-medium overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-          {
+            {
               friends && friends.map((user: FriendProps, index: number) => {
 
                 if (user._id == currentUserId) return // if self then skip this user
@@ -172,7 +176,7 @@ const Chat = () => {
                   <div key={index} className={`flex items-center justify-evenly lg:justify-center lg:gap-x-1 ps-4 lg:ps-0 pt-1.5 pb-1 mt-1.5 rounded lg:rounded-none cursor-pointer ${isUserOnline ? "text-slate-800" : "text-slate-700"} ${isUserSelected ? "bg-[#e3dbff] font-semibold" : "bg-[#BCA9FF]"}`}
                     onClick={() => handleSelectUser(user)}>
                     <div className="flex items-center gap-x-1.5">
-                    {isUserOnline ? <FaCircle size={17} className="text-green-600" /> : <FaCircle size={17} className="text-red-600" />}
+                      {isUserOnline ? <FaCircle size={17} className="text-green-600" /> : <FaCircle size={17} className="text-red-600" />}
                       <span className={`${isUserSelected ? 'text-xl underline' : 'text-lg'}`}>{textClip(user.username, 8)}</span>
                       <span className="text-xs lg:text-xs mt-1">({isUserOnline ? "online" : "offline"})</span>
                     </div>
@@ -185,7 +189,7 @@ const Chat = () => {
             }
           </div>
         </div>
-      </div>
+      </div >
 
       <div className="absolute top-0 -left-8">
         <img src={cosmicButterfly} className="w-[40rem] h-auto" />
@@ -194,7 +198,7 @@ const Chat = () => {
       <div className="absolute top-0 right-20">
         <img src={cosmicButterflyRight} className="w-[34rem] h-auto" />
       </div>
-    </div>
+    </div >
   )
 }
 

@@ -7,6 +7,8 @@ import useAxios from '../../hooks/useAxios'
 import { useDecodedToken } from '../../hooks/useDecodedToken'
 import { UserProps } from '../../types/User.types'
 import Button from '../../components/general/clickable/Button'
+import { toast } from 'react-toastify'
+import { AxiosError, AxiosResponse } from 'axios'
 
 const Profile = () => {
 
@@ -14,7 +16,7 @@ const Profile = () => {
     const decodedToken = useDecodedToken()
 
     const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false)
-    const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<User>()
+    const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<UserProps>()
 
     const onSubmit: SubmitHandler<UserProps> = async (data) => {
 
@@ -30,9 +32,14 @@ const Profile = () => {
         console.log(newData)
 
         const headers = { 'Content-Type': 'multipart/form-data' };
-        const response = await axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, newData, { headers })
-        console.log(response.data);
-        window.location.reload();
+        await toast.promise(
+            axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, newData, { headers }),
+            {
+                pending: 'Updating...',
+                success: { render: ({ data }: { data: AxiosResponse }) => data.data.message || 'Successfully updated!' },
+                error: { render: ({ data }: { data: AxiosError<any> }) => data.response?.data?.message || 'An error occurred during the update.' }
+            }
+        );
     }
 
     useEffect(() => {
@@ -70,7 +77,7 @@ const Profile = () => {
                                 required: 'Name is required',
                                 pattern: {
                                     value: /^[A-Za-z]+$/,
-                                    message: 'Name should only contain letters without spaces'
+                                    message: 'Name should only contain English letters without spaces'
                                 },
                                 minLength: {
                                     value: 2,
@@ -90,7 +97,7 @@ const Profile = () => {
                                 required: 'Surname is required',
                                 pattern: {
                                     value: /^[A-Za-z]+$/,
-                                    message: 'Surname should only contain letters without spaces'
+                                    message: 'Name should only contain English letters without spaces'
                                 },
                                 minLength: {
                                     value: 2,
@@ -165,20 +172,20 @@ const Profile = () => {
                         {...register("profilePhoto")} multiple={false}
                     />
                     {
-                        ((watchProfilePhoto instanceof FileList || typeof watchProfilePhoto === 'string') && watchProfilePhoto.length) &&
-                        <div className="absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
-                            <img className="h-full rounded-r-xl"
-                                src={
-                                    (watchProfilePhoto instanceof FileList)
-                                        ? URL.createObjectURL(watchProfilePhoto[0])
-                                        : `${process.env.API_URL}/${watchProfilePhoto}`
-                                }
-                            />
-                        </div>
+                        ((watchProfilePhoto instanceof FileList || typeof watchProfilePhoto === 'string') && watchProfilePhoto.length) ?
+                            <div className="absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
+                                <img className="h-full rounded-r-xl"
+                                    src={
+                                        (watchProfilePhoto instanceof FileList)
+                                            ? URL.createObjectURL(watchProfilePhoto[0])
+                                            : `${process.env.API_URL}/${watchProfilePhoto}`
+                                    }
+                                />
+                            </div>
+                            : null
                     }
                 </div>
             </div>
-
 
             <div className="flex flex-col gap-y-1">
                 <label htmlFor="about" className="text-2xl font-semibold ps-2">About</label>
@@ -188,7 +195,7 @@ const Profile = () => {
                 />
             </div>
 
-            <Button text="Update" color="primary" innerHeight={3} size="2xl" uppercased className="mt-2"/>
+            <Button text="Update" color="primary" innerHeight={3} size="2xl" uppercased className="mt-2" />
         </form>
     )
 }

@@ -35,7 +35,7 @@ const Header: React.FC = () => {
         <header ref={headerRef} className="bg-gradient-to-b from-[#4F22F2] to-[#0D0D0D1a] transition-height duration-500 ease-in-out overflow-hidden" style={{ height: '125px' }}>
             <div className="max-w-6xl mx-auto lg:px-12">
                 <nav className={`w-full py-8 flex flex-col lg:flex-row lg:justify-between items-center gap-y-4`}>
-                    <div className="w-full flex justify-between ps-7 pe-10 lg:p-0 lg:flex-1">
+                    <div className="w-full flex justify-between pb-1 ps-7 pe-10 lg:ps-0 lg:pe-0 lg:flex-1">
                         <Link to="/" className="min-w-72 text-[1.7rem] lg:text-3xl font-bold">Let's Chat Together</Link>
                         <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden text-4xl">{menuOpen ? <IoMdClose /> : <IoMdMenu />}</button>
                     </div>

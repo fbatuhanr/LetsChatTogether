@@ -25,6 +25,7 @@ import Chat from './pages/Chat'
 import { Layout as AccountLayout, Profile, Settings } from './pages/account'
 import { User, Users } from './pages/user'
 import Friends from './pages/account/Friends'
+import ScrollToTop from './helper/ScrollToTop'
 
 function App() {
 
@@ -33,6 +34,7 @@ function App() {
       <StoreProvider>
         <ToastContainer autoClose={2000} pauseOnHover={false} />
         <Router>
+        <ScrollToTop />
           <Header />
           <Layout>
             <Routes>

@@ -5,28 +5,28 @@ import { ErrorMessage } from "@hookform/error-message"
 import { useDecodedToken } from '../../hooks/useDecodedToken'
 import useAxios from '../../hooks/useAxios'
 import Button from '../../components/general/clickable/Button'
+import { UserProps } from '../../types/User.types'
+import { toast } from 'react-toastify'
+import { AxiosError, AxiosResponse } from 'axios'
 
-interface ISettingsInput {
-    email: string,
-    password: string
-}
 const Settings = () => {
 
     const axiosInstance = useAxios()
     const decodedToken = useDecodedToken()
 
-    const { register, formState: { errors }, handleSubmit, reset } = useForm<ISettingsInput>()
+    const { register, formState: { errors }, handleSubmit, reset } = useForm<UserProps>()
 
-    const onSubmit: SubmitHandler<ISettingsInput> = async (data) => {
+    const onSubmit: SubmitHandler<UserProps> = async (data) => {
         console.log(data)
-        try {
-            const response = await axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, data)
-            console.log(response.data)
-            // window.location.reload();
 
-        } catch (error) {
-            console.error('Error updating settings data:', error);
-        }
+        await toast.promise(
+            axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, data),
+            {
+                pending: 'Updating...',
+                success: { render: ({ data }: { data: AxiosResponse }) => data.data.message || 'Successfully updated!' },
+                error: { render: ({ data }: { data: AxiosError<any> }) => data.response?.data?.message || 'An error occurred during the update.' }
+            }
+        );
     }
 
     useEffect(() => {
@@ -59,10 +59,10 @@ const Settings = () => {
                 <label htmlFor="email" className="text-2xl font-semibold ps-2">Email</label>
                 <input type="text" id="email" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500" placeholder="Type here..."
                     {...register("email", {
-                        required: "required",
+                        required: "Email is required",
                         pattern: {
-                            value: /\S+@\S+\.\S+/,
-                            message: "Entered value does not match email format"
+                            value: /^[^\s@]{1,64}@[^\s@]{1,253}\.[^\s@]{2,}$/,
+                            message: "Invalid email address"
                         }
                     })}
                 />
@@ -71,7 +71,7 @@ const Settings = () => {
                 </div>
             </div>
 
-            <Button text="Update" color="primary" innerHeight={3} size="2xl" uppercased className="mt-2"/>
+            <Button text="Update" color="primary" innerHeight={3} size="2xl" uppercased className="mt-2" />
         </form>
     )
 }
