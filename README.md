@@ -80,6 +80,11 @@ The design for "Let's Chat Together" was created using Figma. You can view the f
    ```bash
   cd ../client
   npm run dev
-  ```````
+   ```
 
-zort
+5. **Open your browser and navigate to http://localhost:3000 to see the application in action.**
+
+Contributing:
+Feel free to submit issues or pull requests. Contributions are welcome!
+
+<img width="896" alt="Lets Chat Together Figma" src="https://github.com/fbatuhanr/lets-chat-together/assets/34348780/e1832679-b6d6-423a-9566-406283de71a2">
