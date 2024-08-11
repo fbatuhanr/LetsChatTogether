@@ -15,6 +15,7 @@ import { FriendProps } from '../types/User.types'
 import { MessageProps } from '../types/Message.types'
 import { MdCancel } from 'react-icons/md'
 import { textClip } from '../utils/textUtils'
+import useScrollOnKeyboardClose from '../hooks/useScrollOnKeyboardClose'
 
 
 const Chat = () => {
@@ -24,7 +25,6 @@ const Chat = () => {
   const currentUsername = decodedToken.username
 
   const { friends, getFriends } = useFriendship(currentUserId)
-
   const {
     chatContainerRef,
     onlineUsers,
@@ -38,6 +38,7 @@ const Chat = () => {
     handleDeleteChat,
     handleDeleteMessage
   } = useChat(currentUserId, currentUsername);
+  const scrollTargetRef = useScrollOnKeyboardClose()
 
 
   useEffect(() => {
@@ -96,7 +97,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="px-2 lg:px-0 relative flex flex-col gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
+    <div ref={scrollTargetRef} className="px-2 lg:px-0 relative flex flex-col gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
       </div>
@@ -105,18 +106,18 @@ const Chat = () => {
           {
             targetUser ?
               <>
-                <div className="flex justify-between lg:px-4 py-2.5 border-[#6841F2] border-b-2 text-base lg:text-lg">
-                  <Link to={`/user/${targetUser.username}`} className="bg-[#0D0D0D] bg-opacity-50 rounded px-2 py-1">
-                    View {textClip(targetUser.username, 8)}
+                <div className="flex justify-center gap-x-1 py-1.5 lg:justify-between lg:px-4 lg:py-2.5 border-[#6841F2] border-b-2 text-base lg:text-lg">
+                  <Link to={`/user/${targetUser.username}`} className="bg-[#0D0D0D] bg-opacity-50 rounded p-1.5 lg:p-2">
+                    View {textClip(targetUser.username, 7)}
                   </Link>
-                  <Link to="/account/friends" className="bg-[#0D0D0D] bg-opacity-50 rounded px-2 py-1">
+                  <Link to="/account/friends" className="bg-[#0D0D0D] bg-opacity-50 rounded p-1.5 lg:p-2">
                     Manage Friends
                   </Link>
-                  <button onClick={handleDeleteChat} className="text-red-600 bg-[#0D0D0D] bg-opacity-50 rounded px-2 py-1">
+                  <button onClick={handleDeleteChat} className="text-red-600 bg-[#0D0D0D] bg-opacity-50 rounded p-1.5 lg:p-2">
                     Delete Chat
                   </button>
                 </div>
-                <div ref={chatContainerRef} className="h-[18.5rem] lg:h-72 mt-2 mb-2 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg">
+                <div ref={chatContainerRef} className="h-[18.5rem] lg:h-72 mt-2 mb-2 px-0 lg:px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg">
                   {messages.map((messageData: MessageProps, index) => {
                     const isMessageBelongsCurrUser = messageData.senderId === currentUserId;
                     const isSenderSamePreviousOne = index > 0 && messageData.senderId === messages[index - 1].senderId;
@@ -170,29 +171,31 @@ const Chat = () => {
         <div className="order-first py-2 lg:py-4 lg:w-[23%] lg:order-last bg-[#472DA6]">
 
           <h3 className="px-4 text-2xl lg:text-3xl font-bold lg:text-center">Friends ({friends?.length ? friends?.length - 1 : 0})</h3>
-          <div className="px-16 lg:px-0 mt-2 h-24 max-h-24 lg:h-auto lg:max-h-none font-medium overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            {
-              friends && friends.map((user: FriendProps, index: number) => {
+          <div className="h-24 max-h-24 lg:h-auto lg:max-h-none overflow-y-auto overflow-x-hidden scrollbar-thick scrollbar-thumb-gray-500 scrollbar-track-gray-200">
+            <div className="px-12 lg:px-0 font-medium">
+              {
+                friends && friends.map((user: FriendProps, index: number) => {
 
-                if (user._id == currentUserId) return // if self then skip this user
+                  if (user._id == currentUserId) return // if self then skip this user
 
-                let isUserOnline = onlineUsers ? onlineUsers.includes(user._id) : false
-                let isUserSelected = user._id == targetUser?._id
-                return (
-                  <div key={index} className={`flex items-center justify-evenly lg:justify-center lg:gap-x-1 ps-4 lg:ps-0 pt-1.5 pb-1 mt-1.5 rounded lg:rounded-none cursor-pointer ${isUserOnline ? "text-slate-800" : "text-slate-700"} ${isUserSelected ? "bg-[#e3dbff] font-semibold" : "bg-[#BCA9FF]"}`}
-                    onClick={() => handleSelectUser(user)}>
-                    <div className="flex items-center gap-x-1.5">
-                      {isUserOnline ? <FaCircle size={17} className="text-green-600" /> : <FaCircle size={17} className="text-red-600" />}
-                      <span className={`${isUserSelected ? 'text-xl underline' : 'text-lg'}`}>{textClip(user.username, 8)}</span>
-                      <span className="text-xs lg:text-xs mt-1">({isUserOnline ? "online" : "offline"})</span>
-                    </div>
-                    <div>
-                      <IoIosChatboxes size={24} className={`${isUserOnline ? "text-slate-800" : "text-slate-700"}`} />
-                    </div>
-                  </div>)
+                  let isUserOnline = onlineUsers ? onlineUsers.includes(user._id) : false
+                  let isUserSelected = user._id == targetUser?._id
+                  return (
+                    <div key={index} className={`flex items-center justify-evenly lg:justify-center lg:gap-x-1 ps-4 lg:ps-0 pt-1.5 pb-1 mt-1.5 rounded lg:rounded-none cursor-pointer ${isUserOnline ? "text-slate-800" : "text-slate-700"} ${isUserSelected ? "bg-[#e3dbff] font-semibold" : "bg-[#BCA9FF]"}`}
+                      onClick={() => handleSelectUser(user)}>
+                      <div className="flex items-center gap-x-1.5">
+                        {isUserOnline ? <FaCircle size={17} className="text-green-600" /> : <FaCircle size={17} className="text-red-600" />}
+                        <span className={`${isUserSelected ? 'text-xl underline' : 'text-lg'}`}>{textClip(user.username, 8)}</span>
+                        <span className="text-xs lg:text-xs mt-1">({isUserOnline ? "online" : "offline"})</span>
+                      </div>
+                      <div>
+                        <IoIosChatboxes size={24} className={`${isUserOnline ? "text-slate-800" : "text-slate-700"}`} />
+                      </div>
+                    </div>)
+                }
+                )
               }
-              )
-            }
+            </div>
           </div>
         </div>
       </div >

@@ -122,6 +122,11 @@ const useChat = (currentUserId: string, currentUsername: string) => {
 
     const handleSelectUser = async (user: FriendProps) => {
 
+        if(user._id === targetUser?._id){
+            setTargetUser(null)
+            return
+        }
+        
         setTargetUser(user);
 
         const data = { firstId: currentUserId, secondId: user._id };

@@ -122,7 +122,7 @@ export const Signup: React.FC = () => {
                                 <ErrorMessage errors={errors} name="passwordAgain" render={({ message }) => <p>{message}</p>} />
                             </div>
                         </div>
-                        <Button text="Sign up" color="primary" size="2xl" innerHeight={3} className="mt-2" />
+                        <Button text="Sign up" color="primary" size="2xl" rounded="2xl" innerHeight={3} className="mt-2" />
                         <p className="mt-2 underline"><Link to="/login">Already have an account? Login</Link></p>
                     </div>
                     <div className="absolute top-16 -right-20 -mr-0.5">

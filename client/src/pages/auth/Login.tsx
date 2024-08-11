@@ -69,7 +69,7 @@ export const Login: React.FC = () => {
                             </div>
                         </div>
 
-                        <Button text="Login" color="primary" size="2xl" innerHeight={3} className="mt-2" />
+                        <Button text="Login" color="primary" size="2xl" rounded="2xl" innerHeight={3} className="mt-2" />
 
                         <p className="mt-2 underline"><Link to="/signup">No account yet? Sign up</Link></p>
                     </div>

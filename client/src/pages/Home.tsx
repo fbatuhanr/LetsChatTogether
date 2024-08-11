@@ -12,6 +12,8 @@ import cosmicButterflyLeft from "../assets/background/cosmic-butterfly.png"
 import { Link } from 'react-router-dom'
 import { useDecodedToken } from '../hooks/useDecodedToken'
 import { FaUsers } from 'react-icons/fa'
+import { IoIosChatboxes } from 'react-icons/io'
+import LinkButton from '../components/general/clickable/LinkButton'
 
 const Home: React.FC = () => {
 
@@ -38,16 +40,16 @@ const Home: React.FC = () => {
                         />
                         with <span className="text-[#F2D541] text-4xl md:text-5xl">Let's Chat Together!</span>
                     </h1>
-                    <h2 className="text-xl md:text-2xl font-light">
+                    <h2 className="text-xl md:text-2xl font-light mb-8 md:mb-4">
                         Embark on a journey of connection <br className="hidden md:block" />
                         and discovery with Let's Chat Together.
                     </h2>
                     {
                         decodedToken.userId ?
-                            <Link to="/users" className="flex items-center justify-center gap-x-2 [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-[225px] py-2 text-center mt-8 md:mt-12 border border-[#000000] bg-[#6841F2] rounded-3xl text-2xl font-semibold">
-                                Browse Users
-                                <FaUsers size={25} className="mt-1" />
-                            </Link>
+                            <div className="flex flex-col justify-center gap-y-2 md:flex-row md:gap-y-0 md:gap-x-3 md:w-[90%]">
+                                <LinkButton text="Start Chatting" target="/chat" color="primary" iconEnd={<IoIosChatboxes className="mt-0.5 ml-0.5"/>} size="xl" innerHeight={2} rounded="3xl" />
+                                <LinkButton text="Browse Users" target="/users" color="secondary" iconEnd={<FaUsers className="mt-0.5 ml-0.5"/>} size="xl" innerHeight={2} rounded="3xl" />
+                            </div>
                             :
                             <Link to="/signup" className="[text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-[210px] py-2 text-center mt-8 md:mt-12 border border-[#000000] bg-[#6841F2] rounded-3xl text-2xl font-semibold">
                                 Join Now

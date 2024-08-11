@@ -29,15 +29,7 @@ export default {
     },
   },
   plugins: [
-    require('tailwind-scrollbar'),
-    function ({ addBase }) {
-      addBase({
-        'button, [type="button"], [type="reset"], [type="submit"]': {
-          backgroundColor: 'initial', // Tailwind'in varsayılan 'transparent' yerine 'initial' kullanabilirsiniz
-          backgroundImage: 'none',    // İsteğe bağlı, varsayılan stilin önüne geçer
-        }
-      })
-    }
+    require('tailwind-scrollbar')
   ]
 }
 

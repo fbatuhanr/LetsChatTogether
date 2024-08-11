@@ -8,6 +8,7 @@ export interface ClickableProps {
     disabled?: boolean
     color?: "primary" | "secondary" | "tertiary" | "quaternary" | "transparent" | null
     size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl" | "9xl"
+    rounded?: "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full"
     outlined?: boolean
     uppercased?: boolean
     innerWidth?: number
@@ -20,6 +21,8 @@ export const colorAdjustment = (color?: string | null, outlined?: boolean) => {
     switch (color) {
       case "primary":
         return `text-white bg-yellow-400 hover:text-gray-200 hover:bg-yellow-500 shadow-md shadow-[#211a3c] [text-shadow:1px_1px_2px_var(--tw-shadow-color)] ${outlined && "border border-yellow-600 hover:border-yellow-400"}`
+      case "secondary":
+        return `text-white bg-[#6841F2] hover:text-gray-200 hover:bg-[#461fce] shadow-md shadow-[#211a3c] [text-shadow:1px_1px_2px_var(--tw-shadow-color)] ${outlined && "border border-[#000000]"}`
       case "transparent":
         return `bg-transparent ${outlined && "border border-yellow-600 hover:border-yellow-500"}`
   
