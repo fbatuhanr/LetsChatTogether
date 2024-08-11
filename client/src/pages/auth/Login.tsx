@@ -26,8 +26,6 @@ export const Login: React.FC = () => {
             error: { render: ({ data }) => `${data}` }
         })
     }
-
-
     /*
     --- WITHOUT react-hook-form
     const [username, setUsername] = useState<string>("")

@@ -22,7 +22,7 @@ async function removeUserFriend(req: Request, res: Response, next: NextFunction)
       return res.status(500).json({ message: 'Friends not found!' })
 
     return res.status(200).json({ message: 'Friend removed successfully!' })
-    //return res.status(204).send()
+    // return res.status(204).send()
 
   } catch (error) {
     next(error);

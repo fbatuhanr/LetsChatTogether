@@ -34,7 +34,6 @@ export const Signup: React.FC = () => {
         })
     }
     const password = watch('password', '');
-
     /*
     --- WITHOUT react-hook-form
     const handleSubmit = async (e: React.FormEvent) => {

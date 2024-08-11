@@ -7,7 +7,6 @@ export interface CustomRequest extends Request {
 
 function authenticateToken(req: CustomRequest, res: Response, next: NextFunction) {
   const token = req.headers['authorization']?.split(' ')[1]
-
   // console.log("active token: ", token)
 
   if (!token) {

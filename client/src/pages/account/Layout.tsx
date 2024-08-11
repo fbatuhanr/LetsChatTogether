@@ -37,10 +37,6 @@ const Layout = () => {
                     </ul>
                 </nav>
 
-                {/* <div className="absolute -top-14 left-0">
-                    <img src={SecureImg} className="w-28" />
-                </div> */}
-
                 <div className="w-full lg:w-[91%] mx-auto my-12 px-4">
                     <Outlet />
                 </div>

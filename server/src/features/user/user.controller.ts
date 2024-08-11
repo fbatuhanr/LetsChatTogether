@@ -29,7 +29,7 @@ async function getAllWithLimitation(req: Request, res: Response, next: NextFunct
 async function get(req: CustomRequest, res: Response, next: NextFunction) {
   try {
 
-    if (req.user.userId !== req.params.id) { // authMiddleware tarafından başarıyla decoded edilmişse req.user'a decoded bilgileri döndürülür.
+    if (req.user.userId !== req.params.id) { // If it is successfully decoded by authMiddleware, decoded information is returned to req.user.
       return res.status(403).json({ message: 'Access denied' });
     }
     res.json(await userService.get(req.params.id));

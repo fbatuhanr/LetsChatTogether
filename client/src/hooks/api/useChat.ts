@@ -1,4 +1,3 @@
-// src/hooks/useChat.ts
 import { useEffect, useMemo, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import useAxios from '../useAxios';
@@ -26,11 +25,6 @@ const useChat = (currentUserId: string, currentUsername: string) => {
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        /*const activeChats = async () => {
-            const response = await axiosInstance.get(`${process.env.CHAT_API_URL}/${currentUserId}`);
-            console.log(response.data);
-        };
-        activeChats();*/
 
         socket.on('users', (users: any) => {
             console.log(users)

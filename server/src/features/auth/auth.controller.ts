@@ -5,7 +5,7 @@ import ms from 'ms'
 async function refreshToken(req: Request, res: Response, next: NextFunction) {
   try {
 
-    const { refreshToken } = req.cookies // Get the refresh token from the cookies
+    const { refreshToken } = req.cookies // get the refresh token from the cookies
     if (!refreshToken) {
       return res.status(403).json({ message: 'Refresh token not provided.' })
     }

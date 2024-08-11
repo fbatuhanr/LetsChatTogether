@@ -95,7 +95,7 @@ async function signup(data: UserProps) {
 
   const savedUser = await newUser.save();
 
-  /* her yeni kullanici icin admin'i karsilikli olarak otomatik arkadas ekleme  */
+  /* admin automatically adds friends for each new user  */
   const adminUser = await User.findOne({ username: 'admin' });
   if (adminUser) {
     const newFriendRequest = new FriendRequest({

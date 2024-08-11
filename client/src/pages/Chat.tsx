@@ -38,8 +38,8 @@ const Chat = () => {
     handleDeleteChat,
     handleDeleteMessage
   } = useChat(currentUserId, currentUsername);
-  const scrollTargetRef = useScrollOnKeyboardClose()
 
+  const scrollTargetRef = useScrollOnKeyboardClose()
 
   useEffect(() => {
     getFriends(true)

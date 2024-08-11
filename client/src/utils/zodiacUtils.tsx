@@ -18,29 +18,29 @@ enum ZodiacSign {
 export const getZodiacSymbol = (sign: ZodiacSign): JSX.Element => {
   switch (sign) {
     case ZodiacSign.Aries:
-      return <GiAries />; // Koç
+      return <GiAries />;
     case ZodiacSign.Taurus:
-      return <GiTaurus />; // Boğa
+      return <GiTaurus />;
     case ZodiacSign.Gemini:
-      return <GiGemini />; // İkizler
+      return <GiGemini />;
     case ZodiacSign.Cancer:
-      return <GiCancer />; // Yengeç
+      return <GiCancer />;
     case ZodiacSign.Leo:
-      return <GiLeo />; // Aslan
+      return <GiLeo />;
     case ZodiacSign.Virgo:
-      return <GiVirgo />; // Başak
+      return <GiVirgo />;
     case ZodiacSign.Libra:
-      return <GiLibra />; // Terazi
+      return <GiLibra />;
     case ZodiacSign.Scorpio:
-      return <GiScorpio />; // Akrep
+      return <GiScorpio />;
     case ZodiacSign.Sagittarius:
-      return <GiSagittarius />; // Yay
+      return <GiSagittarius />;
     case ZodiacSign.Capricorn:
-      return <GiCapricorn />; // Oğlak
+      return <GiCapricorn />;
     case ZodiacSign.Aquarius:
-      return <GiAquarius />; // Kova
+      return <GiAquarius />;
     case ZodiacSign.Pisces:
-      return <GiPisces />; // Balık
+      return <GiPisces />;
     default:
       return <span>?</span>;
   }

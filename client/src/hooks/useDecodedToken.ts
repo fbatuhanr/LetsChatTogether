@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode'
 import { defaultDecodedToken } from '../constants/defaultValues'
 
 export interface DecodedTokenProps {
-    userId: string; // or mongoose.Types.ObjectId
+    userId: string;
     username: string;
     exp?: number;
     iat?: number;

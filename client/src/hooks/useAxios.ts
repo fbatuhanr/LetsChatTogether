@@ -17,7 +17,6 @@ const useAxios = () => {
         (config) => {
             const state = store.getState()
             const accessToken = state.auth.accessToken
-
             // console.log(accessToken)
 
             if (accessToken) {
