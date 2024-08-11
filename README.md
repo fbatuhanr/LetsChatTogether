@@ -48,6 +48,12 @@
 
 The design for "Let's Chat Together" was created using Figma. You can view the full design [here](https://www.figma.com/design/hQqZzp9YHbtrdf8cFZq9an/Lets-Chat-Together---Design?node-id=0-1&t=XTE8czVsFzN4qNlX-1).
 
+## LIVE DEMO
+Client deployment on Vercel: [lets-chat-together.vercel.app](https://lets-chat-together.vercel.app)
+Server deployment on Render: [lets-chat-together.onrender.com](https://lets-chat-together.onrender.com)
+**Deployment Note:** 
+Free instances may experience delays of up to 50 seconds or more due to inactivity, as they may spin down when not in use.
+
 ## Getting Started
 
 1. **Clone the repository:**
@@ -109,4 +115,15 @@ MESSAGE_API_URL=your_message_api_url
 Contributing:
 Feel free to submit issues or pull requests. Contributions are welcome!
 
-<img width="896" alt="Lets Chat Together Figma" src="https://github.com/fbatuhanr/lets-chat-together/assets/34348780/e1832679-b6d6-423a-9566-406283de71a2">
+##Application Live Demo Screenshots:
+![lets-chat-together_chat](https://github.com/user-attachments/assets/6e527f00-975f-496d-801c-a59f56375f46)
+![lets-chat-together_friends](https://github.com/user-attachments/assets/3563a48f-d541-4af9-a0aa-198c2c39b66b)
+![lets-chat-together_profile](https://github.com/user-attachments/assets/a158cc99-ac8b-4e5d-a829-023468221492)
+![lets-chat-together-settings](https://github.com/user-attachments/assets/bb3be8d6-df74-4405-9ed9-b6ea01e468d3)
+![lets-chat-together-user-own](https://github.com/user-attachments/assets/b2a89dc9-8eed-40b1-b8c7-2cc25f9a3277)
+![lets-chat-together-user](https://github.com/user-attachments/assets/4713b11f-b1af-444c-8953-a44886c43725)
+![lets-chat-together-users](https://github.com/user-attachments/assets/d1ceb965-dda9-42be-b571-444419ade368)
+![lets-chat-together-chat-delete](https://github.com/user-attachments/assets/1dee923a-571b-469d-bd33-844bd1356a78)
+
+##Application Figma Design:
+<img width="785" alt="Lets Chat Together Figma" src="https://github.com/user-attachments/assets/ad7632be-3a0c-415a-a5c6-dfa677cdaf02">
