@@ -1,7 +1,12 @@
 # Let's Chat Together
 
 "Let's Chat Together" is a dynamic chat platform designed for seamless communication, both online and offline. It provides users with a comprehensive suite of features for messaging, managing friends, and handling chat interactions.
-https://github.com/user-attachments/assets/2a17c4ce-155a-423b-befa-da923acb6ce7
+
+
+
+https://github.com/user-attachments/assets/524e8ac8-e884-48fa-9b93-dcdabc44bbc6
+
+
 
 ## Features
 
