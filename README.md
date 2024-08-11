@@ -49,9 +49,12 @@
 The design for "Let's Chat Together" was created using Figma. You can view the full design [here](https://www.figma.com/design/hQqZzp9YHbtrdf8cFZq9an/Lets-Chat-Together---Design?node-id=0-1&t=XTE8czVsFzN4qNlX-1).
 
 ## LIVE DEMO
-Client deployment on Vercel: [lets-chat-together.vercel.app](https://lets-chat-together.vercel.app)
-Server deployment on Render: [lets-chat-together.onrender.com](https://lets-chat-together.onrender.com)
-**Deployment Note:** 
+Client deployment on Vercel: [lets-chat-together.vercel.app](https://lets-chat-together.vercel.app) 
+
+Server deployment on Render: [lets-chat-together.onrender.com](https://lets-chat-together.onrender.com) 
+
+**Deployment Note:**  
+
 Free instances may experience delays of up to 50 seconds or more due to inactivity, as they may spin down when not in use.
 
 ## Getting Started
