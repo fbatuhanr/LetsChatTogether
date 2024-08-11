@@ -72,7 +72,7 @@ The design for "Let's Chat Together" was created using Figma. You can view the f
    
 - Create a .env file in the server directory with the following variables:
 ```bash
-NODE_ENV=development # or production
+NODE_ENV=development or production
 MONGODB_URI=your_mongodb_uri
 PORT=your_server_port
 CORS_ORIGIN=your_cors_origin
