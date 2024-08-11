@@ -70,17 +70,35 @@ The design for "Let's Chat Together" was created using Figma. You can view the f
    
 3. **Set up environment variables:**
    
-   Create .env files in both client and server directories with the required variables.
+- Create a .env file in the server directory with the following variables:
+```bash
+NODE_ENV=development # or production
+MONGODB_URI=your_mongodb_uri
+PORT=your_server_port
+CORS_ORIGIN=your_cors_origin
+ACCESS_TOKEN_SECRET=your_access_token_secret
+REFRESH_TOKEN_SECRET=your_refresh_token_secret
+ACCESS_TOKEN_EXPIRATION=your_access_token_expiration
+REFRESH_TOKEN_EXPIRATION=your_refresh_token_expiration
+```
+- Create a .env file in the client directory with the following variables:
+```bash
+API_URL=your_api_url
+AUTH_API_URL=your_auth_api_url
+USER_API_URL=your_user_api_url
+CHAT_API_URL=your_chat_api_url
+MESSAGE_API_URL=your_message_api_url
+```
 
 4. **Run the application:**
 
-  Start the backend server:
+- Start the backend server:
 ```bash
    cd server
    npm start
 ```
 
-  Start the frontend development server:
+- Start the frontend development server:
 ```bash
   cd ../client
   npm run dev
