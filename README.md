@@ -112,6 +112,11 @@ MESSAGE_API_URL=your_message_api_url
    cd server
    npm start
 ```
+or
+```bash
+   cd server
+   npm run dev
+```
 
 - Start the frontend development server:
 ```bash
