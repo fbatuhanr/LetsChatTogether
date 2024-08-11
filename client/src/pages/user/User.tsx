@@ -44,7 +44,7 @@ const User = () => {
                                         `${data.name && data.name} ${data.surname && data.surname}`
                                 }
                             </h2>
-                            <div className="flex justify-center items-center w-full lg:w-[90%] mx-auto mt-6 lg:mt-4 border-b font-semibold text-sm">
+                            <div className="flex justify-center items-center w-full lg:w-[90%] mx-auto mt-6 lg:mt-4 border-b font-semibold text-[0.81rem] lg:text-sm">
                                 <div className="border-r pr-2">
                                     {data.dateOfBirth && <Age dateOfBirth={data.dateOfBirth} />}
                                 </div>
@@ -76,8 +76,8 @@ const User = () => {
                                 : <FriendRequestButton targetUserId={data._id} />
                             :
                             <div className="text-center py-2">
-                                <Link to="/login" className="bg-[#6841F2] px-8 py-2.5 rounded-2xl text-xl font-semibold [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#211a3c] shadow-md">
-                                    Join Now to Add Friends and Message!
+                                <Link to="/login" className="bg-[#6841F2] px-2 text-lg lg:px-8 lg:text-xl py-2.5 rounded-2xl font-semibold [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#211a3c] shadow-md">
+                                    Join Now to Add Friends!
                                 </Link>
                             </div>
                     }
