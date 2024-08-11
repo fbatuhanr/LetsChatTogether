@@ -75,7 +75,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // its true when production and its false development mode
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict", // its none when we made production because its based on different domains, but in development its strict because localhost wants that
       maxAge: ms(process.env.REFRESH_TOKEN_EXPIRATION!)
     });
     return res.status(200).json({
