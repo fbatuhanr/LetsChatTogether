@@ -52,18 +52,21 @@ The design for "Let's Chat Together" was created using Figma. You can view the f
 
 1. **Clone the repository:**
    
-   ```bash
+```bash
    git clone https://github.com/fbatuhanr/lets-chat-together.git
+```
 
 2. **Install dependencies for frontend and backend:**
 
-   ```bash
+```bash
    cd lets-chat-together/client
    npm install
+```
    
-   ```bash
+```bash
    cd ../server
    npm install
+```
    
 3. **Set up environment variables:**
    
@@ -72,15 +75,16 @@ The design for "Let's Chat Together" was created using Figma. You can view the f
 4. **Run the application:**
 
   Start the backend server:
-   ```bash
+```bash
    cd server
    npm start
+```
 
   Start the frontend development server:
-   ```bash
+```bash
   cd ../client
   npm run dev
-   ```
+```
 
 5. **Open your browser and navigate to http://localhost:3000 to see the application in action.**
 
