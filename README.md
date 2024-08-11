@@ -118,7 +118,8 @@ MESSAGE_API_URL=your_message_api_url
 Contributing:
 Feel free to submit issues or pull requests. Contributions are welcome!
 
-##Application Live Demo Screenshots:
+
+## Application Live Demo Screenshots:
 ![lets-chat-together_chat](https://github.com/user-attachments/assets/6e527f00-975f-496d-801c-a59f56375f46)
 ![lets-chat-together_friends](https://github.com/user-attachments/assets/3563a48f-d541-4af9-a0aa-198c2c39b66b)
 ![lets-chat-together_profile](https://github.com/user-attachments/assets/a158cc99-ac8b-4e5d-a829-023468221492)
@@ -128,5 +129,5 @@ Feel free to submit issues or pull requests. Contributions are welcome!
 ![lets-chat-together-users](https://github.com/user-attachments/assets/d1ceb965-dda9-42be-b571-444419ade368)
 ![lets-chat-together-chat-delete](https://github.com/user-attachments/assets/1dee923a-571b-469d-bd33-844bd1356a78)
 
-##Application Figma Design:
+## Application Figma Design:
 <img width="785" alt="Lets Chat Together Figma" src="https://github.com/user-attachments/assets/ad7632be-3a0c-415a-a5c6-dfa677cdaf02">
