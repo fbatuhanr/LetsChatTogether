@@ -58,6 +58,7 @@ The design for "Let's Chat Together" was created using Figma. You can view the f
 Client deployment on Vercel: [lets-chat-together.vercel.app](https://lets-chat-together.vercel.app) 
 
 Server deployment on Render: [lets-chat-together.onrender.com](https://lets-chat-together.onrender.com) 
+
 Server deployment on Adaptable.io: [lets-chat-together.adaptable.app](https://lets-chat-together.adaptable.app) 
 
 **Deployment Note:**  
