@@ -23,7 +23,6 @@ logs/**/*.log
 /server/node_modules/
 /server/dist/
 /server/.env
-/server/uploads
 
 # Client folder
 /client/node_modules/
