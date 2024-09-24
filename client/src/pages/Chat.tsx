@@ -46,7 +46,8 @@ const Chat = () => {
   }, [])
 
   const getUsernameById = (id: string) => friends?.find((i) => i._id === id)?.username;
-  const getPhotoById = (id: string) => friends?.find((i) => i._id === id)?.profilePhoto;
+  // used before firebase > const getPhotoById = (id: string) => friends?.find((i) => i._id === id)?.profilePhoto;
+  const getPhotoById = (id: string) => friends?.find((i) => i._id === id)?.profilePhotoFirebase;
 
 
   const renderMessageHeader = (messageData: MessageProps, isMessageBelongsCurrUser: boolean, isSenderSamePreviousOne: boolean) => {
@@ -63,13 +64,13 @@ const Chat = () => {
     const initials = getUsernameById(messageData.senderId)?.[0].toUpperCase();
     const avatarClasses = `w-10 h-10 leading-9 text-xl text-center rounded-full overflow-hidden ${isMessageBelongsCurrUser ? 'order-1 ml-1 border-2' : 'mr-1'} ${messageData.date ? 'mb-3' : 'mb-1.5'}`;
     const bgColor = `bg-[#4F22F2]`;
-
     return (
       <>
         {isMessageBelongsCurrUser && deleteMessageButton}
         <div className={`${avatarClasses} ${bgColor}`}>
           {profilePic ? (
-            <img src={`${process.env.API_URL}/${profilePic}`} alt="Profile" />
+            /* used before firebase > <img src={`${process.env.API_URL}/${profilePic}`} alt="Profile" /> */
+            <img src={profilePic} alt="Profile" />
           ) : (
             initials
           )}

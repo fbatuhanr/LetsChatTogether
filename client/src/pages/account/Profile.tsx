@@ -1,203 +1,304 @@
-import { useEffect, useState } from 'react'
-import { useForm, SubmitHandler, Controller } from "react-hook-form"
-import { ErrorMessage } from "@hookform/error-message"
-import Datepicker from "tailwind-datepicker-react"
+import { useEffect, useState } from "react";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { ErrorMessage } from "@hookform/error-message";
+import Datepicker from "tailwind-datepicker-react";
 
-import useAxios from '../../hooks/useAxios'
-import { useDecodedToken } from '../../hooks/useDecodedToken'
-import { UserProps } from '../../types/User.types'
-import Button from '../../components/general/clickable/Button'
-import { toast } from 'react-toastify'
-import { AxiosError, AxiosResponse } from 'axios'
+import useAxios from "../../hooks/useAxios";
+import { useDecodedToken } from "../../hooks/useDecodedToken";
+import { UserProps } from "../../types/User.types";
+import Button from "../../components/general/clickable/Button";
+import { toast } from "react-toastify";
+import { AxiosError, AxiosResponse } from "axios";
+
+import { storage } from "../../firebase/firebaseConfig";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
 const Profile = () => {
+  const axiosInstance = useAxios();
+  const decodedToken = useDecodedToken();
 
-    const axiosInstance = useAxios()
-    const decodedToken = useDecodedToken()
+  const [isDatepickerVisible, setIsDatepickerVisible] =
+    useState<boolean>(false);
+  const {
+    register,
+    control,
+    watch,
+    formState: { errors },
+    handleSubmit,
+    reset,
+  } = useForm<UserProps>();
 
-    const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false)
-    const { register, control, watch, formState: { errors }, handleSubmit, reset } = useForm<UserProps>()
+  const onSubmit: SubmitHandler<UserProps> = async (data) => {
+    try {
+      console.log(data);
 
-    const onSubmit: SubmitHandler<UserProps> = async (data) => {
+      let newData = { ...data };
 
-        console.log(data)
+      if ("File" in window && data.profilePhoto instanceof FileList) {
+        newData = { ...newData, profilePhoto: data.profilePhoto[0] };
 
-        let newData = {
-            ...data
-        }
-
-        if (('File' in window && data.profilePhoto instanceof FileList))
-            newData = { ...newData, profilePhoto: data.profilePhoto[0] }
-
-        console.log(newData)
-
-        const headers = { 'Content-Type': 'multipart/form-data' };
-        await toast.promise(
-            axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, newData, { headers }),
-            {
-                pending: 'Updating...',
-                success: { render: ({ data }: { data: AxiosResponse }) => data.data.message || 'Successfully updated!' },
-                error: { render: ({ data }: { data: AxiosError<any> }) => data.response?.data?.message || 'An error occurred during the update.' }
+        const file = data.profilePhoto[0];
+        const storageRef = ref(storage, `uploads/${Date.now()}-${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        const downloadUrl = await new Promise<string>((resolve, reject) => {
+          uploadTask.on(
+            "state_changed",
+            null,
+            (error) => {
+              reject(error);
+            },
+            async () => {
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(url);
             }
-        );
+          );
+        });
+
+        newData = { ...newData, profilePhotoFirebase: downloadUrl };
+      }
+
+      console.log(newData);
+
+      const headers = { "Content-Type": "multipart/form-data" };
+
+      await toast.promise(
+        axiosInstance.put(
+          `${process.env.API_URL}/user/${decodedToken.userId}`,
+          newData,
+          { headers }
+        ),
+        {
+          pending: "Updating...",
+          success: {
+            render: ({ data }: { data: AxiosResponse }) =>
+              data.data.message || "Successfully updated!",
+          },
+          error: {
+            render: ({ data }: { data: AxiosError<any> }) =>
+              data.response?.data?.message ||
+              "An error occurred during the update.",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("An error occurred:", error);
+      toast.error("Failed to upload or update profile.");
     }
+  };
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await axiosInstance.get(`${process.env.API_URL}/user/${decodedToken.userId}`)
-                console.log(response.data)
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axiosInstance.get(
+          `${process.env.API_URL}/user/${decodedToken.userId}`
+        );
+        console.log(response.data);
 
-                reset({
-                    ...response.data,
-                    dateOfBirth: response.data.dateOfBirth ? new Date(response.data.dateOfBirth) : null
-                })
+        reset({
+          ...response.data,
+          dateOfBirth: response.data.dateOfBirth ? new Date(response.data.dateOfBirth) : null,
+          profilePhoto: response.data.profilePhotoFirebase ? response.data.profilePhotoFirebase : null // for firebase storage
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    fetchData();
+  }, [reset]);
 
-            } catch (error) {
-                console.error('Error fetching data:', error)
-            }
-        }
-        fetchData()
-    }, [reset])
+  const watchProfilePhoto = watch("profilePhoto");
+  useEffect(() => {
+    console.log(watchProfilePhoto);
+  }, [watchProfilePhoto]);
 
-    const watchProfilePhoto = watch('profilePhoto')
-    useEffect(() => {
-        console.log(watchProfilePhoto)
-    }, [watchProfilePhoto])
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-y-4 h-full justify-center"
+    >
+      <div>
+        <div className="flex justify-between gap-x-2">
+          <div className="w-full">
+            <label htmlFor="name" className="text-2xl font-semibold ps-2">
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500"
+              placeholder="Type here..."
+              {...register("name", {
+                required: "Name is required",
+                pattern: {
+                  value: /^[A-Za-z]+$/,
+                  message:
+                    "Name should only contain English letters without spaces",
+                },
+                minLength: {
+                  value: 2,
+                  message: "Name must be at least 2 characters long",
+                },
+                maxLength: {
+                  value: 50,
+                  message: "Name cannot be more than 50 characters long",
+                },
+              })}
+            />
+          </div>
+          <div className="w-full">
+            <label htmlFor="surname" className="text-2xl font-semibold ps-2">
+              Surname
+            </label>
+            <input
+              type="text"
+              id="surname"
+              className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500"
+              placeholder="Type here..."
+              {...register("surname", {
+                required: "Surname is required",
+                pattern: {
+                  value: /^[A-Za-z]+$/,
+                  message:
+                    "Name should only contain English letters without spaces",
+                },
+                minLength: {
+                  value: 2,
+                  message: "Surname must be at least 2 characters long",
+                },
+                maxLength: {
+                  value: 50,
+                  message: "Surname cannot be more than 50 characters long",
+                },
+              })}
+            />
+          </div>
+        </div>
+        <div className="text-sm mt-1 px-4">
+          <ErrorMessage
+            errors={errors}
+            name="name"
+            render={({ message }) => <p>{message}</p>}
+          />
+          <ErrorMessage
+            errors={errors}
+            name="surname"
+            render={({ message }) => <p>{message}</p>}
+          />
+        </div>
+      </div>
 
-    return (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-4 h-full justify-center">
+      <div className="flex justify-between gap-x-2">
+        <div className="w-full">
+          <label htmlFor="gender" className="text-2xl font-semibold ps-2">
+            Gender
+          </label>
+          <select
+            id="gender"
+            className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200 outline-1 focus:outline-dashed outline-indigo-500"
+            {...register("gender", {
+              required: "Gender is required",
+            })}
+          >
+            <option value="">Choose...</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+          <ErrorMessage
+            errors={errors}
+            name="gender"
+            render={({ message }) => <p>{message}</p>}
+          />
+        </div>
+        <div className="w-full">
+          <label htmlFor="dateofbirth" className="text-2xl font-semibold ps-2">
+            Date of Birth
+          </label>
+          <Controller
+            name="dateOfBirth"
+            control={control}
+            render={({ field }) => (
+              <Datepicker
+                value={field.value}
+                onChange={(date) => field.onChange(date)}
+                show={isDatepickerVisible}
+                setShow={(state) => setIsDatepickerVisible(state)}
+                options={{
+                  defaultDate: field.value,
+                  autoHide: true,
+                  todayBtn: false,
+                  clearBtn: true,
+                  theme: {
+                    background: "",
+                    todayBtn: "",
+                    clearBtn: "",
+                    icons: "",
+                    text: "",
+                    disabledText: "",
+                    input:
+                      "!bg-[#6841f2] text-white !border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500",
+                    inputIcon: "!text-white",
+                    selected: "",
+                  },
+                }}
+              />
+            )}
+          />
+        </div>
+      </div>
 
-            <div>
-                <div className="flex justify-between gap-x-2">
-                    <div className="w-full">
-                        <label htmlFor="name" className="text-2xl font-semibold ps-2">Name</label>
-                        <input type="text" id="name" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500" placeholder="Type here..."
-                            {...register('name', {
-                                required: 'Name is required',
-                                pattern: {
-                                    value: /^[A-Za-z]+$/,
-                                    message: 'Name should only contain English letters without spaces'
-                                },
-                                minLength: {
-                                    value: 2,
-                                    message: 'Name must be at least 2 characters long'
-                                },
-                                maxLength: {
-                                    value: 50,
-                                    message: 'Name cannot be more than 50 characters long'
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className="w-full">
-                        <label htmlFor="surname" className="text-2xl font-semibold ps-2">Surname</label>
-                        <input type="text" id="surname" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500" placeholder="Type here..."
-                            {...register('surname', {
-                                required: 'Surname is required',
-                                pattern: {
-                                    value: /^[A-Za-z]+$/,
-                                    message: 'Name should only contain English letters without spaces'
-                                },
-                                minLength: {
-                                    value: 2,
-                                    message: 'Surname must be at least 2 characters long'
-                                },
-                                maxLength: {
-                                    value: 50,
-                                    message: 'Surname cannot be more than 50 characters long'
-                                }
-                            })}
-                        />
-                    </div>
-                </div>
-                <div className="text-sm mt-1 px-4">
-                    <ErrorMessage errors={errors} name="name" render={({ message }) => <p>{message}</p>} />
-                    <ErrorMessage errors={errors} name="surname" render={({ message }) => <p>{message}</p>} />
-                </div>
+      <div className="flex flex-col gap-y-1">
+        <label htmlFor="profilePhoto" className="text-2xl font-semibold ps-2">
+          Photo
+        </label>
+        <div className="relative">
+          <input
+            type="file"
+            id="profilePhoto"
+            className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500"
+            {...register("profilePhoto")}
+            multiple={false}
+          />
+          {(watchProfilePhoto instanceof FileList ||
+            typeof watchProfilePhoto === "string") &&
+          watchProfilePhoto.length ? (
+            <div className="absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
+              <img
+                className="h-full rounded-r-xl"
+                src={
+                  watchProfilePhoto instanceof FileList
+                    ? URL.createObjectURL(watchProfilePhoto[0])
+                    : watchProfilePhoto // `${process.env.API_URL}/${watchProfilePhoto}` used before firebase
+                }
+              />
             </div>
+          ) : null}
+        </div>
+      </div>
 
-            <div className="flex justify-between gap-x-2">
-                <div className="w-full">
-                    <label htmlFor="gender" className="text-2xl font-semibold ps-2">Gender</label>
-                    <select id="gender" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200 outline-1 focus:outline-dashed outline-indigo-500"
-                        {...register('gender', {
-                            required: 'Gender is required'
-                        })}
-                    >
-                        <option value="">Choose...</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <ErrorMessage errors={errors} name="gender" render={({ message }) => <p>{message}</p>} />
-                </div>
-                <div className="w-full">
-                    <label htmlFor="dateofbirth" className="text-2xl font-semibold ps-2">Date of Birth</label>
-                    <Controller
-                        name="dateOfBirth"
-                        control={control}
-                        render={({ field }) => (
-                            <Datepicker
-                                value={field.value}
-                                onChange={(date) => field.onChange(date)}
-                                show={isDatepickerVisible} setShow={(state) => setIsDatepickerVisible(state)}
-                                options={{
-                                    defaultDate: field.value,
-                                    autoHide: true,
-                                    todayBtn: false,
-                                    clearBtn: true,
-                                    theme: {
-                                        background: "",
-                                        todayBtn: "",
-                                        clearBtn: "",
-                                        icons: "",
-                                        text: "",
-                                        disabledText: "",
-                                        input: "!bg-[#6841f2] text-white !border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500",
-                                        inputIcon: "!text-white",
-                                        selected: "",
-                                    }
-                                }}
-                            />
-                        )}
-                    />
-                </div>
-            </div>
+      <div className="flex flex-col gap-y-1">
+        <label htmlFor="about" className="text-2xl font-semibold ps-2">
+          About
+        </label>
+        <textarea
+          id="about"
+          className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500"
+          placeholder="anything about yourself..."
+          {...register("about")}
+          rows={4}
+        />
+      </div>
 
-            <div className="flex flex-col gap-y-1">
-                <label htmlFor="profilePhoto" className="text-2xl font-semibold ps-2">Photo</label>
-                <div className="relative">
-                    <input type="file" id="profilePhoto" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500"
-                        {...register("profilePhoto")} multiple={false}
-                    />
-                    {
-                        ((watchProfilePhoto instanceof FileList || typeof watchProfilePhoto === 'string') && watchProfilePhoto.length) ?
-                            <div className="absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
-                                <img className="h-full rounded-r-xl"
-                                    src={
-                                        (watchProfilePhoto instanceof FileList)
-                                            ? URL.createObjectURL(watchProfilePhoto[0])
-                                            : `${process.env.API_URL}/${watchProfilePhoto}`
-                                    }
-                                />
-                            </div>
-                            : null
-                    }
-                </div>
-            </div>
+      <Button
+        text="Update"
+        color="primary"
+        innerHeight={3}
+        size="2xl"
+        uppercased
+        className="mt-2"
+      />
+    </form>
+  );
+};
 
-            <div className="flex flex-col gap-y-1">
-                <label htmlFor="about" className="text-2xl font-semibold ps-2">About</label>
-                <textarea id="about" className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500" placeholder="anything about yourself..."
-                    {...register('about')}
-                    rows={4}
-                />
-            </div>
-
-            <Button text="Update" color="primary" innerHeight={3} size="2xl" uppercased className="mt-2" />
-        </form>
-    )
-}
-
-export default Profile
+export default Profile;

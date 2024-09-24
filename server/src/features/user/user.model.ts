@@ -10,6 +10,7 @@ const UserSchema = new Schema({
     gender: { type: String, enum: ['male', 'female', 'other'] },
     dateOfBirth: { type: Date },
     profilePhoto: { type: String },
+    profilePhotoFirebase: { type: String },
     about: { type: String },
 
     friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]

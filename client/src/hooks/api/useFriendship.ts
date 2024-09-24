@@ -36,7 +36,8 @@ const useFriendship = (currentUserId: string) => {
                         {
                             _id: response.data._id,
                             username: response.data.username,
-                            profilePhoto: response.data.profilePhoto ? response.data.profilePhoto : null
+                            profilePhoto: response.data.profilePhoto ? response.data.profilePhoto : null,
+                            profilePhotoFirebase: response.data.profilePhotoFirebase ? response.data.profilePhotoFirebase : null
                         },
                         ...response.data.friends
                     ];

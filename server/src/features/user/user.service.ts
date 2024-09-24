@@ -11,6 +11,7 @@ type UserProps = {
   email: string | null,
   dateOfBirth: string | null,
   profilePhoto: string | null,
+  profilePhotoFirebase: string | null,
 }
 
 async function getAll() {
@@ -120,9 +121,8 @@ async function signup(data: UserProps) {
 
 function update(id: string, file: any, data: UserProps) {
 
-  let newData = {
-    ...data
-  }
+  let newData = { ...data }
+
   if (file)
     newData = { ...newData, profilePhoto: file.path }
 
