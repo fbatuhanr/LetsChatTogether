@@ -111,8 +111,11 @@ async function signup(req: Request, res: Response, next: NextFunction) {
 
 async function update(req: Request, res: Response, next: NextFunction) {
   try {
-    
+    /*
+    // it was using for upload to server (before google firebase storage)
     const updatedUser = await userService.update(req.params.id, req.file, req.body)
+    */
+    const updatedUser = await userService.update(req.params.id, req.body)
     if (!updatedUser) 
       return res.status(404).json({ message: 'An error occurred during the update.' })
     

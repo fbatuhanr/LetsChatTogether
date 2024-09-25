@@ -46,9 +46,7 @@ const Chat = () => {
   }, [])
 
   const getUsernameById = (id: string) => friends?.find((i) => i._id === id)?.username;
-  // used before firebase > const getPhotoById = (id: string) => friends?.find((i) => i._id === id)?.profilePhoto;
-  const getPhotoById = (id: string) => friends?.find((i) => i._id === id)?.profilePhotoFirebase;
-
+  const getPhotoById = (id: string) => friends?.find((i) => i._id === id)?.profilePhoto;
 
   const renderMessageHeader = (messageData: MessageProps, isMessageBelongsCurrUser: boolean, isSenderSamePreviousOne: boolean) => {
 

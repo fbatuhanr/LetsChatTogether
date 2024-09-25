@@ -6,6 +6,7 @@ import useSearchUsers from "../../hooks/api/useSearchUser";
 import { UserProps } from "../../types/User.types";
 import useDebounce from "../../hooks/useDebounce";
 import NotFound from "../../components/NotFound";
+import Img from "../../components/general/Img";
 
 const Users: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -52,16 +53,9 @@ const Users: React.FC = () => {
                 key={index}
                 className="w-full h-auto pt-6 pb-7 px-1 lg:px-2 rounded-sm bg-gradient-to-t from-[#0D0D0D] to-[#472DA6] shadow shadow-[#472DA6]"
               >
-                <div className="relative w-40 h-40 mx-auto rounded-full overflow-hidden p-2 border border-[#cccccc]">
+                <div className="flex justify-center items-center relative w-40 h-40 mx-auto rounded-full overflow-hidden p-2 border border-[#cccccc]">
                   <Link to={`/user/${user.username}`}>
-                    {/* used before firestora storage > <img src={user.profilePhoto ? `${process.env.API_URL}/${user.profilePhoto}` : userAvatar} width="100%" height="auto" className="scale-125" /> */}
-                    <img
-                      src={
-                        user.profilePhotoFirebase &&
-                        typeof user.profilePhotoFirebase === "string"
-                          ? user.profilePhotoFirebase
-                          : userAvatar
-                      }
+                    <Img src={user.profilePhoto}
                       width="100%"
                       height="auto"
                       className="scale-125"

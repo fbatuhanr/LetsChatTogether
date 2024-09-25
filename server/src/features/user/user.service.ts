@@ -10,8 +10,7 @@ type UserProps = {
   password: string,
   email: string | null,
   dateOfBirth: string | null,
-  profilePhoto: string | null,
-  profilePhotoFirebase: string | null,
+  profilePhoto: string | null
 }
 
 async function getAll() {
@@ -119,6 +118,8 @@ async function signup(data: UserProps) {
   return savedUser ? true : false;
 }
 
+/*
+// it was using for upload to server (before google firebase storage)
 function update(id: string, file: any, data: UserProps) {
 
   let newData = { ...data }
@@ -126,7 +127,14 @@ function update(id: string, file: any, data: UserProps) {
   if (file)
     newData = { ...newData, profilePhoto: file.path }
 
+
+  console.log('updated data: ', newData)
+
   return User.findOneAndUpdate({ _id: id }, newData)
+}
+*/
+function update(id: string, data: UserProps) {
+  return User.findOneAndUpdate({ _id: id }, data)
 }
 
 function remove(id: string) {

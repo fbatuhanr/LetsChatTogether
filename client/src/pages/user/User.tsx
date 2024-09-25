@@ -39,14 +39,7 @@ const User = () => {
         <div className="w-full lg:w-11/12 mx-auto px-2 lg:px-4 py-12 lg:py-10">
           <div className="flex flex-col gap-y-3 lg:gap-y-0 lg:flex-row items-center lg:px-8">
             <div className="w-40 h-40 rounded-full overflow-hidden p-2 border-2 border-[#472DA6]">
-              {/* used before firebase <img src={data.profilePhoto ? `${process.env.API_URL}/${data.profilePhoto}` : userAvatar} width="100%" height="auto" className="scale-125" />  */}
-              <img
-                src={
-                  data.profilePhotoFirebase &&
-                  typeof data.profilePhotoFirebase === "string"
-                    ? data.profilePhotoFirebase
-                    : userAvatar
-                }
+              <img src={(data.profilePhoto && typeof data.profilePhoto === 'string') ? data.profilePhoto : userAvatar }
                 width="100%"
                 height="auto"
                 className="scale-125"
