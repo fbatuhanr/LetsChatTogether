@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import userAvatar from "../../assets/user-avatar.jpg";
 import LoadingSpinnerPage from "../../components/LoadingSpinnerPage";
 import useSearchUsers from "../../hooks/api/useSearchUser";
 import { UserProps } from "../../types/User.types";
@@ -55,11 +54,14 @@ const Users: React.FC = () => {
               >
                 <div className="flex justify-center items-center relative w-40 h-40 mx-auto rounded-full overflow-hidden p-2 border border-[#cccccc]">
                   <Link to={`/user/${user.username}`}>
-                    <Img src={user.profilePhoto}
-                      width="100%"
-                      height="auto"
-                      className="scale-125"
-                    />
+                    {typeof user.profilePhoto === "string" && (
+                      <Img
+                        src={user.profilePhoto}
+                        width="100%"
+                        height="auto"
+                        className="scale-125"
+                      />
+                    )}
                   </Link>
                   <div className="absolute bottom-0 left-0 right-0 text-center bg-[#0D0D0D] border-t border-[#000000] bg-opacity-80 h-8">
                     <span className="font-semibold">{user.username}</span>
