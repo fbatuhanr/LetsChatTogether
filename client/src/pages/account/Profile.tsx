@@ -1,25 +1,35 @@
-import { useEffect, useState } from 'react';
-import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { ErrorMessage } from '@hookform/error-message';
-import Datepicker from 'tailwind-datepicker-react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { ErrorMessage } from "@hookform/error-message";
+import Datepicker from "tailwind-datepicker-react";
 
-import useAxios from '../../hooks/useAxios';
-import { useDecodedToken } from '../../hooks/useDecodedToken';
-import { UserProps } from '../../types/User.types';
-import Button from '../../components/general/clickable/Button';
-import { toast } from 'react-toastify';
-import { AxiosError, AxiosResponse } from 'axios';
+import useAxios from "../../hooks/useAxios";
+import { useDecodedToken } from "../../hooks/useDecodedToken";
+import { UserProps } from "../../types/User.types";
+import Button from "../../components/general/clickable/Button";
+import { toast } from "react-toastify";
+import { AxiosError, AxiosResponse } from "axios";
 
-import { storage } from '../../firebase/firebaseConfig';
-import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import Img from '../../components/general/Img';
+import { storage } from "../../firebase/firebaseConfig";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import Img from "../../components/general/Img";
+import { ApiErrorProps } from "../../types/ApiError.types";
 
 const Profile = () => {
   const axiosInstance = useAxios();
   const decodedToken = useDecodedToken();
 
-  const [isDatepickerVisible, setIsDatepickerVisible] = useState<boolean>(false);
-  const [oldProfilePhotoUrl, setOldProfilePhotoUrl] = useState<string | null>(null);
+  const [isDatepickerVisible, setIsDatepickerVisible] =
+    useState<boolean>(false);
+  const [oldProfilePhotoUrl, setOldProfilePhotoUrl] = useState<string | null>(
+    null
+  );
   const {
     register,
     control,
@@ -32,99 +42,89 @@ const Profile = () => {
   const onSubmit: SubmitHandler<UserProps> = async (data) => {
     try {
       console.log(data);
-
+  
       let newData = { ...data };
-
-      if ('File' in window && data.profilePhoto instanceof FileList) {
-        // newData = { ...newData, profilePhoto: data.profilePhoto[0] };
+  
+      const toastId = toast.loading("Updating...");
+  
+      if ("File" in window && data.profilePhoto instanceof FileList) {
         const file = data.profilePhoto[0];
         const storageRef = ref(storage, `profile-photos/${Date.now()}-${file.name}`);
+        
         const uploadTask = uploadBytesResumable(storageRef, file);
         const downloadUrl = await new Promise<string>((resolve, reject) => {
-          uploadTask.on('state_changed', null, 
-            (error) => reject(error),
+          uploadTask.on(
+            "state_changed",
+            null,
+            (error) => {
+              toast.dismiss(toastId);
+              reject(error);
+            },
             async () => resolve(await getDownloadURL(uploadTask.snapshot.ref))
           );
         });
-
+  
         if (oldProfilePhotoUrl) {
           const oldPhotoRef = ref(storage, oldProfilePhotoUrl);
           await deleteObject(oldPhotoRef).catch((error) => {
-            console.error('Failed to delete old profile photo:', error);
+            console.error("Failed to delete old profile photo:", error);
           });
         }
-
+  
         newData = { ...newData, profilePhoto: downloadUrl };
         setOldProfilePhotoUrl(downloadUrl);
       }
-
+  
       console.log(newData);
+  
       await toast.promise(
-        axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, newData), 
+        axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, newData),
         {
-          pending: 'Updating...',
+          pending: "Updating...",
           success: {
-            render: ({ data }: { data: AxiosResponse }) =>
-              data.data.message || 'Successfully updated!',
+            render: ({ data }: { data: AxiosResponse }) => {
+              toast.dismiss(toastId);
+              return data.data.message || "Successfully updated!";
+            },
           },
           error: {
-            render: ({ data }: { data: AxiosError<any> }) =>
-              data.response?.data?.message ||
-              'An error occurred during the update.',
+            render: ({ data }: { data: AxiosError<ApiErrorProps> }) => {
+              toast.dismiss(toastId);
+              return data.response?.data?.message || "An error occurred during the update.";
+            },
           },
         }
       );
-      /*
-      // it was using for upload to server (before google firebase storage)
-      const headers = { 'Content-Type': 'multipart/form-data' };
-      await toast.promise(
-        axiosInstance.put(
-          `${process.env.API_URL}/user/${decodedToken.userId}`,
-          newData,
-          { headers }
-        ),
-        {
-          pending: 'Updating...',
-          success: {
-            render: ({ data }: { data: AxiosResponse }) =>
-              data.data.message || 'Successfully updated!',
-          },
-          error: {
-            render: ({ data }: { data: AxiosError<any> }) =>
-              data.response?.data?.message ||
-              'An error occurred during the update.',
-          },
-        }
-      );
-      */
     } catch (error) {
-      console.error('An error occurred:', error);
-      toast.error('Failed to upload or update profile.');
+      console.error("An error occurred:", error);
+      toast.error("Failed to upload or update profile.");
     }
   };
+  
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axiosInstance.get(`${process.env.API_URL}/user/${decodedToken.userId}`)
-        console.log(response.data)
-        const { profilePhoto, dateOfBirth } = response.data
+        const response = await axiosInstance.get(
+          `${process.env.API_URL}/user/${decodedToken.userId}`
+        );
+        console.log(response.data);
+        const { profilePhoto, dateOfBirth } = response.data;
 
         reset({
           ...response.data,
           dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
-        })
+        });
 
-        setOldProfilePhotoUrl(profilePhoto || null)
-        
+        setOldProfilePhotoUrl(profilePhoto || null);
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error("Error fetching data:", error);
       }
     }
     fetchData();
-  }, [reset])
+  }, [reset]);
 
-  const watchProfilePhoto = watch('profilePhoto');
+  const watchProfilePhoto = watch("profilePhoto");
   useEffect(() => {
     console.log(watchProfilePhoto);
   }, [watchProfilePhoto]);
@@ -277,20 +277,14 @@ const Profile = () => {
             {...register("profilePhoto")}
             multiple={false}
           />
-          {(watchProfilePhoto instanceof FileList ||
-            typeof watchProfilePhoto === "string") &&
-          watchProfilePhoto.length ? (
-            <div className="flex items-center justify-center absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
-              <Img
-                className="h-full rounded-r-xl"
-                src={
-                  watchProfilePhoto instanceof FileList
-                    ? URL.createObjectURL(watchProfilePhoto[0])
-                    : watchProfilePhoto
-                }
-              />
-            </div>
-          ) : null}
+          <div className="flex items-center justify-center absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
+            <Img
+              src={watchProfilePhoto}
+              height="100%"
+              width="auto"
+              className="rounded-r-xl"
+            />
+          </div>
         </div>
       </div>
 

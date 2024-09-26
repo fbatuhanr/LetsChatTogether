@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -25,7 +26,16 @@ export default {
       fontFamily: {
         "outfit": ['Outfit', 'sans-serif'],
         "roboto": ['Roboto', 'sans-serif']
-      }
+      },
+      keyframes: {
+        shimmer: {
+          '0%': { backgroundPosition: '-100% 0' },
+          '100%': { backgroundPosition: '100% 0' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 1.5s infinite',
+      },
     },
   },
   plugins: [

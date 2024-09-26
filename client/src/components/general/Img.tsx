@@ -1,36 +1,50 @@
-import { useEffect, useState } from "react";
-import userAvatar from "../../assets/user-avatar.jpg";
-import LoadingSpinner from "../LoadingSpinner";
+import React, { useEffect, useState } from "react";
+import userAvatar from "../../assets/user-avatar.jpg"; // Yedek avatar
 
 interface ImgProps {
-  src: string;
+  src?: string | FileList | File | null | undefined;
   alt?: string;
   width?: string;
   height?: string;
   className?: string;
 }
-const Img: React.FC<ImgProps> = ({ src, alt, width, height, className }) => {
-  const [isValid, setIsValid] = useState<boolean | null>(null);
+
+const Img: React.FC<ImgProps> = ({
+  src,
+  alt = "Image",
+  width = "256px",
+  height = "256px",
+  className = "",
+}) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [imgSrc, setImgSrc] = useState<string>(typeof src === 'string' ? src : '');
 
   useEffect(() => {
-    const checkImage = (url: string): Promise<boolean> => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.src = url;
-
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
-      });
-    };
-
-    checkImage(src).then(setIsValid);
+    if (typeof src === "string") {
+      setImgSrc(src);
+    } else if (src instanceof FileList && src.length > 0) {
+      setImgSrc(URL.createObjectURL(src[0]));
+    }
   }, [src]);
 
-  if (isValid === null) 
-    return <LoadingSpinner />
-  
   return (
-    <img src={isValid ? src : userAvatar} alt={alt} width={width} height={height} className={className} />
+    <div
+      className={`relative ${className} overflow-hidden`}
+      style={{ width, height }}
+    >
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-300 animate-shimmer bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 bg-[length:200%_100%]"></div>
+      )}
+      <img
+        src={imgSrc}
+        alt={alt}
+        className={`w-full h-full object-cover transition-opacity duration-500 ${
+          isLoading ? "opacity-0" : "opacity-100"
+        }`}
+        onLoad={() => setIsLoading(false)}
+        onError={() => setImgSrc(userAvatar)}
+      />
+    </div>
   );
 };
 

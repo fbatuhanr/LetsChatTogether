@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -16,6 +17,7 @@ import { MessageProps } from '../types/Message.types'
 import { MdCancel } from 'react-icons/md'
 import { textClip } from '../utils/textUtils'
 import useScrollOnKeyboardClose from '../hooks/useScrollOnKeyboardClose'
+import Img from '../components/general/Img'
 
 
 const Chat = () => {
@@ -67,8 +69,7 @@ const Chat = () => {
         {isMessageBelongsCurrUser && deleteMessageButton}
         <div className={`${avatarClasses} ${bgColor}`}>
           {profilePic ? (
-            /* used before firebase > <img src={`${process.env.API_URL}/${profilePic}`} alt="Profile" /> */
-            <img src={profilePic} alt="Profile" />
+            <Img src={profilePic} width='100%' height='100%' />
           ) : (
             initials
           )}
@@ -177,8 +178,8 @@ const Chat = () => {
 
                   if (user._id == currentUserId) return // if self then skip this user
 
-                  let isUserOnline = onlineUsers ? onlineUsers.includes(user._id) : false
-                  let isUserSelected = user._id == targetUser?._id
+                  const isUserOnline = onlineUsers ? onlineUsers.includes(user._id) : false
+                  const isUserSelected = user._id == targetUser?._id
                   return (
                     <div key={index} className={`flex items-center justify-evenly lg:justify-center lg:gap-x-1 ps-4 lg:ps-0 pt-1.5 pb-1 mt-1.5 rounded lg:rounded-none cursor-pointer ${isUserOnline ? "text-slate-800" : "text-slate-700"} ${isUserSelected ? "bg-[#e3dbff] font-semibold" : "bg-[#BCA9FF]"}`}
                       onClick={() => handleSelectUser(user)}>
