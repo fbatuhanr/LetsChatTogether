@@ -16,6 +16,7 @@ https://github.com/user-attachments/assets/524e8ac8-e884-48fa-9b93-dcdabc44bbc6
 - **Real-Time Chat**: Engage in live conversations with online friends. Messages are stored and delivered once offline friends return online.
 - **Message Management**: Send, delete, or clear entire chat histories.
 
+
 ## Technologies Used
 
 ### Frontend
@@ -31,6 +32,8 @@ https://github.com/user-attachments/assets/524e8ac8-e884-48fa-9b93-dcdabc44bbc6
 - **[React Hook Form](https://react-hook-form.com/)**: For efficient form handling.
 - **[jwt-decode](https://www.npmjs.com/package/jwt-decode)**: For decoding JWT tokens.
 - **[Axios](https://axios-http.com/)**: For handling API requests.
+- **[Firebase Storage](https://firebase.google.com/docs/storage)**: For storing and serving user-uploaded files securely.
+
 
 ### Backend
 
@@ -39,10 +42,12 @@ https://github.com/user-attachments/assets/524e8ac8-e884-48fa-9b93-dcdabc44bbc6
 - **[MongoDB](https://www.mongodb.com/)** with **[Mongoose](https://mongoosejs.com/)**: For NoSQL database management.
 - **[bcrypt](https://www.npmjs.com/package/bcrypt)**: For secure password hashing.
 - **[body-parser](https://www.npmjs.com/package/body-parser)**: For parsing incoming request bodies.
-- **[multer](https://www.npmjs.com/package/multer)**: For handling file uploads.
+- **[multer](https://www.npmjs.com/package/multer)**: For handling file uploads (now replaced by Firebase Storage for image storage).
 - **[cors](https://www.npmjs.com/package/cors)**: For managing cross-origin requests.
 - **[socket.io](https://socket.io/)**: For real-time bidirectional communication.
 - **[jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)**: For user authentication and token management.
+- **[Firebase](https://firebase.google.com/)**: For storage solutions to upload and manage user files securely.
+
 
 ## JWT Authentication
 
@@ -105,6 +110,12 @@ AUTH_API_URL=your_auth_api_url
 USER_API_URL=your_user_api_url
 CHAT_API_URL=your_chat_api_url
 MESSAGE_API_URL=your_message_api_url
+REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+REACT_APP_FIREBASE_APP_ID=your_firebase_app_id
 ```
 
 4. **Run the application:**
