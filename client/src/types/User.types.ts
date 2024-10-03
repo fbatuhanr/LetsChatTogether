@@ -5,7 +5,7 @@ export interface UserProps {
     name: string;
     surname: string;
     gender: 'male' | 'female' | 'other';
-    dateOfBirth?: Date;
+    dateOfBirth?: Date | undefined;
     profilePhoto?: File | FileList | string | null;
     about?: string | null;
 }

@@ -15,7 +15,7 @@ function errorHandler(err: CustomError, req: Request, res: Response, next: NextF
 
   // Mongoose validation error
   if (err instanceof MongooseError.ValidationError) {
-    const messages = Object.values(err.errors).map((error: any) => error.message);
+    const messages = Object.values(err.errors).map((error) => error.message);
     return res.status(400).json({ message: `Validation Error: ${messages.join(', ')}` });
   }
 

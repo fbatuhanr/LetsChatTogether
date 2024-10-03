@@ -12,6 +12,7 @@ import {
 import storage from 'redux-persist/lib/storage'
 
 import authSlice from './features/authSlice'
+import { PersistedStore } from '../types/Redux.types'
 
 const persistConfig = {
   key: 'persist',
@@ -38,7 +39,7 @@ export const makeStore = () => {
     return makeConfiguredStore()
   } else {
     const persistedReducer = persistReducer(persistConfig, rootReducer)
-    let store: any = configureStore({
+    const store: PersistedStore = configureStore({
       reducer: persistedReducer,
       middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

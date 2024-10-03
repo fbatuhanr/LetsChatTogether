@@ -20,8 +20,13 @@ import {
 } from "firebase/storage";
 import Img from "../../components/general/Img";
 import { ApiErrorProps } from "../../types/ApiError.types";
+import { resizeImage } from "../../utils/imageUtils";
+import LoadingSpinnerPage from "../../components/LoadingSpinnerPage";
+import { errorMessages } from "../../constants/errorMessages";
 
 const Profile = () => {
+  const [loading, setLoading] = useState(false);
+
   const axiosInstance = useAxios();
   const decodedToken = useDecodedToken();
 
@@ -40,70 +45,83 @@ const Profile = () => {
   } = useForm<UserProps>();
 
   const onSubmit: SubmitHandler<UserProps> = async (data) => {
+    setLoading(true);
+
     try {
-      console.log(data);
-  
       let newData = { ...data };
-  
-      const toastId = toast.loading("Updating...");
-  
       if ("File" in window && data.profilePhoto instanceof FileList) {
-        const file = data.profilePhoto[0];
-        const storageRef = ref(storage, `profile-photos/${Date.now()}-${file.name}`);
-        
-        const uploadTask = uploadBytesResumable(storageRef, file);
-        const downloadUrl = await new Promise<string>((resolve, reject) => {
-          uploadTask.on(
-            "state_changed",
-            null,
-            (error) => {
-              toast.dismiss(toastId);
-              reject(error);
-            },
-            async () => resolve(await getDownloadURL(uploadTask.snapshot.ref))
+        if (data.profilePhoto.length > 0) {
+          const file = data.profilePhoto[0];
+          const resizedFile = await resizeImage(file);
+
+          const toastId = toast.loading("Uploading profile photo...");
+
+          const storageRef = ref(
+            storage,
+            `profile-photos/${Date.now()}-${resizedFile.name}`
           );
-        });
-  
-        if (oldProfilePhotoUrl) {
-          const oldPhotoRef = ref(storage, oldProfilePhotoUrl);
-          await deleteObject(oldPhotoRef).catch((error) => {
-            console.error("Failed to delete old profile photo:", error);
+          const uploadTask = uploadBytesResumable(storageRef, resizedFile);
+          const downloadUrl = await new Promise<string>((resolve, reject) => {
+            uploadTask.on(
+              "state_changed",
+              null,
+              (error) => {
+                toast.dismiss(toastId);
+                reject(error);
+              },
+              async () => {
+                toast.update(toastId, { render: "Photo uploaded!", type: "success", isLoading: false, autoClose: 2000 });
+                resolve(await getDownloadURL(uploadTask.snapshot.ref));
+              }
+            );
           });
+          // remove old profile photo from firebase storage
+          if (oldProfilePhotoUrl) {
+            const oldPhotoRef = ref(storage, oldProfilePhotoUrl);
+            await deleteObject(oldPhotoRef).catch((error) => {
+              console.error("Failed to delete old profile photo:", error);
+            });
+          }
+          newData = { ...newData, profilePhoto: downloadUrl };
+          setOldProfilePhotoUrl(downloadUrl);
+        } else {
+          newData = { ...newData, profilePhoto: "" };
         }
-  
-        newData = { ...newData, profilePhoto: downloadUrl };
-        setOldProfilePhotoUrl(downloadUrl);
       }
-  
-      console.log(newData);
-  
+      
       await toast.promise(
-        axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, newData),
+        axiosInstance.put(
+          `${process.env.API_URL}/user/${decodedToken.userId}`,
+          newData
+        ),
         {
-          pending: "Updating...",
+          pending: "Updating profile...",
           success: {
             render: ({ data }: { data: AxiosResponse }) => {
-              toast.dismiss(toastId);
-              return data.data.message || "Successfully updated!";
+              return data.data.message || "Profile successfully updated!";
             },
           },
           error: {
             render: ({ data }: { data: AxiosError<ApiErrorProps> }) => {
-              toast.dismiss(toastId);
-              return data.response?.data?.message || "An error occurred during the update.";
+              return (
+                data.response?.data?.message || errorMessages.profileUpdate
+              );
             },
           },
         }
       );
+      
     } catch (error) {
       console.error("An error occurred:", error);
-      toast.error("Failed to upload or update profile.");
+      toast.error("Failed to upload or update profile!");
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await axiosInstance.get(
           `${process.env.API_URL}/user/${decodedToken.userId}`
@@ -113,12 +131,14 @@ const Profile = () => {
 
         reset({
           ...response.data,
-          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
         });
 
         setOldProfilePhotoUrl(profilePhoto || null);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     }
     fetchData();
@@ -129,6 +149,7 @@ const Profile = () => {
     console.log(watchProfilePhoto);
   }, [watchProfilePhoto]);
 
+  if(loading) return <LoadingSpinnerPage />
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -229,12 +250,36 @@ const Profile = () => {
           />
         </div>
         <div className="w-full">
-          <label htmlFor="dateofbirth" className="text-2xl font-semibold ps-2">
+          <label htmlFor="dateOfBirth" className="text-2xl font-semibold ps-2">
             Date of Birth
           </label>
           <Controller
             name="dateOfBirth"
             control={control}
+            rules={{
+              required: "Date of birth is required", // Required kuralı
+              validate: {
+                isOldEnough: (value) => {
+                  if (value) {
+                    const today = new Date();
+                    const birthDate = new Date(value);
+                    const age = today.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+                    if (
+                      monthDiff < 0 ||
+                      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+                    ) {
+                      return age > 18 || "You must be at least 18 years old";
+                    }
+
+                    return age >= 18 || "You must be at least 18 years old";
+                  }
+
+                  return true;
+                },
+              },
+            }}
             render={({ field }) => (
               <Datepicker
                 value={field.value}
@@ -242,7 +287,7 @@ const Profile = () => {
                 show={isDatepickerVisible}
                 setShow={(state) => setIsDatepickerVisible(state)}
                 options={{
-                  defaultDate: field.value,
+                  defaultDate: field.value || null,
                   autoHide: true,
                   todayBtn: false,
                   clearBtn: true,
@@ -254,13 +299,20 @@ const Profile = () => {
                     text: "",
                     disabledText: "",
                     input:
-                      "!bg-[#6841f2] text-white !border-[#20183F] border-2 rounded-2xl py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500",
+                      "!bg-[#6841f2] text-white !placeholder-white !border-[#20183F] border-2 rounded-2xl py-4 outline-1 focus:outline-dashed outline-indigo-500",
                     inputIcon: "!text-white",
                     selected: "",
                   },
+                  datepickerClassNames:
+                    "text-center left-0 right-0 md:left-auto md:right-auto",
                 }}
               />
             )}
+          />
+          <ErrorMessage
+            errors={errors}
+            name="dateOfBirth"
+            render={({ message }) => <p>{message}</p>}
           />
         </div>
       </div>
@@ -274,8 +326,23 @@ const Profile = () => {
             type="file"
             id="profilePhoto"
             className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-300 outline-1 focus:outline-dashed outline-indigo-500"
-            {...register("profilePhoto")}
             multiple={false}
+            accept="image/*"
+            {...register("profilePhoto", {
+              validate: {
+                maxSize: (files) => {
+                  // Check if there are files and if the first file size exceeds 5MB
+                  if (
+                    files instanceof FileList &&
+                    files.length > 0 &&
+                    files[0].size > 5 * 1024 * 1024
+                  ) {
+                    return "File size must be less than 5MB.";
+                  }
+                  return true;
+                },
+              },
+            })}
           />
           <div className="flex items-center justify-center absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
             <Img
@@ -286,6 +353,11 @@ const Profile = () => {
             />
           </div>
         </div>
+        <ErrorMessage
+          errors={errors}
+          name="profilePhoto"
+          render={({ message }) => <p>{message}</p>}
+        />
       </div>
 
       <div className="flex flex-col gap-y-1">
@@ -302,6 +374,7 @@ const Profile = () => {
       </div>
 
       <Button
+        disabled={loading}
         text="Update"
         color="primary"
         innerHeight={3}

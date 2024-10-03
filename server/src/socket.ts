@@ -1,9 +1,10 @@
+import { Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
 
 let io: Server;
 let socketUsers: string[] = [];
 
-export const initializeSocket = (server: any) => {
+export const initializeSocket = (server: HttpServer) => {
   io = new Server(server, {
     cors: {
       origin: process.env.CORS_ORIGIN || "http://localhost:5173",

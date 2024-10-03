@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from 'react'
 import { useForm, SubmitHandler } from "react-hook-form"
 import { ErrorMessage } from "@hookform/error-message"
 
@@ -8,8 +9,10 @@ import Button from '../../components/general/clickable/Button'
 import { UserProps } from '../../types/User.types'
 import { toast } from 'react-toastify'
 import { AxiosError, AxiosResponse } from 'axios'
+import { ApiErrorProps } from '../../types/ApiError.types'
 
 const Settings = () => {
+    const [loading, setLoading] = useState(false);
 
     const axiosInstance = useAxios()
     const decodedToken = useDecodedToken()
@@ -17,16 +20,16 @@ const Settings = () => {
     const { register, formState: { errors }, handleSubmit, reset } = useForm<UserProps>()
 
     const onSubmit: SubmitHandler<UserProps> = async (data) => {
-        console.log(data)
-
+        setLoading(true);
         await toast.promise(
             axiosInstance.put(`${process.env.API_URL}/user/${decodedToken.userId}`, data),
             {
                 pending: 'Updating...',
                 success: { render: ({ data }: { data: AxiosResponse }) => data.data.message || 'Successfully updated!' },
-                error: { render: ({ data }: { data: AxiosError<any> }) => data.response?.data?.message || 'An error occurred during the update.' }
+                error: { render: ({ data }: { data: AxiosError<ApiErrorProps> }) => data.response?.data?.message || 'An error occurred during the update.' }
             }
         );
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -71,7 +74,7 @@ const Settings = () => {
                 </div>
             </div>
 
-            <Button text="Update" color="primary" innerHeight={3} size="2xl" uppercased className="mt-2" />
+            <Button disabled={loading} text="Update" color="primary" innerHeight={3} size="2xl" uppercased className="mt-2" />
         </form>
     )
 }

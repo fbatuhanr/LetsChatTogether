@@ -4,14 +4,15 @@ import { getIO } from "../../socket";
 
 async function createMessage(req: Request, res: Response, next: NextFunction) {
     try {
-        res.json(await messageService.createMessage(req.body));
+        res.json(await messageService.createMessage(req.body))
     } catch (err) {
-        next(err);
+        next(err)
     }
 }
 async function getMessage(req: Request, res: Response, next: NextFunction) {
     try {
-        res.json(await messageService.getMessage(req.params));
+        const { chatId } = req.params;
+        res.json(await messageService.getMessage(chatId))
     } catch (err) {
         next(err);
     }
@@ -19,7 +20,6 @@ async function getMessage(req: Request, res: Response, next: NextFunction) {
 async function deleteMessage(req: Request, res: Response, next: NextFunction) {
     try {
         const { messageId } = req.params
-        
         await messageService.deleteMessage(messageId)
         
         const io = getIO()

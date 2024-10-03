@@ -6,4 +6,6 @@ export interface MessageProps {
 
     senderId: string;
     receiverId: string | null;
+
+    createdAt?: Date;
 }

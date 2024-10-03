@@ -1,6 +1,7 @@
+import { CreateMessageProps } from "../../types/Message.types"
 import Message from "./message.model"
 
-async function createMessage(data: any) {
+async function createMessage(data: CreateMessageProps) {
 
     const { chatId, senderId, text } = data
 
@@ -12,9 +13,7 @@ async function createMessage(data: any) {
     return await message.save()
 }
 
-async function getMessage(data: any) {
-
-    const { chatId } = data
+async function getMessage(chatId: string) {
 
     return await Message.find({ chatId })
 }

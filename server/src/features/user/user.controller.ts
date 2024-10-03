@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express"
 import * as userService from './user.service'
 import { CustomRequest } from "../../middleware/authMiddleware";
 import ms from "ms";
+import { LoginResponseProps } from "../../types/User.types";
 
 async function getAll(req: Request, res: Response, next: NextFunction) {
   try {
@@ -28,8 +29,7 @@ async function getAllWithLimitation(req: Request, res: Response, next: NextFunct
 
 async function get(req: CustomRequest, res: Response, next: NextFunction) {
   try {
-
-    if (req.user.userId !== req.params.id) { // If it is successfully decoded by authMiddleware, decoded information is returned to req.user.
+    if (!req.user || req.user.userId !== req.params.id) { // If it is successfully decoded by authMiddleware, decoded information is returned to req.user.
       return res.status(403).json({ message: 'Access denied' });
     }
     res.json(await userService.get(req.params.id));
@@ -66,7 +66,7 @@ async function searchUsers(req: Request, res: Response, next: NextFunction) {
 
 async function login(req: Request, res: Response, next: NextFunction) {
   try {
-    const result: any = await userService.login(req.body);
+    const result: LoginResponseProps | false = await userService.login(req.body);
     if (!result)
       return res.status(404).json({ message: 'Invalid username or password!' })
     if (!result.refreshToken || !result.accessToken)
@@ -117,9 +117,9 @@ async function update(req: Request, res: Response, next: NextFunction) {
     */
     const updatedUser = await userService.update(req.params.id, req.body)
     if (!updatedUser) 
-      return res.status(404).json({ message: 'An error occurred during the update.' })
+      return res.status(404).json({ message: 'An error occurred during profile update!' })
     
-    return res.status(201).json({ message: 'Successfully updated!' })
+    return res.status(201).json({ message: 'Profile successfully updated!' })
 
   } catch (error) {
     next(error);

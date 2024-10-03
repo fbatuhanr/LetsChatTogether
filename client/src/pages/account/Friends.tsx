@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react'
 import useFriendship from '../../hooks/api/useFriendship'
 import { useDecodedToken } from '../../hooks/useDecodedToken'
@@ -8,6 +9,8 @@ import { FaEye, FaTrash } from 'react-icons/fa';
 import { IoIosChatboxes } from 'react-icons/io';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
+import { FriendProps } from '../../types/User.types';
+import { IncomingRequestProps, OutgoingRequestProps } from '../../types/Request.types';
 
 const Friends = () => {
 
@@ -97,7 +100,7 @@ const Friends = () => {
                 <div className="px-1">
                     <ul>
                         {
-                            friends && friends.map((friend: any, index: number) =>
+                            friends && friends.map((friend: FriendProps, index: number) =>
                                 <li key={index} className="flex justify-between items-center text-xl my-1 ps-4 pe-2.5 py-1 bg-black bg-opacity-20 rounded-xl">
                                     <Link to={`/user/${friend.username}`} className="flex items-center gap-x-1">
                                         {friend.username}
@@ -122,7 +125,7 @@ const Friends = () => {
                 <div className="px-1">
                     <ul>
                         {
-                            incomingRequests && incomingRequests.map((request: any, index: number) =>
+                            incomingRequests && incomingRequests.map((request: IncomingRequestProps, index: number) =>
                                 <li key={index} className="flex justify-between items-center text-xl my-1 ps-4 pe-2 py-1 bg-black bg-opacity-20 rounded-xl">
                                     <Link to={`/user/${request.sender.username}`}>
                                         {request.sender.username}
@@ -146,7 +149,7 @@ const Friends = () => {
                 <div className="px-1">
                     <ul>
                         {
-                            outgoingRequests && outgoingRequests.map((request: any, index: number) =>
+                            outgoingRequests && outgoingRequests.map((request: OutgoingRequestProps, index: number) =>
                                 <li key={index} className="flex justify-between items-center text-xl my-1 ps-4 pe-2 py-1 bg-black bg-opacity-20 rounded-xl">
                                     <Link to={`/user/${request.receiver.username}`}>
                                         {request.receiver.username}

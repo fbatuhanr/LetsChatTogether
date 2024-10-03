@@ -39,7 +39,7 @@ const User = () => {
       <div className="z-10 w-full lg:w-11/12 max-w-3xl min-h-[400px] px-2 lg:px-8 rounded-xl bg-gradient-to-br from-[#4F22F2] to-[#20183F] border-[#3a1da2] border">
         <div className="w-full lg:w-11/12 mx-auto px-2 lg:px-4 py-12 lg:py-10">
           <div className="flex flex-col gap-y-3 lg:gap-y-0 lg:flex-row items-center lg:px-8">
-            <div className="w-40 h-40 rounded-full overflow-hidden p-2 border-2 border-[#472DA6]">
+            <div className="flex w-40 h-40 rounded-full overflow-hidden p-2 border-2 border-[#472DA6]">
               <Img
                 src={
                   typeof data.profilePhoto === "string" ? data.profilePhoto : ""

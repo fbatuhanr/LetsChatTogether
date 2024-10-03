@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../redux/hooks"
 import { setAccessToken, clearAccessToken } from "../redux/features/authSlice"
@@ -6,12 +7,15 @@ import { jwtDecode } from "jwt-decode"
 import useAxios from "../hooks/useAxios"
 import LoadingSpinner from "../components/LoadingSpinner"
 
-const withAuthCheck = (
-    WrappedComponent: React.FC<{ children: React.ReactNode }>,
+interface WithAuthCheckProps {
+    children?: React.ReactNode;
+}
+const withAuthCheck = <P extends WithAuthCheckProps>(
+    WrappedComponent: React.FC<P>,
     shouldRedirectAuthenticated: boolean,
     redirectPath: string
 ) => {
-    return (props: any) => {
+    return (props: P) => {
         const axiosInstance = useAxios()
         const auth = useAppSelector((state) => state.auth)
         const dispatch = useAppDispatch()
@@ -47,7 +51,7 @@ const withAuthCheck = (
                         setIsAuthenticated(true);
                     }
                 } catch (err) {
-                    console.error("Error:", err)
+                    console.error("Auth Verification Error:", err)
                     dispatch(clearAccessToken())
                     setIsAuthenticated(false)
                 } finally {

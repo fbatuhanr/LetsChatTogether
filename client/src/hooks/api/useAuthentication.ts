@@ -1,75 +1,76 @@
-import { useAppDispatch } from '../../redux/hooks'
-import { setAccessToken, clearAccessToken } from '../../redux/features/authSlice'
-import axios from 'axios'
-import useAxios from '../useAxios'
+import { useAppDispatch } from '../../redux/hooks';
+import {
+  setAccessToken,
+  clearAccessToken,
+} from '../../redux/features/authSlice';
+import useAxios from '../useAxios';
+import { isApiError } from '../../helper/apiHelpers';
+import { errorMessages } from '../../constants/errorMessages';
 
 const useAuthentication = () => {
-    const dispatch = useAppDispatch();
-    const axiosInstance = useAxios();
+  const dispatch = useAppDispatch();
+  const axiosInstance = useAxios();
 
-    const loginCall = (username: string, password: string) => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const response = await axiosInstance.post(`${process.env.USER_API_URL}/login`, {
-                    username,
-                    password
-                });
+  const loginCall = async (
+    username: string,
+    password: string
+  ): Promise<string> => {
+    try {
+      const response = await axiosInstance.post(
+        `${process.env.USER_API_URL}/login`,
+        {
+          username,
+          password,
+        }
+      );
 
-                if (response.status === 200) {
-                    dispatch(setAccessToken(response.data.accessToken))
-                    resolve(response.data.message)
-                } else {
-                    reject(response.data.message)
-                }
-            } catch (error) {
-                if (axios.isAxiosError(error)) {
-                    if (error.response && error.response.data && typeof error.response.data.message === 'string') {
-                        reject(error.response.data.message);
-                    } else {
-                        reject('Request failed!')
-                    }
-                } else {
-                    reject('An unexpected error occurred!')
-                }
-            }
-        });
-    };
+      dispatch(setAccessToken(response.data.accessToken));
+      return response.data.message;
+    } catch (error: unknown) {
+      const errorMessage =
+        isApiError(error) && error.response?.data?.message
+          ? error.response.data.message
+          : errorMessages.default;
 
-    const signupCall = (username: string, email: string, password: string) => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const response = await axiosInstance.post(`${process.env.USER_API_URL}/sign-up`, {
-                    username,
-                    email,
-                    password
-                });
-
-                if (response.status === 201) {
-                    resolve(response.data.message);
-                } else {
-                    reject(response.data.message);
-                }
-            } catch (error) {
-                if (axios.isAxiosError(error)) {
-                    if (error.response && error.response.data && typeof error.response.data.message === 'string') {
-                        reject(error.response.data.message);
-                    } else {
-                        reject('Request failed!')
-                    }
-                } else {
-                    reject('An unexpected error occurred!')
-                }
-            }
-        });
+      throw errorMessage;
     }
+  };
 
+  const signupCall = async (
+    username: string,
+    email: string,
+    password: string
+  ): Promise<string> => {
+    try {
+      const response = await axiosInstance.post(
+        `${process.env.USER_API_URL}/sign-up`,
+        {
+          username,
+          email,
+          password,
+        }
+      );
+      return response.data.message;
+    } catch (error: unknown) {
+      const errorMessage =
+        isApiError(error) && error.response?.data?.message
+          ? error.response.data.message
+          : errorMessages.default;
 
-    const logoutCall = async () => {
-        await axiosInstance.post(`${process.env.USER_API_URL}/logout`);
-        dispatch(clearAccessToken());
-    };
+      throw errorMessage;
+    }
+  };
 
-    return { loginCall, signupCall, logoutCall };
+  const logoutCall = async () => {
+    try {
+      await axiosInstance.post(`${process.env.USER_API_URL}/logout`);
+      dispatch(clearAccessToken());
+    } catch (error) {
+      console.error('Logout Error:', error);
+    }
+  };
+
+  return { loginCall, signupCall, logoutCall };
 };
 
 export default useAuthentication;
