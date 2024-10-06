@@ -152,13 +152,13 @@ const Chat = () => {
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
       </div>
-      <div className="z-10 flex flex-col lg:flex-row w-full max-w-4xl h-[580px] lg:h-[450px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
+      <div className="z-10 flex flex-col lg:flex-row w-full max-w-4xl h-[545px] lg:h-[450px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
         <div className="h-full px-2 lg:pt-2 lg:w-[78%] lg:px-8 relative">
           {isLoading ? (
             <LoadingSpinnerPage />
           ) : chat && targetUser ? (
             <>
-              <div className="absolute -top-40 mt-0.5 lg:mt-0.5 left-4 text-[0.7rem] lg:text-[0.8rem]">
+              <div className="absolute -top-36 lg:mt-0.5 left-4 text-[0.7rem] lg:text-[0.8rem]">
                 <p>
                   Conversation created:{" "}
                   <b>{timeAgoCalculator(chat.createdAt)}</b>
@@ -291,7 +291,7 @@ const Chat = () => {
               All Friends <span className="lg:hidden">({friends?.length ? friends?.length - 1 : 0})</span>
             </button>
           </div>
-          <div className="h-20 max-h-20 lg:h-auto lg:max-h-[357px] overflow-y-auto overflow-x-hidden scrollbar-thick scrollbar-thumb-gray-500 scrollbar-track-gray-200">
+          <div className="h-16 max-h-16 lg:h-auto lg:max-h-[357px] overflow-y-auto overflow-x-hidden scrollbar-thick scrollbar-thumb-gray-500 scrollbar-track-gray-200">
             <div className="px-12 lg:px-0 font-medium">
               {sortedFriends &&
                 sortedFriends.map((user: FriendProps, index: number) => {
