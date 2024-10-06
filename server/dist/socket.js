@@ -9,38 +9,51 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSocketUsers = exports.getIO = exports.initializeSocket = void 0;
+exports.isSocketChatActive = exports.clearAllSocketChatStates = exports.clearSocketChatState = exports.setSocketChatState = exports.getSocketChatStates = exports.getSocketUsers = exports.getIO = exports.initializeSocket = void 0;
 const socket_io_1 = require("socket.io");
 let io;
-let socketUsers = [];
+let socketUsers = new Set();
+let socketChatStates = {};
 const initializeSocket = (server) => {
     io = new socket_io_1.Server(server, {
         cors: {
             origin: process.env.CORS_ORIGIN || "http://localhost:5173",
-            credentials: true
-        }
+            credentials: true,
+        },
     });
-    io.on('connection', (socket) => {
+    io.on("connection", (socket) => {
         const userId = socket.handshake.headers.userid;
-        console.log("Socket connected for user: ", userId);
-        if (!socketUsers.includes(userId)) {
-            socketUsers.push(userId);
-        }
+        console.log("Socket User Connect:", userId);
+        socketUsers.add(userId);
+        (0, exports.setSocketChatState)(userId, null);
         socket.join(`room${userId}`);
-        io.emit("users", socketUsers);
-        socket.on('sendMessage', (messageData) => {
-            console.log(messageData);
-            socket.to(`room${messageData.receiverId}`).emit('message', messageData);
+        io.emit("users", (0, exports.getSocketUsers)());
+        socket.on("chatClosed", () => {
+            (0, exports.clearSocketChatState)(userId);
         });
-        socket.on('disconnect', () => __awaiter(void 0, void 0, void 0, function* () {
-            console.log("User disconnected", userId);
-            socketUsers = socketUsers.filter(user => user !== userId);
-            io.emit("users", socketUsers);
+        socket.on("disconnect", () => __awaiter(void 0, void 0, void 0, function* () {
+            console.log("Socket User Disconnected:", userId);
+            socketUsers.delete(userId);
+            (0, exports.clearSocketChatState)(userId);
+            io.emit("users", (0, exports.getSocketUsers)());
         }));
     });
 };
 exports.initializeSocket = initializeSocket;
 const getIO = () => io;
 exports.getIO = getIO;
-const getSocketUsers = () => socketUsers;
+const getSocketUsers = () => Array.from(socketUsers);
 exports.getSocketUsers = getSocketUsers;
+const getSocketChatStates = () => socketChatStates;
+exports.getSocketChatStates = getSocketChatStates;
+const setSocketChatState = (userId, chatId) => { socketChatStates[userId] = chatId; };
+exports.setSocketChatState = setSocketChatState;
+const clearSocketChatState = (userId) => { delete socketChatStates[userId]; };
+exports.clearSocketChatState = clearSocketChatState;
+const clearAllSocketChatStates = () => { socketChatStates = {}; };
+exports.clearAllSocketChatStates = clearAllSocketChatStates;
+const isSocketChatActive = (userId, chatId) => {
+    const activeChatId = (0, exports.getSocketChatStates)()[userId];
+    return activeChatId === chatId;
+};
+exports.isSocketChatActive = isSocketChatActive;

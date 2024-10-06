@@ -38,7 +38,32 @@ const socket_1 = require("../../socket");
 function createMessage(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            res.json(yield messageService.createMessage(req.body));
+            const { senderId, receiverId, chatId, text } = req.body;
+            const isRead = (0, socket_1.isSocketChatActive)(receiverId, chatId);
+            const createdMessage = yield messageService.createMessage({
+                chatId,
+                senderId,
+                text,
+                isRead,
+            });
+            const { _id, createdAt } = createdMessage;
+            const messageData = {
+                _id: _id.toString(),
+                text,
+                date: createdAt,
+                senderId,
+                receiverId,
+            };
+            if ((0, socket_1.getSocketUsers)().includes(receiverId) && (0, socket_1.isSocketChatActive)(receiverId, chatId)) {
+                (0, socket_1.getIO)().to(`room${receiverId}`).emit("message", messageData);
+            }
+            const unreadMessagesCount = yield messageService.getUnreadMessagesCount(chatId, senderId);
+            const notificationData = {
+                senderId,
+                unreadMessagesCount
+            };
+            (0, socket_1.getIO)().to(`room${receiverId}`).emit("messageNotification", notificationData);
+            return res.json(messageData);
         }
         catch (err) {
             next(err);
@@ -49,7 +74,8 @@ exports.createMessage = createMessage;
 function getMessage(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            res.json(yield messageService.getMessage(req.params));
+            const { chatId } = req.params;
+            return res.json(yield messageService.getMessage(chatId));
         }
         catch (err) {
             next(err);
@@ -61,10 +87,12 @@ function deleteMessage(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { messageId } = req.params;
+            const { chatId, receiverId } = req.body;
             yield messageService.deleteMessage(messageId);
-            const io = (0, socket_1.getIO)();
-            io.emit('messageDeleted', messageId);
-            res.status(200).json({ message: 'Message deleted successfully.' });
+            if ((0, socket_1.getSocketUsers)().includes(receiverId) && (0, socket_1.isSocketChatActive)(receiverId, chatId)) {
+                (0, socket_1.getIO)().to(`room${receiverId}`).emit("messageDeleted", messageId);
+            }
+            return res.json({ message: "Message deleted successfully." });
         }
         catch (error) {
             next(error);

@@ -43,23 +43,23 @@ function refreshToken(req, res, next) {
         try {
             const { refreshToken } = req.cookies; // get the refresh token from the cookies
             if (!refreshToken) {
-                return res.status(403).json({ message: 'Refresh token not provided.' });
+                return res.status(403).json({ message: "Refresh token not provided." });
             }
             const newTokens = yield authService.refreshToken(refreshToken);
             if (newTokens) {
                 res.cookie("refreshToken", newTokens.refreshToken, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production', // its true when production and its false development mode
-                    sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict", // its none when we made production because its based on different domains, but in development its strict because localhost wants that
-                    maxAge: (0, ms_1.default)(process.env.REFRESH_TOKEN_EXPIRATION)
+                    secure: process.env.NODE_ENV === "production", // its true when production and its false development mode
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // its none when we made production because its based on different domains, but in development its strict because localhost wants that
+                    maxAge: (0, ms_1.default)(process.env.REFRESH_TOKEN_EXPIRATION),
                 });
                 return res.status(200).json({
-                    message: 'Token refreshed successfully!',
+                    message: "Token refreshed successfully!",
                     accessToken: newTokens.accessToken,
                 });
             }
             else {
-                return res.status(403).json({ message: 'Invalid refresh token.' });
+                return res.status(403).json({ message: "Invalid refresh token." });
             }
         }
         catch (error) {

@@ -30,6 +30,6 @@ const express_1 = require("express");
 const authMiddleware_1 = __importDefault(require("../../middleware/authMiddleware"));
 const friendController = __importStar(require("./friend.controller"));
 const router = (0, express_1.Router)();
-router.get('/:userId', authMiddleware_1.default, friendController.getUserFriends);
-router.delete('/:userId/:friendId', authMiddleware_1.default, friendController.removeUserFriend);
+router.get("/:userId", authMiddleware_1.default, friendController.getUserFriends);
+router.delete("/:userId/:friendId", authMiddleware_1.default, friendController.removeUserFriend);
 exports.default = router;

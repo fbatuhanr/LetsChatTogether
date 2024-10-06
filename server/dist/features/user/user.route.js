@@ -28,17 +28,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const authMiddleware_1 = __importDefault(require("../../middleware/authMiddleware"));
-const multer_1 = __importDefault(require("multer"));
 const userController = __importStar(require("./user.controller"));
-const storage = multer_1.default.diskStorage({
+/*
+// it was using for upload to server (before google firebase storage)
+import multer from 'multer'
+const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads');
+        cb(null, 'uploads')
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
+        cb(null, Date.now() + '-' + file.originalname)
     }
-});
-const upload = (0, multer_1.default)({ storage: storage });
+})
+const upload = multer({ storage: storage })
+*/
 const router = (0, express_1.Router)();
 router.post('/login', userController.login);
 router.post('/logout', userController.logout);
@@ -47,6 +50,10 @@ router.get('/find', userController.getByUsername);
 router.get('/search', userController.searchUsers);
 router.get('/', authMiddleware_1.default, userController.getAllWithLimitation);
 router.get('/:id', authMiddleware_1.default, userController.get);
-router.put('/:id', authMiddleware_1.default, upload.single('profilePhoto'), userController.update);
+/*
+// it was using for upload to server (before google firebase storage)
+router.put('/:id', authenticateToken, upload.single('profilePhoto'), userController.update);
+*/
+router.put('/:id', authMiddleware_1.default, userController.update);
 router.delete('/:id', authMiddleware_1.default, userController.remove);
 exports.default = router;

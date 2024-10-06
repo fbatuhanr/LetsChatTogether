@@ -40,7 +40,9 @@ function getIncomingRequests(req, res, next) {
             const { userId } = req.params;
             const allRequests = yield friendRequestService.getIncomingRequests(userId);
             if (!allRequests)
-                return res.status(404).json({ message: 'Incoming friend requests not found!' });
+                return res
+                    .status(404)
+                    .json({ message: "Incoming friend requests not found!" });
             return res.status(200).json(allRequests);
         }
         catch (error) {
@@ -55,7 +57,9 @@ function getOutgoingRequests(req, res, next) {
             const { userId } = req.params;
             const allRequests = yield friendRequestService.getOutgoingRequests(userId);
             if (!allRequests)
-                return res.status(404).json({ message: 'Outgoing friend requests not found!' });
+                return res
+                    .status(404)
+                    .json({ message: "Outgoing friend requests not found!" });
             return res.status(200).json(allRequests);
         }
         catch (error) {
@@ -70,8 +74,8 @@ function acceptRequest(req, res, next) {
             const { senderId, receiverId } = req.body;
             const result = yield friendRequestService.acceptRequest(senderId, receiverId);
             if (!result)
-                return res.status(404).json({ message: 'Friend request accept failed!' });
-            return res.status(201).json({ message: 'Friend request accepted!' });
+                return res.status(404).json({ message: "Friend request accept failed!" });
+            return res.status(201).json({ message: "Friend request accepted!" });
         }
         catch (error) {
             next(error);
@@ -85,8 +89,10 @@ function cancelRequest(req, res, next) {
             const { senderId, receiverId } = req.body;
             const request = yield friendRequestService.cancelRequest(senderId, receiverId);
             if (!request)
-                return res.status(404).json({ message: 'Friend request not found or already processed!' });
-            res.status(200).json({ message: 'Friend request canceled successfully!' });
+                return res
+                    .status(404)
+                    .json({ message: "Friend request not found or already processed!" });
+            res.status(200).json({ message: "Friend request canceled successfully!" });
         }
         catch (error) {
             next(error);
@@ -100,7 +106,7 @@ function getRequestStatusBetweenUsers(req, res, next) {
             const { senderId, receiverId } = req.query;
             const request = yield friendRequestService.getRequestStatusBetweenUsers(senderId, receiverId);
             if (!request)
-                return res.status(404).json({ message: 'Friend request not found!' });
+                return res.status(404).json({ message: "Friend request not found!" });
             return res.status(200).json(request);
         }
         catch (error) {
@@ -115,10 +121,12 @@ function sendRequest(req, res, next) {
             const { senderId, receiverId } = req.body;
             const friendRequest = yield friendRequestService.sendRequest(senderId, receiverId);
             if (friendRequest) {
-                return res.status(201).json({ message: 'Friend request sent successfully!' });
+                return res
+                    .status(201)
+                    .json({ message: "Friend request sent successfully!" });
             }
             else {
-                return res.status(500).json({ message: 'Friend request failed!' });
+                return res.status(500).json({ message: "Friend request failed!" });
             }
         }
         catch (error) {

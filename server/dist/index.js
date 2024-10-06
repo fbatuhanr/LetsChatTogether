@@ -17,6 +17,7 @@ const chat_1 = require("./features/chat");
 const message_1 = require("./features/message");
 const friendRequest_1 = require("./features/friendRequest");
 const friend_1 = require("./features/friend");
+const notification_1 = require("./features/notification");
 const auth_1 = require("./features/auth");
 const errorHandler_1 = __importDefault(require("./middleware/errorHandler"));
 /* CONFIGURATIONS */
@@ -29,13 +30,13 @@ const app = (0, express_1.default)();
 const port = process.env.PORT || 3001;
 const corsOptions = {
     origin: process.env.CORS_ORIGIN || "http://localhost:5173",
-    credentials: true
+    credentials: true,
 };
 app.use((0, cors_1.default)(corsOptions));
 app.use(body_parser_1.default.json({ limit: "100mb" }));
 app.use(body_parser_1.default.urlencoded({ limit: "50mb", extended: true }));
 app.use((0, cookie_parser_1.default)());
-app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../uploads')));
+app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../uploads")));
 const expressServer = app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
 });
@@ -48,5 +49,6 @@ app.use("/chat", chat_1.chat);
 app.use("/message", message_1.message);
 app.use("/friend-request", friendRequest_1.friendRequest);
 app.use("/friend", friend_1.friend);
-app.use('/auth', auth_1.auth);
+app.use("/notification", notification_1.notification);
+app.use("/auth", auth_1.auth);
 app.use(errorHandler_1.default);

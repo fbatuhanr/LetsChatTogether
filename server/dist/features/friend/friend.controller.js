@@ -40,7 +40,7 @@ function getUserFriends(req, res, next) {
             const { userId } = req.params;
             const friends = yield friendService.getUserFriends(userId);
             if (!friends)
-                return res.status(404).json({ message: 'Friends not found!' });
+                return res.status(404).json({ message: "Friends not found!" });
             return res.status(200).json(friends);
         }
         catch (error) {
@@ -55,8 +55,8 @@ function removeUserFriend(req, res, next) {
             const { userId, friendId } = req.params;
             const result = yield friendService.removeUserFriend(userId, friendId);
             if (!result)
-                return res.status(500).json({ message: 'Friends not found!' });
-            return res.status(200).json({ message: 'Friend removed successfully!' });
+                return res.status(500).json({ message: "Friends not found!" });
+            return res.status(200).json({ message: "Friend removed successfully!" });
             // return res.status(204).send()
         }
         catch (error) {

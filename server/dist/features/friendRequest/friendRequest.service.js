@@ -12,29 +12,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cancelRequest = exports.acceptRequest = exports.sendRequest = exports.getRequestStatusBetweenUsers = exports.getIncomingRequests = exports.getOutgoingRequests = void 0;
+exports.cancelRequest = exports.acceptRequest = exports.sendRequest = exports.getRequestStatusBetweenUsers = exports.getIncomingRequestCount = exports.getIncomingRequests = exports.getOutgoingRequests = void 0;
 const friendRequest_model_1 = __importDefault(require("./friendRequest.model"));
 const user_model_1 = __importDefault(require("../user/user.model"));
 function getOutgoingRequests(userId) {
-    return friendRequest_model_1.default.find({ sender: userId, status: 'pending' }).populate('receiver', 'username');
+    return friendRequest_model_1.default.find({ sender: userId, status: "pending" }).populate("receiver", "username");
 }
 exports.getOutgoingRequests = getOutgoingRequests;
 function getIncomingRequests(userId) {
-    return friendRequest_model_1.default.find({ receiver: userId, status: 'pending' }).populate('sender', 'username');
+    return friendRequest_model_1.default.find({ receiver: userId, status: "pending" }).populate("sender", "username");
 }
 exports.getIncomingRequests = getIncomingRequests;
+function getIncomingRequestCount(userId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return friendRequest_model_1.default.countDocuments({
+            receiver: userId,
+            status: "pending",
+        });
+    });
+}
+exports.getIncomingRequestCount = getIncomingRequestCount;
 function acceptRequest(senderId, receiverId) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield friendRequest_model_1.default.findOneAndUpdate({ $or: [{ sender: senderId, receiver: receiverId }, { sender: receiverId, receiver: senderId }] }, { status: 'accepted' });
-        yield user_model_1.default.findByIdAndUpdate(senderId, { $addToSet: { friends: receiverId } });
-        yield user_model_1.default.findByIdAndUpdate(receiverId, { $addToSet: { friends: senderId } });
+        yield friendRequest_model_1.default.findOneAndUpdate({
+            $or: [
+                { sender: senderId, receiver: receiverId },
+                { sender: receiverId, receiver: senderId },
+            ],
+        }, { status: "accepted" });
+        yield user_model_1.default.findByIdAndUpdate(senderId, {
+            $addToSet: { friends: receiverId },
+        });
+        yield user_model_1.default.findByIdAndUpdate(receiverId, {
+            $addToSet: { friends: senderId },
+        });
         return true;
     });
 }
 exports.acceptRequest = acceptRequest;
 function getRequestStatusBetweenUsers(senderId, receiverId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const request = yield friendRequest_model_1.default.findOne({ $or: [{ sender: senderId, receiver: receiverId }, { sender: receiverId, receiver: senderId }] });
+        const request = yield friendRequest_model_1.default.findOne({
+            $or: [
+                { sender: senderId, receiver: receiverId },
+                { sender: receiverId, receiver: senderId },
+            ],
+        });
         if (request) {
             const isSender = request.sender.toString() === senderId;
             return { isSender, status: request.status };
@@ -47,7 +70,7 @@ function sendRequest(senderId, receiverId) {
     return __awaiter(this, void 0, void 0, function* () {
         const friendRequest = new friendRequest_model_1.default({
             sender: senderId,
-            receiver: receiverId
+            receiver: receiverId,
         });
         const savedFriendRequest = yield friendRequest.save();
         return savedFriendRequest ? true : false;
@@ -56,7 +79,12 @@ function sendRequest(senderId, receiverId) {
 exports.sendRequest = sendRequest;
 function cancelRequest(senderId, receiverId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const removedFriendRequest = yield friendRequest_model_1.default.findOneAndDelete({ $or: [{ sender: senderId, receiver: receiverId, status: 'pending' }, { sender: receiverId, receiver: senderId, status: 'pending' }] });
+        const removedFriendRequest = yield friendRequest_model_1.default.findOneAndDelete({
+            $or: [
+                { sender: senderId, receiver: receiverId, status: "pending" },
+                { sender: receiverId, receiver: senderId, status: "pending" },
+            ],
+        });
         return removedFriendRequest ? true : false;
     });
 }

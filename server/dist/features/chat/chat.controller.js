@@ -34,12 +34,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteChat = exports.findChat = exports.findUserChats = exports.createChat = void 0;
 const chatService = __importStar(require("./chat.service"));
+const messageService = __importStar(require("../message/message.service"));
 const socket_1 = require("../../socket");
 function createChat(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { firstId, secondId } = req.body;
-            res.json(yield chatService.createChat(firstId, secondId));
+            const { senderId, receiverId } = req.body;
+            const chat = yield chatService.createChat(senderId, receiverId);
+            (0, socket_1.setSocketChatState)(senderId, chat._id.toString());
+            messageService.updateMessageReadStatus(chat._id.toString(), receiverId);
+            if ((0, socket_1.getSocketUsers)().includes(receiverId)) {
+                (0, socket_1.getIO)().to(`room${receiverId}`).emit("chatSelected");
+            }
+            return res.json(chat);
         }
         catch (error) {
             next(error);
@@ -51,7 +58,16 @@ function findUserChats(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { userId } = req.params;
-            res.json(yield chatService.findUserChats(userId));
+            const chats = yield chatService.findUserChats(userId);
+            if (!chats) {
+                return res.status(404).json({ message: "Chat not found!" });
+            }
+            const chatsWithUnreadMessageCount = yield Promise.all(chats.map((chat) => __awaiter(this, void 0, void 0, function* () {
+                const receiverId = chat.members.filter(memberId => memberId.toString() !== userId).toString();
+                const unreadMessagesCount = yield messageService.getUnreadMessagesCount(chat._id.toString(), receiverId);
+                return Object.assign(Object.assign({}, chat.toObject()), { unreadMessagesCount });
+            })));
+            return res.json(chatsWithUnreadMessageCount);
         }
         catch (error) {
             next(error);
@@ -62,8 +78,12 @@ exports.findUserChats = findUserChats;
 function findChat(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { firstId, secondId } = req.params;
-            res.json(yield chatService.findChat(firstId, secondId));
+            const { senderId, receiverId } = req.params;
+            const chat = yield chatService.findChat(senderId, receiverId);
+            if (!chat) {
+                return res.status(404).json({ message: "Chat not found!" });
+            }
+            return res.json(chat);
         }
         catch (error) {
             next(error);
@@ -75,11 +95,14 @@ function deleteChat(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { chatId } = req.params;
-            const { deleteBy } = req.body;
+            const { deleteBy, receiverId } = req.body;
             yield chatService.deleteChat(chatId);
-            const io = (0, socket_1.getIO)();
-            io.emit('chatDeleted', { chatId, deleteBy });
-            res.status(200).json({ message: 'Chat and related messages deleted successfully.' });
+            if ((0, socket_1.getSocketUsers)().includes(receiverId)) {
+                (0, socket_1.getIO)().to(`room${receiverId}`).emit("chatDeleted", { chatId, deleteBy });
+            }
+            return res.json({
+                message: "Chat and related messages deleted successfully.",
+            });
         }
         catch (error) {
             next(error);

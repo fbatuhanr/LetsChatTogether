@@ -17,7 +17,9 @@ const user_model_1 = __importDefault(require("../user/user.model"));
 const friendRequest_model_1 = __importDefault(require("../friendRequest/friendRequest.model"));
 function getUserFriends(userId) {
     return __awaiter(this, void 0, void 0, function* () {
-        return user_model_1.default.findById(userId).populate('friends', 'username profilePhoto').select('username profilePhoto friends');
+        return user_model_1.default.findById(userId)
+            .populate("friends", "username profilePhoto")
+            .select("username profilePhoto friends");
     });
 }
 exports.getUserFriends = getUserFriends;
@@ -28,8 +30,8 @@ function removeUserFriend(userId, friendId) {
         yield friendRequest_model_1.default.findOneAndDelete({
             $or: [
                 { sender: userId, receiver: friendId },
-                { sender: friendId, receiver: userId }
-            ]
+                { sender: friendId, receiver: userId },
+            ],
         });
         return true;
     });

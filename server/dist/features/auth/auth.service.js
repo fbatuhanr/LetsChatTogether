@@ -16,16 +16,20 @@ exports.refreshToken = exports.generateRefreshToken = exports.generateAccessToke
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
 function generateAccessToken(user) {
-    const id = user.userId instanceof mongoose_1.default.Types.ObjectId ? user.userId.toString() : user.userId;
+    const id = user.userId instanceof mongoose_1.default.Types.ObjectId
+        ? user.userId.toString()
+        : user.userId;
     return jsonwebtoken_1.default.sign({ userId: id, username: user.username }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRATION
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
     });
 }
 exports.generateAccessToken = generateAccessToken;
 function generateRefreshToken(user) {
-    const id = user.userId instanceof mongoose_1.default.Types.ObjectId ? user.userId.toString() : user.userId;
+    const id = user.userId instanceof mongoose_1.default.Types.ObjectId
+        ? user.userId.toString()
+        : user.userId;
     return jsonwebtoken_1.default.sign({ userId: id, username: user.username }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRATION
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
     });
 }
 exports.generateRefreshToken = generateRefreshToken;
@@ -34,8 +38,14 @@ function refreshToken(refreshToken) {
         try {
             const decoded = jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
             console.log("decoded: ", decoded);
-            const newAccessToken = generateAccessToken({ userId: decoded.userId, username: decoded.username });
-            const newRefreshToken = generateRefreshToken({ userId: decoded.userId, username: decoded.username });
+            const newAccessToken = generateAccessToken({
+                userId: decoded.userId,
+                username: decoded.username,
+            });
+            const newRefreshToken = generateRefreshToken({
+                userId: decoded.userId,
+                username: decoded.username,
+            });
             return { accessToken: newAccessToken, refreshToken: newRefreshToken };
         }
         catch (error) {

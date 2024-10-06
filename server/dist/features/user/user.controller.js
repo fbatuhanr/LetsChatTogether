@@ -68,7 +68,7 @@ exports.getAllWithLimitation = getAllWithLimitation;
 function get(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            if (req.user.userId !== req.params.id) { // If it is successfully decoded by authMiddleware, decoded information is returned to req.user.
+            if (!req.user || req.user.userId !== req.params.id) { // If it is successfully decoded by authMiddleware, decoded information is returned to req.user.
                 return res.status(403).json({ message: 'Access denied' });
             }
             res.json(yield userService.get(req.params.id));
@@ -167,10 +167,14 @@ exports.signup = signup;
 function update(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const updatedUser = yield userService.update(req.params.id, req.file, req.body);
+            /*
+            // it was using for upload to server (before google firebase storage)
+            const updatedUser = await userService.update(req.params.id, req.file, req.body)
+            */
+            const updatedUser = yield userService.update(req.params.id, req.body);
             if (!updatedUser)
-                return res.status(404).json({ message: 'An error occurred during the update.' });
-            return res.status(201).json({ message: 'Successfully updated!' });
+                return res.status(404).json({ message: 'An error occurred during profile update!' });
+            return res.status(201).json({ message: 'Profile successfully updated!' });
         }
         catch (error) {
             next(error);

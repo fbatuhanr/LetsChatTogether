@@ -15,12 +15,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteChat = exports.findChat = exports.findUserChats = exports.createChat = void 0;
 const chat_model_1 = __importDefault(require("./chat.model"));
 const message_model_1 = __importDefault(require("../message/message.model"));
-function createChat(firstId, secondId) {
+function createChat(senderId, receiverId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const chat = yield chat_model_1.default.findOne({ members: { $all: [firstId, secondId] } });
-        if (chat)
+        const chat = yield chat_model_1.default.findOne({ members: { $all: [senderId, receiverId] } });
+        if (chat) {
+            chat.updatedAt = new Date();
+            yield chat.save();
             return chat;
-        const newChat = new chat_model_1.default({ members: [firstId, secondId] });
+        }
+        const newChat = new chat_model_1.default({ members: [senderId, receiverId] });
         return newChat.save();
     });
 }
@@ -31,9 +34,9 @@ function findUserChats(userId) {
     });
 }
 exports.findUserChats = findUserChats;
-function findChat(firstId, secondId) {
+function findChat(senderId, receiverId) {
     return __awaiter(this, void 0, void 0, function* () {
-        return chat_model_1.default.findOne({ members: { $all: [firstId, secondId] } });
+        return chat_model_1.default.findOne({ members: { $all: [senderId, receiverId] } });
     });
 }
 exports.findChat = findChat;
@@ -41,7 +44,7 @@ function deleteChat(chatId) {
     return __awaiter(this, void 0, void 0, function* () {
         const chat = yield chat_model_1.default.findById(chatId);
         if (!chat)
-            throw new Error('Chat not found!');
+            throw new Error("Chat not found!");
         yield chat_model_1.default.findByIdAndDelete(chatId);
         yield message_model_1.default.deleteMany({ chatId });
     });

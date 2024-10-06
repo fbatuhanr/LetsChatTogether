@@ -126,11 +126,23 @@ function signup(data) {
     });
 }
 exports.signup = signup;
-function update(id, file, data) {
-    let newData = Object.assign({}, data);
-    if (file)
-        newData = Object.assign(Object.assign({}, newData), { profilePhoto: file.path });
-    return user_model_1.default.findOneAndUpdate({ _id: id }, newData);
+/*
+// it was using for upload to server (before google firebase storage)
+function update(id: string, file: any, data: UserProps) {
+
+  let newData = { ...data }
+
+  if (file)
+    newData = { ...newData, profilePhoto: file.path }
+
+
+  console.log('updated data: ', newData)
+
+  return User.findOneAndUpdate({ _id: id }, newData)
+}
+*/
+function update(id, data) {
+    return user_model_1.default.findOneAndUpdate({ _id: id }, data);
 }
 exports.update = update;
 function remove(id) {

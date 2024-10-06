@@ -32,6 +32,6 @@ const chatController = __importStar(require("./chat.controller"));
 const router = (0, express_1.Router)();
 router.post("/", authMiddleware_1.default, chatController.createChat);
 router.get("/:userId", authMiddleware_1.default, chatController.findUserChats);
-router.get("/find/:firstId/:secondId", authMiddleware_1.default, chatController.findChat);
+router.get("/find/:senderId/:receiverId", authMiddleware_1.default, chatController.findChat);
 router.delete("/:chatId", authMiddleware_1.default, chatController.deleteChat);
 exports.default = router;

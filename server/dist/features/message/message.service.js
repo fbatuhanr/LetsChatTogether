@@ -12,24 +12,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteMessage = exports.getMessage = exports.createMessage = void 0;
+exports.deleteMessage = exports.getMessage = exports.getUnreadMessagesCount = exports.updateMessageReadStatus = exports.createMessage = void 0;
 const message_model_1 = __importDefault(require("./message.model"));
 function createMessage(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { chatId, senderId, text } = data;
-        const message = new message_model_1.default({
-            chatId,
-            senderId,
-            text
-        });
-        return yield message.save();
+        const message = new message_model_1.default(data);
+        return message.save();
     });
 }
 exports.createMessage = createMessage;
-function getMessage(data) {
+function updateMessageReadStatus(chatId, senderId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { chatId } = data;
-        return yield message_model_1.default.find({ chatId });
+        return message_model_1.default.updateMany({ chatId, senderId, isRead: false }, { $set: { isRead: true } });
+    });
+}
+exports.updateMessageReadStatus = updateMessageReadStatus;
+function getUnreadMessagesCount(chatId, senderId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return message_model_1.default.countDocuments({ chatId, senderId, isRead: false });
+    });
+}
+exports.getUnreadMessagesCount = getUnreadMessagesCount;
+function getMessage(chatId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return message_model_1.default.find({ chatId });
     });
 }
 exports.getMessage = getMessage;
@@ -37,8 +43,8 @@ function deleteMessage(messageId) {
     return __awaiter(this, void 0, void 0, function* () {
         const message = yield message_model_1.default.findById(messageId);
         if (!message)
-            throw new Error('Message not found!');
-        yield message_model_1.default.findByIdAndDelete(messageId);
+            throw new Error("Message not found!");
+        return message_model_1.default.findByIdAndDelete(messageId);
         // await Message.findByIdAndUpdate(messageId, { text: "message has been removed"})
     });
 }
