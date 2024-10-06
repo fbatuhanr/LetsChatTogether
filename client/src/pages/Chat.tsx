@@ -158,7 +158,7 @@ const Chat = () => {
             <LoadingSpinnerPage />
           ) : chat && targetUser ? (
             <>
-              <div className="absolute -top-36 lg:mt-0.5 left-4 text-[0.7rem] lg:text-[0.8rem]">
+              <div className="absolute -top-32 lg:mt-0.5 left-4 text-[0.7rem] lg:text-[0.8rem]">
                 <p>
                   Conversation created:{" "}
                   <b>{timeAgoCalculator(chat.createdAt)}</b>
