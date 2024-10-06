@@ -4,7 +4,7 @@ import * as chatService from "../chat/chat.service";
 import * as messageService from "../message/message.service";
 import * as friendRequestService from "../friendRequest/friendRequest.service";
 
-async function get(req: Request, res: Response, next: NextFunction) {
+async function getNotifications(req: Request, res: Response, next: NextFunction) {
   try {
     const { userId } = req.params;
 
@@ -37,4 +37,4 @@ async function get(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { get };
+export { getNotifications };

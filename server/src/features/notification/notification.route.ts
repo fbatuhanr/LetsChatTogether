@@ -4,6 +4,6 @@ import * as notificationController from "./notification.controller";
 
 const router = Router();
 
-router.get("/:userId", authenticateToken, notificationController.get);
+router.get("/:userId", authenticateToken, notificationController.getNotifications);
 
 export default router;
