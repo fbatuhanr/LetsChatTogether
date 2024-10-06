@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as friendService from "./friend.service";
+import * as chatService from "../chat/chat.service";
 
 async function getUserFriends(req: Request, res: Response, next: NextFunction) {
   try {
@@ -24,10 +25,16 @@ async function removeUserFriend(
       userId as string,
       friendId as string
     );
-    if (!result) return res.status(500).json({ message: "Friends not found!" });
+    if (!result) {
+      return res.status(404).json({ message: "Friends not found!" });
+    }
+
+    const chat = await chatService.findChat(userId, friendId);
+    if (chat) {
+      await chatService.deleteChat(chat.id);
+    }
 
     return res.status(200).json({ message: "Friend removed successfully!" });
-    // return res.status(204).send()
   } catch (error) {
     next(error);
   }

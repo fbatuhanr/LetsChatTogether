@@ -232,7 +232,7 @@ const Profile = () => {
           </label>
           <select
             id="gender"
-            className="w-full bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200 outline-1 focus:outline-dashed outline-indigo-500"
+            className="w-full min-h-[57px] bg-[#6841f2] border-[#20183F] border-2 rounded-2xl px-6 py-4 placeholder-slate-200 outline-1 focus:outline-dashed outline-indigo-500"
             {...register("gender", {
               required: "Gender is required",
             })}
@@ -343,7 +343,7 @@ const Profile = () => {
               },
             })}
           />
-          <div className="flex items-center justify-center absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
+          <div className="flex items-center justify-center w-[66px] h-[66px] absolute top-0 bottom-0 right-0 p-0.5 bg-[#20183F] rounded-tr-2xl rounded-br-2xl">
             <Img
               src={watchProfilePhoto}
               height="100%"

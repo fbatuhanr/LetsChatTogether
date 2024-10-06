@@ -12,7 +12,16 @@ import { ConversationProps } from "../../types/Chat.types";
 import useGeneralNotifications from "./useGeneralNotifications";
 
 const useChat = (currentUserId: string, currentUsername: string) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingChats, setIsLoadingChats] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isUserSelectionInProgress, setIsUserSelectionInProgress] =
+    useState(false);
+  const [isMessageSending, setIsMessageSending] = useState(false);
+  const [isChatDeletionInProgress, setIsChatDeletionInProgress] =
+    useState(false);
+  const [isMessageDeletionInProgress, setIsMessageDeletionInProgress] =
+    useState(false);
+
   const axiosInstance = useAxios();
 
   const { fetchGeneralNotifications } = useGeneralNotifications(currentUserId);
@@ -118,11 +127,12 @@ const useChat = (currentUserId: string, currentUsername: string) => {
   }, []);
 
   useEffect(() => {
-    scrollToTop();
     scrollChatContainerToBottom();
   }, [messages]);
 
   const handleSelectUser = async (user: FriendProps) => {
+    if (isUserSelectionInProgress) return;
+
     if (user._id === targetUser?._id) {
       setChat(null);
       setTargetUser(null);
@@ -132,7 +142,7 @@ const useChat = (currentUserId: string, currentUsername: string) => {
       return;
     }
     try {
-      setIsLoading(true);
+      setIsUserSelectionInProgress(true);
       const response = await axiosInstance.post("chat", {
         senderId: currentUserId,
         receiverId: user._id,
@@ -152,14 +162,14 @@ const useChat = (currentUserId: string, currentUsername: string) => {
 
       toast.error(errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsUserSelectionInProgress(false);
     }
   };
   const handleSendMessage = async () => {
-    if (!messageInput) return;
-
+    if (!messageInput || isMessageSending) return;
     try {
       if (!chat || !targetUser) throw false;
+      setIsMessageSending(true);
 
       const data = {
         chatId: chat._id,
@@ -179,54 +189,15 @@ const useChat = (currentUserId: string, currentUsername: string) => {
 
       toast.error(errorMessage);
       return false;
+    } finally {
+      setIsMessageSending(false);
     }
   };
-
-  const fetchUsersMessages = async (chatId: string, selectedUserId: string) => {
-    try {
-      const response = await axiosInstance.get(`message/${chatId}`);
-      console.log("Messages Between Selected Users:", response.data);
-      const conversation = response.data.map((msg: MessageProps) => {
-        const isSenderCurrentUser = msg.senderId === currentUserId;
-        return {
-          _id: msg._id,
-          text: msg.text,
-          date: msg.createdAt,
-          senderId: isSenderCurrentUser ? currentUserId : selectedUserId,
-          receiverId: isSenderCurrentUser ? selectedUserId : currentUserId,
-        };
-      });
-
-      setMessages(conversation);
-    } catch (error: unknown) {
-      const errorMessage =
-        isApiError(error) && error.response?.data?.message
-          ? error.response.data.message
-          : errorMessages.fetchMessages;
-
-      toast.error(errorMessage);
-    }
-  };
-  const fetchUserConversations = async (userId: string) => {
-    try {
-      if (!userId) throw false;
-
-      const response = await axiosInstance.get(`chat/${userId}`);
-      console.log("User's Conversations:", response.data);
-      setConversations(response.data);
-    } catch (error: unknown) {
-      const errorMessage =
-        isApiError(error) && error.response?.data?.message
-          ? error.response.data.message
-          : errorMessages.fetchConversations;
-
-      toast.error(errorMessage);
-    }
-  };
-
   const handleDeleteChat = async () => {
+    if (isChatDeletionInProgress) return;
     try {
       if (!chat || !targetUser) throw false;
+      setIsChatDeletionInProgress(true);
 
       const result = await Swal.fire({
         title: `Do you want to delete all conversations and chat with ${targetUser?.username}?`,
@@ -282,11 +253,15 @@ const useChat = (currentUserId: string, currentUsername: string) => {
           : errorMessages.deleteChat;
 
       Swal.fire("Error!", errorMessage, "error");
+    } finally {
+      setIsChatDeletionInProgress(false);
     }
   };
   const handleDeleteMessage = async (messageId: string) => {
+    if (isMessageDeletionInProgress) return;
     try {
       if (!messageId || !chat || !targetUser) throw false;
+      setIsMessageDeletionInProgress(true);
 
       const response = await axiosInstance.delete(`message/${messageId}`, {
         data: {
@@ -306,15 +281,59 @@ const useChat = (currentUserId: string, currentUsername: string) => {
           : errorMessages.deleteMessage;
 
       toast.error(errorMessage);
+    } finally {
+      setIsMessageDeletionInProgress(false);
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+  const fetchUsersMessages = async (chatId: string, selectedUserId: string) => {
+    try {
+      setIsLoadingMessages(true);
+      const response = await axiosInstance.get(`message/${chatId}`);
+      console.log("Messages Between Selected Users:", response.data);
+      const conversation = response.data.map((msg: MessageProps) => {
+        const isSenderCurrentUser = msg.senderId === currentUserId;
+        return {
+          _id: msg._id,
+          text: msg.text,
+          date: msg.createdAt,
+          senderId: isSenderCurrentUser ? currentUserId : selectedUserId,
+          receiverId: isSenderCurrentUser ? selectedUserId : currentUserId,
+        };
+      });
+
+      setMessages(conversation);
+    } catch (error: unknown) {
+      const errorMessage =
+        isApiError(error) && error.response?.data?.message
+          ? error.response.data.message
+          : errorMessages.fetchMessages;
+
+      toast.error(errorMessage);
+    } finally {
+      setIsLoadingMessages(false);
+    }
   };
+  const fetchUserConversations = async (userId: string) => {
+    try {
+      if (!userId) throw false;
+      setIsLoadingChats(true);
+
+      const response = await axiosInstance.get(`chat/${userId}`);
+      console.log("User's Conversations:", response.data);
+      setConversations(response.data);
+    } catch (error: unknown) {
+      const errorMessage =
+        isApiError(error) && error.response?.data?.message
+          ? error.response.data.message
+          : errorMessages.fetchConversations;
+
+      toast.error(errorMessage);
+    } finally {
+      setIsLoadingChats(false);
+    }
+  };
+
   const scrollChatContainerToBottom = () => {
     if (!chatContainerRef.current) return;
 
@@ -325,7 +344,12 @@ const useChat = (currentUserId: string, currentUsername: string) => {
   };
 
   return {
-    isLoading,
+    isLoadingChats,
+    isLoadingMessages,
+    isUserSelectionInProgress,
+    isMessageSending,
+    isChatDeletionInProgress,
+    isMessageDeletionInProgress,
 
     chat,
     chatContainerRef,

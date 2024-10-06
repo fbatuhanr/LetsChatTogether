@@ -29,7 +29,13 @@ const Chat = () => {
 
   const { friends, getFriends } = useFriendship(currentUserId);
   const {
-    isLoading,
+    isLoadingChats,
+    isLoadingMessages,
+    isUserSelectionInProgress,
+    isMessageSending,
+    isChatDeletionInProgress,
+    isMessageDeletionInProgress,
+
     chat,
     chatContainerRef,
     onlineUsers,
@@ -154,7 +160,7 @@ const Chat = () => {
       </div>
       <div className="z-10 flex flex-col lg:flex-row w-full max-w-4xl h-[545px] lg:h-[450px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
         <div className="h-full px-2 lg:pt-2 lg:w-[78%] lg:px-8 relative">
-          {isLoading ? (
+          {isLoadingMessages ? (
             <LoadingSpinnerPage />
           ) : chat && targetUser ? (
             <>
@@ -288,7 +294,10 @@ const Chat = () => {
               className={`w-full py-1 ${activeTab === 1 && "bg-[#2f1c74]"}`}
               onClick={() => setActiveTab(1)}
             >
-              All Friends <span className="lg:hidden">({friends?.length ? friends?.length - 1 : 0})</span>
+              All Friends{" "}
+              <span className="lg:hidden">
+                ({friends?.length ? friends?.length - 1 : 0})
+              </span>
             </button>
           </div>
           <div className="h-16 max-h-16 lg:h-auto lg:max-h-[357px] overflow-y-auto overflow-x-hidden scrollbar-thick scrollbar-thumb-gray-500 scrollbar-track-gray-200">
