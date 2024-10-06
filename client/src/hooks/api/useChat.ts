@@ -210,7 +210,6 @@ const useChat = (currentUserId: string, currentUsername: string) => {
     try {
       if (!userId) throw false;
 
-      setIsLoading(true);
       const response = await axiosInstance.get(`chat/${userId}`);
       console.log("User's Conversations:", response.data);
       setConversations(response.data);
@@ -221,8 +220,6 @@ const useChat = (currentUserId: string, currentUsername: string) => {
           : errorMessages.fetchConversations;
 
       toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
     }
   };
 
