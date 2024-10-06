@@ -297,7 +297,7 @@ const Chat = () => {
               All Friends <span className="lg:hidden">({friends?.length ? friends?.length - 1 : 0})</span>
             </button>
           </div>
-          <div className="h-24 max-h-24 lg:h-auto lg:max-h-[357px] overflow-y-auto overflow-x-hidden scrollbar-thick scrollbar-thumb-gray-500 scrollbar-track-gray-200">
+          <div className="h-20 max-h-20 lg:h-auto lg:max-h-[357px] overflow-y-auto overflow-x-hidden scrollbar-thick scrollbar-thumb-gray-500 scrollbar-track-gray-200">
             <div className="px-12 lg:px-0 font-medium">
               {sortedFriends &&
                 sortedFriends.map((user: FriendProps, index: number) => {
