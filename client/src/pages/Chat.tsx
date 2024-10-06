@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { FaCircle } from "react-icons/fa";
-import { IoIosChatboxes, IoIosSend } from "react-icons/io";
+import { IoIosChatboxes, IoIosNotifications, IoIosSend } from "react-icons/io";
 
 import cosmicButterfly from "../assets/background/cosmic-butterfly.png";
 import cosmicButterflyRight from "../assets/background/cosmic-butterfly-right.png";
@@ -44,9 +44,7 @@ const Chat = () => {
     handleDeleteChat,
     handleDeleteMessage,
   } = useChat(currentUserId, currentUsername);
-  const [sortedFriends, setSortedFriends] = useState<FriendProps[] | null>(
-    null
-  );
+  const [sortedFriends, setSortedFriends] = useState<FriendProps[]>([]);
 
   const scrollTargetRef = useScrollOnKeyboardClose();
 
@@ -66,7 +64,7 @@ const Chat = () => {
         )
       : friends;
   const sortedFriendsByOnlineStatus = () => {
-    if (!filteredFriendsByTab) return null;
+    if (!filteredFriendsByTab?.length) return [];
 
     return filteredFriendsByTab
       ?.filter((friend) => friend._id !== currentUserId)
@@ -74,36 +72,22 @@ const Chat = () => {
         const aOnline = onlineUsers?.includes(a._id) ? 0 : 1;
         const bOnline = onlineUsers?.includes(b._id) ? 0 : 1;
 
-        if (activeTab === 0) {
-          if (aOnline === bOnline) {
-            const aUpdatedAt = conversations.find((chat) =>
-              chat.members.includes(a._id)
-            )?.updatedAt;
-            const bUpdatedAt = conversations.find((chat) =>
-              chat.members.includes(b._id)
-            )?.updatedAt;
-
-            const aDate = aUpdatedAt
-              ? new Date(aUpdatedAt).getTime()
-              : -Infinity;
-            const bDate = bUpdatedAt
-              ? new Date(bUpdatedAt).getTime()
-              : -Infinity;
-
-            return bDate - aDate;
-          }
+        if (aOnline !== bOnline) {
           return aOnline - bOnline;
-        } else {
-          
-          return a.username.localeCompare(b.username);
         }
+
+        return a.username.localeCompare(b.username);
       });
   };
-
   const getUsernameById = (id: string) =>
     friends?.find((i) => i._id === id)?.username;
   const getPhotoById = (id: string) =>
     friends?.find((i) => i._id === id)?.profilePhoto;
+  const getUnreadMessageCountById = (id: string) =>
+    conversations?.find(
+      (chat) =>
+        chat.members.includes(currentUserId) && chat.members.includes(id)
+    )?.unreadMessagesCount;
 
   const renderMessageHeader = (
     messageData: MessageProps,
@@ -169,43 +153,46 @@ const Chat = () => {
   return (
     <div
       ref={scrollTargetRef}
-      className="px-2 lg:px-0 relative flex flex-col gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden"
+      className="-mt-2 lg:mt-0 px-2 lg:px-0 relative flex flex-col gap-y-3 lg:gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden"
     >
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
       </div>
-      <div className="z-10 flex flex-col lg:flex-row w-full max-w-4xl h-[600px] lg:h-[450px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
-        <div className="h-full px-2 pt-2 lg:w-[79%] lg:px-8 relative">
+      <div className="z-10 flex flex-col lg:flex-row w-full max-w-4xl h-[580px] lg:h-[450px] rounded bg-gradient-to-br from-[#0D0D0D] to-[#472DA6] border-[#472DA6] border-2">
+        <div className="h-full px-2 lg:pt-2 lg:w-[78%] lg:px-8 relative">
           {isLoading ? (
             <LoadingSpinnerPage />
           ) : chat && targetUser ? (
             <>
-              <div className="absolute -top-6 mt-0.5 left-4 text-[0.8rem]">
-                <p>Conversation created: <b>{timeAgoCalculator(chat.createdAt)}</b></p>
+              <div className="absolute -top-40 mt-0.5 lg:mt-0.5 left-4 text-[0.7rem] lg:text-[0.8rem]">
+                <p>
+                  Conversation created:{" "}
+                  <b>{timeAgoCalculator(chat.createdAt)}</b>
+                </p>
               </div>
               <div className="flex justify-center gap-x-1 py-1.5 lg:justify-between lg:px-4 lg:py-1.5 border-[#6841F2] border-b-2 text-base font-medium lg:text-lg">
                 <Link
                   to={`/user/${targetUser.username}`}
-                  className="bg-[#0D0D0D] bg-opacity-50 rounded-sm p-1.5 lg:p-2 lg:w-full text-center"
+                  className="bg-[#0D0D0D] bg-opacity-50 hover:bg-opacity-75 rounded-sm p-1.5 lg:p-2 lg:w-full text-center"
                 >
-                  View {textClip(targetUser.username, 10)}
+                  View {textClip(targetUser.username, 13)}
                 </Link>
                 <Link
                   to="/account/friends"
-                  className="bg-[#0D0D0D] bg-opacity-50 rounded-sm p-1.5 lg:p-2 lg:w-full text-center"
+                  className="bg-[#0D0D0D] bg-opacity-50 hover:bg-opacity-75 rounded-sm p-1.5 lg:p-2 lg:w-full text-center"
                 >
                   Manage Friends
                 </Link>
                 <button
                   onClick={handleDeleteChat}
-                  className="text-red-600 bg-[#0D0D0D] bg-opacity-50 rounded-sm p-1.5 lg:p-2 lg:w-full text-center"
+                  className="text-red-600 bg-[#0D0D0D] bg-opacity-50 hover:bg-opacity-75 rounded-sm p-1.5 lg:p-2 lg:w-full text-center"
                 >
                   Delete Chat
                 </button>
               </div>
               <div
                 ref={chatContainerRef}
-                className="h-[18.5rem] lg:h-72 mt-2 mb-2 px-0 lg:px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg"
+                className="h-[296px] lg:h-72 mt-2 mb-2 px-0 lg:px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg"
               >
                 {messages.map((messageData: MessageProps, index) => {
                   const isMessageBelongsCurrUser =
@@ -257,7 +244,7 @@ const Chat = () => {
                   );
                 })}
               </div>
-              <div className="border-2 border-[#6841F2] bg-[#6841F2] flex h-14 items-stretch overflow-hidden rounded-xl">
+              <div className="border-2 border-[#6841F2] bg-[#6841F2] flex h-14 items-stretch overflow-hidden rounded">
                 <input
                   type="text"
                   value={messageInput}
@@ -292,22 +279,22 @@ const Chat = () => {
             </div>
           )}
         </div>
-        <div className="order-first py-2 lg:pt-2.5 lg:w-[21%] lg:order-last bg-[#472DA6]">
-          <h3 className="px-4 text-2xl lg:text-[1.75rem] font-bold lg:text-center mb-1.5">
+        <div className="order-first py-1 lg:pt-2.5 lg:w-[22%] lg:order-last bg-[#472DA6]">
+          <h3 className="hidden lg:block px-4 text-2xl lg:text-[1.75rem] font-bold lg:text-center mb-1.5">
             Friends ({friends?.length ? friends?.length - 1 : 0})
           </h3>
-          <div className="flex justify-stretch border-t border-b border-[#2f1c74] -mr-[2px] mb-1">
+          <div className="flex justify-stretch border-t border-b border-[#2f1c74] -ml-[2px] -mr-[2px] mb-1 lg:ml-0">
             <button
               className={`w-full py-1 ${activeTab === 0 && "bg-[#2f1c74]"}`}
               onClick={() => setActiveTab(0)}
             >
-              Chats
+              Chats ({conversations?.length ? conversations.length : 0})
             </button>
             <button
               className={`w-full py-1 ${activeTab === 1 && "bg-[#2f1c74]"}`}
               onClick={() => setActiveTab(1)}
             >
-              All Friends
+              All Friends <span className="lg:hidden">({friends?.length ? friends?.length - 1 : 0})</span>
             </button>
           </div>
           <div className="h-24 max-h-24 lg:h-auto lg:max-h-[357px] overflow-y-auto overflow-x-hidden scrollbar-thick scrollbar-thumb-gray-500 scrollbar-track-gray-200">
@@ -321,8 +308,8 @@ const Chat = () => {
                   return (
                     <div
                       key={index}
-                      className={`flex items-center justify-evenly lg:justify-between lg:gap-x-1 ps-4 lg:ps-2 lg:pe-2 pt-1.5 pb-1 ${
-                        index !== 0 && "mt-1.5"
+                      className={`flex items-center justify-between lg:gap-x-1 ps-12 pe-16 lg:ps-2 lg:pe-2 pt-1.5 pb-1 ${
+                        index !== 0 && "mt-1"
                       } rounded lg:rounded-none cursor-pointer ${
                         isUserOnline ? "text-slate-800" : "text-slate-700"
                       } ${
@@ -330,7 +317,10 @@ const Chat = () => {
                           ? "bg-[#e3dbff] font-semibold"
                           : "bg-[#BCA9FF]"
                       }`}
-                      onClick={() => handleSelectUser(user)}
+                      onClick={() => {
+                        handleSelectUser(user);
+                        setActiveTab(0);
+                      }}
                     >
                       <div className="flex items-center gap-x-1.5">
                         {isUserOnline ? (
@@ -340,13 +330,23 @@ const Chat = () => {
                         )}
                         <span
                           className={`${
-                            isUserSelected ? "text-xl underline" : "text-lg"
+                            isUserSelected
+                              ? "text-lg lg:text-xl underline"
+                              : "text-base lg:text-lg"
                           }`}
                         >
                           {textClip(user.username, 8)}
                         </span>
-                        {/* <span className="text-xs lg:text-[0.65rem] mt-1 lg:mt-0.5">({isUserOnline ? "online" : "offline"})</span> */}
                       </div>
+                      {!isUserSelected &&
+                        (getUnreadMessageCountById(user?._id) || 0) > 0 && (
+                          <div className="flex items-center text-white font-bold text-sm ps-[3px] pe-[6px] rounded bg-[#6841f2]">
+                            <div className="flex items-center animate-notification">
+                              <IoIosNotifications size={18} />
+                              {getUnreadMessageCountById(user?._id)}
+                            </div>
+                          </div>
+                        )}
                       <div>
                         <IoIosChatboxes
                           size={24}

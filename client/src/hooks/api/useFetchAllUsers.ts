@@ -7,7 +7,7 @@ const useFetchAllUsers = (page: number, limit: number) => {
 
   const axiosInstance = useAxios();
 
-  const [users, setUsers] = useState<UserProps[] | null>(null);
+  const [users, setUsers] = useState<UserProps[]>([]);
 
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ const useFetchAllUsers = (page: number, limit: number) => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get(`${process.env.USER_API_URL}?page=${page}&limit=${limit}`)
+        const response = await axiosInstance.get(`user?page=${page}&limit=${limit}`)
         setUsers(response.data.users);
         setTotalPages(response.data.totalPages)
       } catch (err) {

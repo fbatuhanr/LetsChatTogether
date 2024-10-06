@@ -1,1 +1,1 @@
-export { default as chat } from "./chat.route"
+export { default as chat } from "./chat.route";

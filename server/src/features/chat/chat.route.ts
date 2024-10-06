@@ -1,14 +1,13 @@
-import { Router } from 'express'
-import authenticateToken from '../../middleware/authMiddleware'
-import * as chatController from './chat.controller'
+import { Router } from "express";
+import authenticateToken from "../../middleware/authMiddleware";
+import * as chatController from "./chat.controller";
 
-const router = Router()
+const router = Router();
 
-router.post("/", authenticateToken, chatController.createChat)
-router.get("/:userId", authenticateToken, chatController.findUserChats)
-router.get("/find/:firstId/:secondId", authenticateToken, chatController.findChat)
+router.post("/", authenticateToken, chatController.createChat);
+router.get("/:userId", authenticateToken, chatController.findUserChats);
+router.get("/find/:senderId/:receiverId", authenticateToken, chatController.findChat);
 
-router.delete("/:chatId", authenticateToken, chatController.deleteChat)
+router.delete("/:chatId", authenticateToken, chatController.deleteChat);
 
-
-export default router
+export default router;

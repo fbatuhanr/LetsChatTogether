@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import useFriendRequest, { RequestStatus } from '../hooks/api/useFriendship'
 import MessageImg from "../assets/message.png"

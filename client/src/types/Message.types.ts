@@ -8,4 +8,6 @@ export interface MessageProps {
     receiverId: string | null;
 
     createdAt?: Date;
+
+    isRead?: boolean;
 }

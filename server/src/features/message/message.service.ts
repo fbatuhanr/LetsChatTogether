@@ -1,30 +1,36 @@
-import { CreateMessageProps } from "../../types/Message.types"
-import Message from "./message.model"
+import { CreateMessageProps } from "../../types/Message.types";
+import Message from "./message.model";
 
 async function createMessage(data: CreateMessageProps) {
-
-    const { chatId, senderId, text } = data
-
-    const message = new Message({
-        chatId,
-        senderId,
-        text
-    })
-    return await message.save()
+  const message = new Message(data);
+  return message.save();
+}
+async function updateMessageReadStatus(chatId: string, senderId: string) {
+  return Message.updateMany(
+    { chatId, senderId, isRead: false },
+    { $set: { isRead: true } }
+  );
+}
+async function getUnreadMessagesCount(chatId: string, senderId: string) {
+  return Message.countDocuments({ chatId, senderId, isRead: false });
 }
 
 async function getMessage(chatId: string) {
-
-    return await Message.find({ chatId })
+  return Message.find({ chatId });
 }
 
 async function deleteMessage(messageId: string) {
+  const message = await Message.findById(messageId);
+  if (!message) throw new Error("Message not found!");
 
-    const message = await Message.findById(messageId);
-    if (!message) throw new Error('Message not found!')
-
-    await Message.findByIdAndDelete(messageId)
-    // await Message.findByIdAndUpdate(messageId, { text: "message has been removed"})
+  return Message.findByIdAndDelete(messageId);
+  // await Message.findByIdAndUpdate(messageId, { text: "message has been removed"})
 }
 
-export { createMessage, getMessage, deleteMessage }
+export {
+  createMessage,
+  updateMessageReadStatus,
+  getUnreadMessagesCount,
+  getMessage,
+  deleteMessage,
+};

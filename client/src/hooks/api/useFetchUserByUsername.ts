@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import useAxios from '../useAxios';
-import { UserProps } from '../../types/User.types';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect } from "react";
+import useAxios from "../useAxios";
+import { UserProps } from "../../types/User.types";
 
 const useFetchUserByUsername = (username: string) => {
-    
   const axiosInstance = useAxios();
-  
+
   const [data, setData] = useState<UserProps | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -13,7 +13,7 @@ const useFetchUserByUsername = (username: string) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axiosInstance.get(`${process.env.USER_API_URL}/find`, {
+        const response = await axiosInstance.get("user/find", {
           params: { username },
         });
         setData(response.data);
@@ -30,4 +30,4 @@ const useFetchUserByUsername = (username: string) => {
   return { data, loading, error };
 };
 
-export default useFetchUserByUsername
+export default useFetchUserByUsername;

@@ -1,42 +1,51 @@
-import { Server as HttpServer } from 'http';
-import { Server } from 'socket.io';
+import { Server as HttpServer } from "http";
+import { Server } from "socket.io";
 
 let io: Server;
-let socketUsers: string[] = [];
+let socketUsers = new Set<string>();
+let socketChatStates: { [key: string]: string | null } = {};
 
 export const initializeSocket = (server: HttpServer) => {
   io = new Server(server, {
     cors: {
       origin: process.env.CORS_ORIGIN || "http://localhost:5173",
-      credentials: true
-    }
+      credentials: true,
+    },
   });
 
-  io.on('connection', (socket) => {
-
+  io.on("connection", (socket) => {
     const userId = socket.handshake.headers.userid as string;
-    console.log("Socket connected for user: ", userId);
+    console.log("Socket User Connect:",userId);
 
-    if (!socketUsers.includes(userId)) {
-      socketUsers.push(userId);
-    }
+    socketUsers.add(userId);
+    setSocketChatState(userId, null);
 
     socket.join(`room${userId}`);
 
-    io.emit("users", socketUsers);
+    io.emit("users", getSocketUsers());
 
-    socket.on('sendMessage', (messageData) => {
-      console.log(messageData);
-      socket.to(`room${messageData.receiverId}`).emit('message', messageData);
+    socket.on("chatClosed", () => {
+      clearSocketChatState(userId);
     });
+    socket.on("disconnect", async () => {
+      console.log("Socket User Disconnected:",userId);
 
-    socket.on('disconnect', async () => {
-      console.log("User disconnected", userId);
-      socketUsers = socketUsers.filter(user => user !== userId);
-      io.emit("users", socketUsers);
+      socketUsers.delete(userId);
+      clearSocketChatState(userId);
+      io.emit("users", getSocketUsers());
     });
   });
 };
 
-export const getIO = () => io
-export const getSocketUsers = () => socketUsers
+export const getIO = () => io;
+export const getSocketUsers = () => Array.from(socketUsers);
+
+export const getSocketChatStates = () => socketChatStates;
+export const setSocketChatState = (userId: string, chatId: string | null) => { socketChatStates[userId] = chatId; };
+export const clearSocketChatState = (userId: string) => { delete socketChatStates[userId]; };
+export const clearAllSocketChatStates = () => { socketChatStates = {}; };
+
+export const isSocketChatActive = (userId: string, chatId: string): boolean => {
+  const activeChatId = getSocketChatStates()[userId];
+  return activeChatId === chatId;
+};

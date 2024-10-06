@@ -23,6 +23,7 @@ import { ApiErrorProps } from "../../types/ApiError.types";
 import { resizeImage } from "../../utils/imageUtils";
 import LoadingSpinnerPage from "../../components/LoadingSpinnerPage";
 import { errorMessages } from "../../constants/errorMessages";
+import { successMessages } from "../../constants/successMessages";
 
 const Profile = () => {
   const [loading, setLoading] = useState(false);
@@ -70,7 +71,12 @@ const Profile = () => {
                 reject(error);
               },
               async () => {
-                toast.update(toastId, { render: "Photo uploaded!", type: "success", isLoading: false, autoClose: 2000 });
+                toast.update(toastId, {
+                  render: successMessages.photoUpload,
+                  type: "success",
+                  isLoading: false,
+                  autoClose: 2000,
+                });
                 resolve(await getDownloadURL(uploadTask.snapshot.ref));
               }
             );
@@ -88,7 +94,7 @@ const Profile = () => {
           newData = { ...newData, profilePhoto: "" };
         }
       }
-      
+
       await toast.promise(
         axiosInstance.put(
           `${process.env.API_URL}/user/${decodedToken.userId}`,
@@ -97,23 +103,18 @@ const Profile = () => {
         {
           pending: "Updating profile...",
           success: {
-            render: ({ data }: { data: AxiosResponse }) => {
-              return data.data.message || "Profile successfully updated!";
-            },
+            render: ({ data }: { data: AxiosResponse }) =>
+              data.data.message || successMessages.profileUpdate,
           },
           error: {
-            render: ({ data }: { data: AxiosError<ApiErrorProps> }) => {
-              return (
-                data.response?.data?.message || errorMessages.profileUpdate
-              );
-            },
+            render: ({ data }: { data: AxiosError<ApiErrorProps> }) =>
+              data.response?.data?.message || errorMessages.profileUpdate,
           },
         }
       );
-      
     } catch (error) {
-      console.error("An error occurred:", error);
-      toast.error("Failed to upload or update profile!");
+      console.error("Profile Update Submission Error:", error);
+      toast.error(errorMessages.profileUpdate);
     } finally {
       setLoading(false);
     }
@@ -123,9 +124,7 @@ const Profile = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get(
-          `${process.env.API_URL}/user/${decodedToken.userId}`
-        );
+        const response = await axiosInstance.get(`user/${decodedToken.userId}`);
         console.log(response.data);
         const { profilePhoto, dateOfBirth } = response.data;
 
@@ -140,7 +139,7 @@ const Profile = () => {
       } finally {
         setLoading(false);
       }
-    }
+    };
     fetchData();
   }, [reset]);
 
@@ -149,7 +148,7 @@ const Profile = () => {
     console.log(watchProfilePhoto);
   }, [watchProfilePhoto]);
 
-  if(loading) return <LoadingSpinnerPage />
+  if (loading) return <LoadingSpinnerPage />;
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}

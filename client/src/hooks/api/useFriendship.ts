@@ -18,17 +18,15 @@ export interface FriendRequestStatus {
 const useFriendship = (currentUserId: string) => {
   const axiosInstance = useAxios();
 
-  const [friends, setFriends] = useState<Array<FriendProps> | null>(null);
-  const [incomingRequests, setIncomingRequests] = useState<[] | null>(null);
-  const [outgoingRequests, setOutgoingRequests] = useState<[] | null>(null);
+  const [friends, setFriends] = useState<FriendProps[]>([]);
+  const [incomingRequests, setIncomingRequests] = useState<[]>([]);
+  const [outgoingRequests, setOutgoingRequests] = useState<[]>([]);
   const [requestStatusBetweenUsers, setRequestStatusBetweenUsers] =
-    useState<FriendRequestStatus | null>(null);
+    useState<FriendRequestStatus>({ status: RequestStatus.None });
 
   const getFriends = async (includeUser: boolean = false) => {
     try {
-      const response = await axiosInstance.get(
-        `${process.env.API_URL}/friend/${currentUserId}`
-      );
+      const response = await axiosInstance.get(`friend/${currentUserId}`);
       if (!includeUser) {
         setFriends(response.data.friends);
       } else {
@@ -58,7 +56,7 @@ const useFriendship = (currentUserId: string) => {
   const getIncomingRequests = async () => {
     try {
       const response = await axiosInstance.get(
-        `${process.env.API_URL}/friend-request/incoming/${currentUserId}`
+        `friend-request/incoming/${currentUserId}`
       );
       setIncomingRequests(response.data);
     } catch (error: unknown) {
@@ -74,7 +72,7 @@ const useFriendship = (currentUserId: string) => {
   const getOutgoingRequests = async () => {
     try {
       const response = await axiosInstance.get(
-        `${process.env.API_URL}/friend-request/outgoing/${currentUserId}`
+        `friend-request/outgoing/${currentUserId}`
       );
       setOutgoingRequests(response.data);
     } catch (error: unknown) {
@@ -89,15 +87,12 @@ const useFriendship = (currentUserId: string) => {
   };
   const getRequestStatusBetweenUsers = async (targetUserId: string) => {
     try {
-      const response = await axiosInstance.get(
-        `${process.env.API_URL}/friend-request/status`,
-        {
-          params: {
-            senderId: currentUserId,
-            receiverId: targetUserId,
-          },
-        }
-      );
+      const response = await axiosInstance.get("friend-request/status", {
+        params: {
+          senderId: currentUserId,
+          receiverId: targetUserId,
+        },
+      });
       setRequestStatusBetweenUsers(response.data);
     } catch (error: unknown) {
       const errorMessage =
@@ -112,29 +107,25 @@ const useFriendship = (currentUserId: string) => {
 
   const removeFriend = async (targetUserId: string): Promise<string> => {
     try {
-        const response = await axiosInstance.delete(
-          `${process.env.API_URL}/friend/${currentUserId}/${targetUserId}`
-        );
-        return response.data.message;
-      } 
-      catch (error: unknown) {
-        const errorMessage =
-          isApiError(error) && error.response?.data?.message
-            ? error.response.data.message
-            : errorMessages.default;
+      const response = await axiosInstance.delete(
+        `friend/${currentUserId}/${targetUserId}`
+      );
+      return response.data.message;
+    } catch (error: unknown) {
+      const errorMessage =
+        isApiError(error) && error.response?.data?.message
+          ? error.response.data.message
+          : errorMessages.default;
 
-        throw errorMessage;
-      }
+      throw errorMessage;
+    }
   };
   const sendRequest = async (targetUserId: string): Promise<string> => {
     try {
-      const response = await axiosInstance.post(
-        `${process.env.API_URL}/friend-request/send`,
-        {
-          senderId: currentUserId,
-          receiverId: targetUserId,
-        }
-      );
+      const response = await axiosInstance.post("friend-request/send", {
+        senderId: currentUserId,
+        receiverId: targetUserId,
+      });
       return response.data.message;
     } catch (error: unknown) {
       const errorMessage =
@@ -147,13 +138,10 @@ const useFriendship = (currentUserId: string) => {
   };
   const acceptRequest = async (targetUserId: string): Promise<string> => {
     try {
-      const response = await axiosInstance.put(
-        `${process.env.API_URL}/friend-request/accept`,
-        {
-          senderId: currentUserId,
-          receiverId: targetUserId,
-        }
-      );
+      const response = await axiosInstance.put("friend-request/accept", {
+        senderId: currentUserId,
+        receiverId: targetUserId,
+      });
       return response.data.message;
     } catch (error: unknown) {
       const errorMessage =
@@ -166,15 +154,12 @@ const useFriendship = (currentUserId: string) => {
   };
   const cancelRequest = async (targetUserId: string): Promise<string> => {
     try {
-      const response = await axiosInstance.delete(
-        `${process.env.API_URL}/friend-request/cancel`,
-        {
-          data: {
-            senderId: currentUserId,
-            receiverId: targetUserId,
-          },
-        }
-      );
+      const response = await axiosInstance.delete("friend-request/cancel", {
+        data: {
+          senderId: currentUserId,
+          receiverId: targetUserId,
+        },
+      });
       return response.data.message;
     } catch (error: unknown) {
       const errorMessage =

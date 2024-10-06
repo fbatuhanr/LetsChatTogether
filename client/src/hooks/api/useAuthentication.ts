@@ -1,11 +1,11 @@
-import { useAppDispatch } from '../../redux/hooks';
+import { useAppDispatch } from "../../redux/hooks";
 import {
   setAccessToken,
   clearAccessToken,
-} from '../../redux/features/authSlice';
-import useAxios from '../useAxios';
-import { isApiError } from '../../helper/apiHelpers';
-import { errorMessages } from '../../constants/errorMessages';
+} from "../../redux/features/authSlice";
+import useAxios from "../useAxios";
+import { isApiError } from "../../helper/apiHelpers";
+import { errorMessages } from "../../constants/errorMessages";
 
 const useAuthentication = () => {
   const dispatch = useAppDispatch();
@@ -16,13 +16,10 @@ const useAuthentication = () => {
     password: string
   ): Promise<string> => {
     try {
-      const response = await axiosInstance.post(
-        `${process.env.USER_API_URL}/login`,
-        {
-          username,
-          password,
-        }
-      );
+      const response = await axiosInstance.post("user/login", {
+        username,
+        password,
+      });
 
       dispatch(setAccessToken(response.data.accessToken));
       return response.data.message;
@@ -42,14 +39,11 @@ const useAuthentication = () => {
     password: string
   ): Promise<string> => {
     try {
-      const response = await axiosInstance.post(
-        `${process.env.USER_API_URL}/sign-up`,
-        {
-          username,
-          email,
-          password,
-        }
-      );
+      const response = await axiosInstance.post("user/sign-up", {
+        username,
+        email,
+        password,
+      });
       return response.data.message;
     } catch (error: unknown) {
       const errorMessage =
@@ -63,10 +57,10 @@ const useAuthentication = () => {
 
   const logoutCall = async () => {
     try {
-      await axiosInstance.post(`${process.env.USER_API_URL}/logout`);
+      await axiosInstance.post("user/logout");
       dispatch(clearAccessToken());
     } catch (error) {
-      console.error('Logout Error:', error);
+      console.error("Logout Error:", error);
     }
   };
 

@@ -38,7 +38,7 @@ const withAuthCheck = <P extends WithAuthCheckProps>(
 
                     if (isTokenExpired) {
                         console.log("Token has expired, refreshing...")
-                        const response = await axiosInstance.post(`${process.env.AUTH_API_URL}/refresh-token`)
+                        const response = await axiosInstance.post(`auth/refresh-token`)
 
                         if (response.status === 200) {
                             dispatch(setAccessToken(response.data.accessToken))

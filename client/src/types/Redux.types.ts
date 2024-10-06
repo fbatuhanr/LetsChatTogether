@@ -1,6 +1,6 @@
 import { Store } from "@reduxjs/toolkit";
-import persistStore from "redux-persist/es/persistStore";
+import { Persistor } from "redux-persist";
 
 export interface PersistedStore extends Store {
-    __persistor?: ReturnType<typeof persistStore>;
+    __persistor?: Persistor;
 }
