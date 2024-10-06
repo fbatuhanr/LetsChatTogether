@@ -118,6 +118,7 @@ const useChat = (currentUserId: string, currentUsername: string) => {
   }, []);
 
   useEffect(() => {
+    scrollToTop();
     scrollChatContainerToBottom();
   }, [messages]);
 
@@ -308,6 +309,12 @@ const useChat = (currentUserId: string, currentUsername: string) => {
     }
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   const scrollChatContainerToBottom = () => {
     if (!chatContainerRef.current) return;
 

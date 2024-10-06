@@ -16,7 +16,6 @@ import { FriendProps } from "../types/User.types";
 import { MessageProps } from "../types/Message.types";
 import { MdCancel } from "react-icons/md";
 import { textClip } from "../utils/textUtils";
-import useScrollOnKeyboardClose from "../hooks/useScrollOnKeyboardClose";
 import Img from "../components/general/Img";
 import LoadingSpinnerPage from "../components/LoadingSpinnerPage";
 import { timeAgoCalculator } from "../utils/dateUtils";
@@ -45,8 +44,6 @@ const Chat = () => {
     handleDeleteMessage,
   } = useChat(currentUserId, currentUsername);
   const [sortedFriends, setSortedFriends] = useState<FriendProps[]>([]);
-
-  const scrollTargetRef = useScrollOnKeyboardClose();
 
   useEffect(() => {
     getFriends(true);
@@ -151,10 +148,7 @@ const Chat = () => {
   };
 
   return (
-    <div
-      ref={scrollTargetRef}
-      className="-mt-2 lg:mt-0 px-2 lg:px-0 relative flex flex-col gap-y-3 lg:gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden"
-    >
+    <div className="-mt-2 lg:mt-0 px-2 lg:px-0 relative flex flex-col gap-y-3 lg:gap-y-4 justify-center items-center bg-blur-ellipse-small bg-[center_top_-1rem] bg-[length:200px] bg-no-repeat overflow-hidden">
       <div>
         <h1 className="text-5xl font-bold">Chat</h1>
       </div>
