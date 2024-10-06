@@ -12,7 +12,7 @@ import { ConversationProps } from "../../types/Chat.types";
 import useGeneralNotifications from "./useGeneralNotifications";
 
 const useChat = (currentUserId: string, currentUsername: string) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const axiosInstance = useAxios();
 
   const { fetchGeneralNotifications } = useGeneralNotifications(currentUserId);
