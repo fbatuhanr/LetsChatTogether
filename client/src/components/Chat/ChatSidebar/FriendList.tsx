@@ -58,7 +58,13 @@ const FriendList: React.FC<{ activeTab: number }> = ({ activeTab }) => {
 
   useEffect(() => {
     if (listRef.current && isMobile) {
-      listRef.current.style.height = isExpanded ? "350px" : "64px";
+      listRef.current.style.height = isExpanded
+        ? `${
+            listRef.current.scrollHeight < 350
+              ? `${listRef.current.scrollHeight}px`
+              : "350px"
+          }`
+        : "64px";
     }
   }, [isExpanded, isMobile]);
 

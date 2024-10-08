@@ -47,6 +47,7 @@ const Settings = () => {
 
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
       try {
         const response = await axiosInstance.get(`user/${decodedToken.userId}`);
         // console.log(response.data);
@@ -57,6 +58,9 @@ const Settings = () => {
         });
       } catch (error) {
         console.error("Error fetching data:", error);
+      }
+      finally {
+        setIsLoading(false);
       }
     }
     fetchData();

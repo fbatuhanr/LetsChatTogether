@@ -8,7 +8,7 @@ const FriendHeader: React.FC<FriendHeaderProps> = ({
   activeTab,
   setActiveTab,
 }) => {
-  const { friendsCount, chatsCount } = useChatContext();
+  const { friendsCount, chatsCount, isLoadingChats } = useChatContext();
   return (
     <div>
       <h3 className="hidden lg:block px-4 text-2xl lg:text-[1.75rem] font-bold lg:text-center mb-1.5">
@@ -19,13 +19,16 @@ const FriendHeader: React.FC<FriendHeaderProps> = ({
           className={`w-full py-1 ${activeTab === 0 && "bg-[#2f1c74]"}`}
           onClick={() => setActiveTab(0)}
         >
-          Chats ({chatsCount})
+          Chats {!isLoadingChats && `(${chatsCount})`}
         </button>
         <button
           className={`w-full py-1 ${activeTab === 1 && "bg-[#2f1c74]"}`}
           onClick={() => setActiveTab(1)}
         >
-          All Friends <span className="lg:hidden">({friendsCount})</span>
+          All Friends{" "}
+          <span className="lg:hidden">
+            {friendsCount > 0 && `(${friendsCount})`}
+          </span>
         </button>
       </div>
     </div>

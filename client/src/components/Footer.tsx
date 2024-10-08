@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
             {
                 title: "Let's Chat Together",
                 icon: "info",
-                html: `<b>Project Source Code:</b> <br/> <a href="https://github.com/fbatuhanr/lets-chat-together" target="_blank">github.com/fbatuhanr/lets-chat-together</a>`,
+                html: `<b>Developed by:</b><br/> <a href="https://github.com/fbatuhanr" target="_blank">Batuhan Ozturk</a>`,
             }
         )
     }
@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
                         </div>
                         <div className="relative">
                             <input type="text" className="w-full ps-8 pe-24 py-2 rounded-full bg-[#0D0D0D] text-[#BBBBBB]" placeholder="write your email..." />
-                            <button className="absolute right-0 px-4 py-2 rounded-full bg-[#F2D541]">Submit</button>
+                            <a href="https://www.linkedin.com/in/-batuhan/" target="_blank" className="absolute right-0 px-4 py-2 rounded-full bg-[#F2D541]">Submit</a>
                         </div>
                     </div>
                 </nav>
