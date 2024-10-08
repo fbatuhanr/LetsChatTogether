@@ -7,9 +7,14 @@ import LoadingDots from "../../loading/LoadingDots";
 import { MdCompress, MdExpand } from "react-icons/md";
 import useIsMobile from "../../../hooks/useIsMobile";
 
-const FriendList: React.FC<{ activeTab: number }> = ({ activeTab }) => {
+interface FriendListProps {
+  activeTab: number;
+  isExpanded: boolean;
+  setIsExpanded: (status: boolean) => void;
+}
+const FriendList: React.FC<FriendListProps> = ({ activeTab, isExpanded, setIsExpanded }) => {
+
   const isMobile = useIsMobile(1024);
-  const [isExpanded, setIsExpanded] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
 
   const {
@@ -70,7 +75,7 @@ const FriendList: React.FC<{ activeTab: number }> = ({ activeTab }) => {
 
   return (
     <>
-      {isMobile && (
+      {isMobile && sortedFriends.length > 1 && (
         <button
           type="button"
           className="absolute p-4 top-[50px] right-2"
