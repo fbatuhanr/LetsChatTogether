@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeUserFriend = exports.getUserFriends = void 0;
 const friendService = __importStar(require("./friend.service"));
+const chatService = __importStar(require("../chat/chat.service"));
 function getUserFriends(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -54,10 +55,14 @@ function removeUserFriend(req, res, next) {
         try {
             const { userId, friendId } = req.params;
             const result = yield friendService.removeUserFriend(userId, friendId);
-            if (!result)
-                return res.status(500).json({ message: "Friends not found!" });
+            if (!result) {
+                return res.status(404).json({ message: "Friends not found!" });
+            }
+            const chat = yield chatService.findChat(userId, friendId);
+            if (chat) {
+                yield chatService.deleteChat(chat.id);
+            }
             return res.status(200).json({ message: "Friend removed successfully!" });
-            // return res.status(204).send()
         }
         catch (error) {
             next(error);

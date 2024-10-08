@@ -97,8 +97,9 @@ function searchUsers(req, res, next) {
             const searchRegex = new RegExp(req.query.query, 'i');
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
+            const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
             const currUserId = req.query.currUserId;
-            const result = yield userService.searchUsers(searchRegex, page, limit, currUserId);
+            const result = yield userService.searchUsers(searchRegex, page, limit, sortOrder, currUserId);
             if (result)
                 return res.status(200).json(result);
             res.status(500).json({ message: 'Unexpected error occurred.' });

@@ -26,13 +26,15 @@ exports.getAll = getAll;
 function getAllWithLimitation(page, limit) {
     return __awaiter(this, void 0, void 0, function* () {
         const totalUsers = yield user_model_1.default.countDocuments();
-        const users = yield user_model_1.default.find().skip((page - 1) * limit).limit(limit);
+        const users = yield user_model_1.default.find()
+            .skip((page - 1) * limit)
+            .limit(limit);
         if (!users)
             return false;
         return {
             totalPages: Math.ceil(totalUsers / limit),
             currentPage: page,
-            users
+            users,
         };
     });
 }
@@ -49,7 +51,7 @@ function getByUsername(username) {
     });
 }
 exports.getByUsername = getByUsername;
-function searchUsers(searchRegex, page, limit, currUserId) {
+function searchUsers(searchRegex, page, limit, sortOrder, currUserId) {
     return __awaiter(this, void 0, void 0, function* () {
         const excludeUserId = currUserId || "000000000000000000000000";
         const findPattern = {
@@ -63,17 +65,20 @@ function searchUsers(searchRegex, page, limit, currUserId) {
                             $expr: {
                                 $regexMatch: {
                                     input: { $concat: ["$name", " ", "$surname"] },
-                                    regex: searchRegex
-                                }
-                            }
-                        }
-                    ]
+                                    regex: searchRegex,
+                                },
+                            },
+                        },
+                    ],
                 },
-                { _id: { $ne: excludeUserId } }
-            ]
+                { _id: { $ne: excludeUserId } },
+            ],
         };
         const totalUsers = yield user_model_1.default.countDocuments(findPattern);
-        const users = yield user_model_1.default.find(findPattern).skip((page - 1) * limit).limit(limit);
+        const users = yield user_model_1.default.find(findPattern)
+            .sort({ createdAt: sortOrder })
+            .skip((page - 1) * limit)
+            .limit(limit);
         if (!users)
             return false;
         return {
@@ -93,8 +98,14 @@ function login(data) {
             return false;
         if (!user.comparePassword(password))
             return false;
-        const accessToken = (0, auth_service_1.generateAccessToken)({ userId: user._id, username: user.username });
-        const refreshToken = (0, auth_service_1.generateRefreshToken)({ userId: user._id, username: user.username });
+        const accessToken = (0, auth_service_1.generateAccessToken)({
+            userId: user._id,
+            username: user.username,
+        });
+        const refreshToken = (0, auth_service_1.generateRefreshToken)({
+            userId: user._id,
+            username: user.username,
+        });
         return { accessToken, refreshToken };
     });
 }
@@ -111,12 +122,12 @@ function signup(data) {
         newUser.hashPassword = bcryptjs_1.default.hashSync(data.password, 10);
         const savedUser = yield newUser.save();
         /* admin automatically adds friends for each new user  */
-        const adminUser = yield user_model_1.default.findOne({ username: 'admin' });
+        const adminUser = yield user_model_1.default.findOne({ username: "admin" });
         if (adminUser) {
             const newFriendRequest = new friendRequest_model_1.default({
                 sender: savedUser._id,
                 receiver: adminUser._id,
-                status: 'accepted',
+                status: "accepted",
             });
             yield newFriendRequest.save();
             yield user_model_1.default.updateOne({ _id: adminUser._id }, { $addToSet: { friends: savedUser._id } });
