@@ -14,9 +14,67 @@ import { useDecodedToken } from "../hooks/useDecodedToken";
 import { FaUsers } from "react-icons/fa";
 import { IoIosChatboxes } from "react-icons/io";
 import LinkButton from "../components/general/clickable/LinkButton";
+import { useEffect, useRef, useState } from "react";
 
 const Home: React.FC = () => {
   const decodedToken = useDecodedToken();
+
+  const [animTranslateX, setAnimTranslateX] = useState({
+    target1: 100,
+    target2: -100,
+  });
+
+  const animTargetRefs = useRef({
+    target1: null as HTMLDivElement | null,
+    target2: null as HTMLDivElement | null,
+  });
+
+  const handleScroll = () => {
+    const windowHeight = window.innerHeight;
+
+    if (animTargetRefs.current.target1) {
+      const targetPosition1 = animTargetRefs.current.target1.getBoundingClientRect().top;
+
+      if (targetPosition1 <= windowHeight && targetPosition1 >= 0) {
+        const scrollY = window.scrollY - (windowHeight - targetPosition1);
+        const newTranslateX1 = Math.min(Math.max(scrollY / 5, 0), 25);
+        setAnimTranslateX(prevState => ({
+          ...prevState,
+          target1: newTranslateX1,
+        }));
+      } else {
+        setAnimTranslateX(prevState => ({
+          ...prevState,
+          target1: 100,
+        }));
+      }
+    }
+    
+    if (animTargetRefs.current.target2) {
+      const targetPosition2 = animTargetRefs.current.target2.getBoundingClientRect().top;
+
+      if (targetPosition2 <= windowHeight && targetPosition2 >= 0) {
+        const scrollY = window.scrollY - (windowHeight - targetPosition2);
+        const newTranslateX2 = Math.min(Math.max(scrollY / 3, -50), 0);
+        setAnimTranslateX(prevState => ({
+          ...prevState,
+          target2: newTranslateX2,
+        }));
+      } else {
+        setAnimTranslateX(prevState => ({
+          ...prevState,
+          target2: -100,
+        }));
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
     <div>
@@ -83,7 +141,7 @@ const Home: React.FC = () => {
             </Link>
           )}
         </div>
-        <div className="absolute -top-8 p-10 md:relative md:basis-1/2 md:p-8 z-10">
+        <div className="absolute p-10 md:relative md:basis-1/2 md:p-8 z-10">
           <img
             src={HeroImg}
             width="100%"
@@ -92,10 +150,10 @@ const Home: React.FC = () => {
           />
         </div>
 
-        <div className="absolute top-40 left-0 right-0 md:-top-6 md:right-auto">
+        <div className="absolute top-40 left-0 right-0 md:-top-6 md:right-auto animate-slowRotate">
           <img
             src={poseidonsRealm}
-            className="w-[24rem] md:w-[36rem] md:mx-auto h-auto opacity-20 md:opacity-50"
+            className="w-[24rem] md:w-[36rem] md:mx-auto h-auto opacity-20 md:opacity-40"
           />
         </div>
       </section>
@@ -106,7 +164,7 @@ const Home: React.FC = () => {
             <div className="basis-1/4 md:relative">
               <img
                 src={HumanImg1}
-                className="absolute w-1/2 md:w-full -left-12 -top-24"
+                className="absolute w-1/2 md:w-full -left-12 -top-24 animate-breatheAndSlide"
               />
             </div>
             <div className="basis-3/4 md:basis-2/3 flex flex-col">
@@ -136,9 +194,17 @@ const Home: React.FC = () => {
           </p>
         </div>
         <div className="basis-1/2 p-8">
-          <img src={StatsImg} width="100%" height="auto" />
+          <img
+            src={StatsImg}
+            width="100%"
+            height="auto"
+            className="transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(${animTranslateX.target1}px)` }}
+          />
         </div>
       </section>
+
+      <div ref={el => (animTargetRefs.current.target1 = el)}></div>
 
       <section className="mt-48 md:mt-36">
         <div className="flex px-4 md:px-12 py-14 relative bg-gradient-to-tl from-[#4F22F2] to-[#6841F2] rounded-3xl max-w-6xl mx-auto">
@@ -150,7 +216,7 @@ const Home: React.FC = () => {
             <h2 className="text-[#F2D541] text-3xl md:text-4xl font-bold">
               Max Entertainment
             </h2>
-            <p className="text-2xl md:text-3xl text-center font-medium">
+            <p className="text-2xl md:text-3xl text-center font-medium" ref={el => (animTargetRefs.current.target2 = el)}>
               "We provide the freedom to choose from millions of users with
               different interests. There's something for everyone!"
             </p>
@@ -158,7 +224,8 @@ const Home: React.FC = () => {
           <div className="basis-1/5 md:basis-1/3">
             <img
               src={HumanImg2}
-              className="absolute w-1/2 md:w-80 -top-12 -right-12 md:-top-24 md:right-0"
+              className="absolute w-1/2 md:w-80 -top-12 -right-12 md:-top-24 md:right-0 transition-transform duration-300 ease-in-out"
+              style={{ transform: `translateX(${animTranslateX.target2}px)` }}
             />
           </div>
         </div>
@@ -169,7 +236,7 @@ const Home: React.FC = () => {
           {decodedToken.userId ? (
             <Link
               to="/chat"
-              className="[text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-3/4 relative py-6 md:py-8 border border-[#0D0D0D] ps-14 md:ps-28 mx-auto bg-[#F2D541] text-2xl md:text-4xl font-bold rounded-full"
+              className="animate-bounce [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-3/4 relative py-6 md:py-8 border border-[#0D0D0D] ps-14 md:ps-28 mx-auto bg-[#F2D541] text-2xl md:text-4xl font-bold rounded-full"
             >
               Start Chatting Now
               <img
@@ -180,7 +247,7 @@ const Home: React.FC = () => {
           ) : (
             <Link
               to="/signup"
-              className="[text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-3/4 relative py-6 md:py-8 border border-[#0D0D0D] ps-14 md:ps-28 mx-auto bg-[#F2D541] text-2xl md:text-4xl font-bold rounded-full"
+              className="animate-bounce [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-[#0D0D0D] w-full md:w-3/4 relative py-6 md:py-8 border border-[#0D0D0D] ps-14 md:ps-28 mx-auto bg-[#F2D541] text-2xl md:text-4xl font-bold rounded-full"
             >
               Start Free Today
               <img

@@ -10,9 +10,10 @@ import { UserProps } from "../../types/User.types";
 import { toast } from "react-toastify";
 import { AxiosError, AxiosResponse } from "axios";
 import { ApiErrorProps } from "../../types/ApiError.types";
+import LoadingSpinnerPage from "../../components/loading/LoadingSpinnerPage";
 
 const Settings = () => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const axiosInstance = useAxios();
   const decodedToken = useDecodedToken();
@@ -25,7 +26,7 @@ const Settings = () => {
   } = useForm<UserProps>();
 
   const onSubmit: SubmitHandler<UserProps> = async (data) => {
-    setLoading(true);
+    setIsLoading(true);
     await toast.promise(
       axiosInstance.put(`user/${decodedToken.userId}`, data),
       {
@@ -41,14 +42,14 @@ const Settings = () => {
         },
       }
     );
-    setLoading(false);
+    setIsLoading(false);
   };
 
   useEffect(() => {
     async function fetchData() {
       try {
         const response = await axiosInstance.get(`user/${decodedToken.userId}`);
-        console.log(response.data);
+        // console.log(response.data);
 
         reset({
           ...response.data,
@@ -61,6 +62,7 @@ const Settings = () => {
     fetchData();
   }, [reset]);
 
+  if (isLoading) return <LoadingSpinnerPage />;
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -107,7 +109,7 @@ const Settings = () => {
       </div>
 
       <Button
-        disabled={loading}
+        disabled={isLoading}
         text="Update"
         color="primary"
         innerHeight={3}

@@ -26,7 +26,7 @@ const useGeneralNotifications = (currentUserId: string) => {
 
     try {
       const response = await axiosInstance.get(`notification/${currentUserId}`);
-      console.log(response.data);
+      // console.log(response.data);
       dispatch(setNotifications(response.data));
     } catch (error: unknown) {
       const errorMessage =

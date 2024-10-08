@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { isApiError } from "../../helper/apiHelpers";
 import { errorMessages } from "../../constants/errorMessages";
-import { ConversationProps } from "../../types/Chat.types";
+import { ActiveSelectionProps, ChatProps } from "../../types/Chat.types";
 import useGeneralNotifications from "./useGeneralNotifications";
 
 const useChat = (currentUserId: string, currentUsername: string) => {
@@ -32,33 +32,36 @@ const useChat = (currentUserId: string, currentUsername: string) => {
     [currentUserId]
   );
 
-  const [chat, setChat] = useState<ConversationProps | null>(null);
-  const [targetUser, setTargetUser] = useState<FriendProps | null>(null);
-
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
+  const [activeSelection, setActiveSelection] = useState<ActiveSelectionProps>({
+    chat: null,
+    user: null,
+  });
+
+  const [chats, setChats] = useState<ChatProps[]>([]);
   const [messages, setMessages] = useState<MessageProps[]>([]);
-  const [messageInput, setMessageInput] = useState("");
-  const [conversations, setConversations] = useState<ConversationProps[]>([]);
+
+  const [messageInput, setMessageInput] = useState('');
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchUserConversations(currentUserId);
+    fetchUserChats(currentUserId);
 
     socket.on("users", (users: string[]) => {
-      console.log("socket.on('users'): ", users);
+      // console.log("socket.on('users'): ", users);
       setOnlineUsers(users);
     });
     socket.on("message", (message: MessageProps) => {
-      console.log("socket.on('message'): ", message);
+      // console.log("socket.on('message'): ", message);
       setMessages((prev) => [...prev, message]);
     });
     socket.on("messageNotification", (notificationData) => {
-      console.log("socket.on('messageNotification'):", notificationData);
+      // console.log("socket.on('messageNotification'):", notificationData);
       fetchGeneralNotifications();
-      setConversations((prevChats) =>
-        prevChats.map((chat) => {
+      setChats((prev) =>
+        prev.map((chat) => {
           if (
             chat.members.includes(currentUserId) &&
             chat.members.includes(notificationData.senderId)
@@ -73,36 +76,39 @@ const useChat = (currentUserId: string, currentUsername: string) => {
       );
     });
     socket.on("chatSelected", () => {
-      console.log("socket.on('chatSelected')");
-      fetchUserConversations(currentUserId);
+      // console.log("socket.on('chatSelected')");
+      fetchUserChats(currentUserId);
     });
     socket.on("chatDeleted", (data) => {
-      console.log("socket.on('chatDeleted'): ", data);
-
+      // console.log("socket.on('chatDeleted'): ", data);
       const { chatId, deleteBy } = data;
-
       toast.warning(
         `${deleteBy} has cleared the entire chat history between you two!`,
         { autoClose: 4000, pauseOnHover: true }
       );
+      setActiveSelection((prev) => {
+        setChats((prevChats) =>
+          prevChats.filter((chat) => chat._id !== chatId)
+        );
 
-      setChat((prev) => {
-        setConversations((prev) => prev.filter((chat) => chat._id !== chatId));
-        if (chatId !== prev?._id) {
+        if (chatId !== prev.chat?._id) {
           return prev;
         }
+
         setMessages([]);
-        setTargetUser(null);
-        setMessageInput("");
+        setMessageInput('');
         socket.emit("chatClosed");
-        return null;
+
+        return {
+          chat: null,
+          user: null,
+        };
       });
     });
     socket.on("messageDeleted", (messageId: string) => {
-      console.log("socket.on('messageDeleted'): ", messageId);
-
-      setTargetUser((prev) => {
-        toast.warning(`${prev?.username} has deleted a message!`, {
+      // console.log("socket.on('messageDeleted'): ", messageId);
+      setActiveSelection((prev) => {
+        toast.warning(`${prev.user?.username} has deleted a message!`, {
           autoClose: 3000,
           pauseOnHover: true,
         });
@@ -133,25 +139,28 @@ const useChat = (currentUserId: string, currentUsername: string) => {
   const handleSelectUser = async (user: FriendProps) => {
     if (isUserSelectionInProgress) return;
 
-    if (user._id === targetUser?._id) {
-      setChat(null);
-      setTargetUser(null);
+    if (user._id === activeSelection.user?._id) {
+      setActiveSelection({ chat: null, user: null });
       setMessages([]);
-      setMessageInput("");
+      setMessageInput('');
       socket.emit("chatClosed");
       return;
     }
     try {
       setIsUserSelectionInProgress(true);
+      setIsLoadingChats(true);
+      setIsLoadingMessages(true);
+
       const response = await axiosInstance.post("chat", {
         senderId: currentUserId,
         receiverId: user._id,
       });
-      console.log("Chat Created or Updated:", response.data);
-
-      setChat(response.data);
-      setTargetUser(user);
-      fetchUserConversations(currentUserId);
+      // console.log("Chat Created or Updated:", response.data);
+      setActiveSelection({
+        chat: response.data,
+        user: user,
+      });
+      fetchUserChats(currentUserId);
       fetchUsersMessages(response.data._id, user._id);
       fetchGeneralNotifications();
     } catch (error: unknown) {
@@ -168,19 +177,19 @@ const useChat = (currentUserId: string, currentUsername: string) => {
   const handleSendMessage = async () => {
     if (!messageInput || isMessageSending) return;
     try {
-      if (!chat || !targetUser) throw false;
+      if (!activeSelection?.chat || !activeSelection?.user) throw false;
       setIsMessageSending(true);
 
       const data = {
-        chatId: chat._id,
+        chatId: activeSelection.chat._id,
         senderId: currentUserId,
-        receiverId: targetUser._id,
+        receiverId: activeSelection.user._id,
         text: messageInput,
       };
       const response = await axiosInstance.post("message", data);
-      console.log("Saved Sent Message:", response.data);
+      // console.log("Saved Sent Message:", response.data);
       setMessages((prev) => [...prev, response.data]);
-      setMessageInput("");
+      setMessageInput('');
     } catch (error: unknown) {
       const errorMessage =
         isApiError(error) && error.response?.data?.message
@@ -196,11 +205,11 @@ const useChat = (currentUserId: string, currentUsername: string) => {
   const handleDeleteChat = async () => {
     if (isChatDeletionInProgress) return;
     try {
-      if (!chat || !targetUser) throw false;
+      if (!activeSelection?.chat || !activeSelection?.user) throw false;
       setIsChatDeletionInProgress(true);
 
       const result = await Swal.fire({
-        title: `Do you want to delete all conversations and chat with ${targetUser?.username}?`,
+        title: `Do you want to delete all conversations and chat with ${activeSelection.user?.username}?`,
         text: "This action cannot be undone!",
         icon: "question",
         showCancelButton: true,
@@ -211,12 +220,15 @@ const useChat = (currentUserId: string, currentUsername: string) => {
         showLoaderOnConfirm: true,
         preConfirm: async () => {
           try {
-            const response = await axiosInstance.delete(`chat/${chat._id}`, {
-              data: {
-                deleteBy: currentUsername,
-                receiverId: targetUser._id,
-              },
-            });
+            const response = await axiosInstance.delete(
+              `chat/${activeSelection.chat?._id}`,
+              {
+                data: {
+                  deleteBy: currentUsername,
+                  receiverId: activeSelection.user?._id,
+                },
+              }
+            );
 
             return response.data.message;
           } catch (error: unknown) {
@@ -236,13 +248,10 @@ const useChat = (currentUserId: string, currentUsername: string) => {
         const successMessage = result.value;
         Swal.fire("Deleted!", successMessage, "success");
 
-        setChat(null);
-        setTargetUser(null);
-        setConversations((prev) =>
-          prev.filter((conv) => conv._id !== chat._id)
-        );
+        setActiveSelection({ chat: null, user: null });
+        setChats((prev) => prev.filter((chat) => chat._id !== activeSelection.chat?._id));
         setMessages([]);
-        setMessageInput("");
+        setMessageInput('');
 
         socket.emit("chatClosed");
       }
@@ -260,18 +269,17 @@ const useChat = (currentUserId: string, currentUsername: string) => {
   const handleDeleteMessage = async (messageId: string) => {
     if (isMessageDeletionInProgress) return;
     try {
-      if (!messageId || !chat || !targetUser) throw false;
+      if (!messageId || !activeSelection?.chat || !activeSelection?.user) throw false;
+
       setIsMessageDeletionInProgress(true);
 
       const response = await axiosInstance.delete(`message/${messageId}`, {
         data: {
-          chatId: chat._id,
-          receiverId: targetUser._id,
+          chatId: activeSelection.chat._id,
+          receiverId: activeSelection.user._id,
         },
       });
-      setMessages((prev) =>
-        prev.filter((message) => message._id !== messageId)
-      );
+      setMessages((prev) => prev.filter((message) => message._id !== messageId));
 
       toast.success(response.data.message);
     } catch (error: unknown) {
@@ -290,8 +298,8 @@ const useChat = (currentUserId: string, currentUsername: string) => {
     try {
       setIsLoadingMessages(true);
       const response = await axiosInstance.get(`message/${chatId}`);
-      console.log("Messages Between Selected Users:", response.data);
-      const conversation = response.data.map((msg: MessageProps) => {
+      // console.log("Messages Between Selected Users:", response.data);
+      const result = response.data.map((msg: MessageProps) => {
         const isSenderCurrentUser = msg.senderId === currentUserId;
         return {
           _id: msg._id,
@@ -302,7 +310,7 @@ const useChat = (currentUserId: string, currentUsername: string) => {
         };
       });
 
-      setMessages(conversation);
+      setMessages(result);
     } catch (error: unknown) {
       const errorMessage =
         isApiError(error) && error.response?.data?.message
@@ -314,14 +322,14 @@ const useChat = (currentUserId: string, currentUsername: string) => {
       setIsLoadingMessages(false);
     }
   };
-  const fetchUserConversations = async (userId: string) => {
+  const fetchUserChats = async (userId: string) => {
     try {
       if (!userId) throw false;
       setIsLoadingChats(true);
 
       const response = await axiosInstance.get(`chat/${userId}`);
-      console.log("User's Conversations:", response.data);
-      setConversations(response.data);
+      // console.log("User's Conversations:", response.data);
+      setChats(response.data);
     } catch (error: unknown) {
       const errorMessage =
         isApiError(error) && error.response?.data?.message
@@ -351,13 +359,13 @@ const useChat = (currentUserId: string, currentUsername: string) => {
     isChatDeletionInProgress,
     isMessageDeletionInProgress,
 
-    chat,
     chatContainerRef,
 
     onlineUsers,
-    targetUser,
 
-    conversations,
+    activeSelection,
+
+    chats,
     messages,
 
     messageInput,

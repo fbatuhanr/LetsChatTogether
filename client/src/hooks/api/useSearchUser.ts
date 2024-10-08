@@ -4,7 +4,9 @@ import useAxios from "../useAxios";
 import { UserProps } from "../../types/User.types";
 import { useDecodedToken } from "../useDecodedToken";
 
-const useSearchUsers = (query: string, page: number, limit: number) => {
+const useSearchUsers = (query: string, page: number, limit: number, sortOrder: string) => {
+  const [isLoading, setIsLoading] = useState(true);
+
   const axiosInstance = useAxios();
 
   const decodedToken = useDecodedToken();
@@ -14,7 +16,6 @@ const useSearchUsers = (query: string, page: number, limit: number) => {
 
   const [totalPages, setTotalPages] = useState(0);
 
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
@@ -22,10 +23,10 @@ const useSearchUsers = (query: string, page: number, limit: number) => {
     const signal = controller.signal;
 
     const fetchUsers = async () => {
-      setLoading(true);
+      setIsLoading(true);
       try {
         const response = await axiosInstance.get("user/search", {
-          params: { query, page, limit, currUserId: decodedToken.userId },
+          params: { query, page, limit, sortOrder, currUserId: decodedToken.userId },
           signal,
         });
         setUsers(response.data.users);
@@ -33,12 +34,12 @@ const useSearchUsers = (query: string, page: number, limit: number) => {
         setTotalPages(response.data.totalPages);
       } catch (err) {
         if (signal.aborted) {
-          console.log("cancelled!");
+          // console.log("cancelled!");
           return;
         }
         setError(err as Error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
     fetchUsers();
@@ -46,9 +47,9 @@ const useSearchUsers = (query: string, page: number, limit: number) => {
     return () => {
       controller.abort();
     };
-  }, [query, page, limit]);
+  }, [query, page, limit, sortOrder]);
 
-  return { users, totalUsers, totalPages, loading, error };
+  return { users, totalUsers, totalPages, isLoading, error };
 };
 
 export default useSearchUsers;

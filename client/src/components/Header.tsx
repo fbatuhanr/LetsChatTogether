@@ -97,7 +97,7 @@ const Header: React.FC = () => {
                       <>
                         <IoIosNotifications size={30} />
                         <div className="absolute bottom-1.5 -right-0.5 bg-[#6841F2] text-white w-4 h-4 text-[0.8rem] flex justify-center items-center rounded-full">
-                          {getTotalNotificationsCount()}
+                          {numberClip(getTotalNotificationsCount())}
                         </div>
                       </>
                     ) : (

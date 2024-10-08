@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/general/clickable/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
+import { useState } from "react";
 
 interface SignupProps {
   username: string;
@@ -14,6 +15,7 @@ interface SignupProps {
   passwordAgain: string;
 }
 export const Signup: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const { signupCall } = useAuthentication();
   const navigate = useNavigate();
 
@@ -25,7 +27,8 @@ export const Signup: React.FC = () => {
   } = useForm<SignupProps>();
 
   const onSubmit: SubmitHandler<SignupProps> = async (data) => {
-    toast.promise(signupCall(data.username, data.email, data.password), {
+    setIsLoading(true);
+    await toast.promise(signupCall(data.username, data.email, data.password), {
       pending: "Information is being checked...",
       success: {
         render: ({ data }) => {
@@ -35,6 +38,7 @@ export const Signup: React.FC = () => {
       },
       error: { render: ({ data }) => `${data}` },
     });
+    setIsLoading(false);
   };
   const password = watch("password", "");
   /*
@@ -163,6 +167,7 @@ export const Signup: React.FC = () => {
               </div>
             </div>
             <Button
+              disabled={isLoading}
               text="Sign up"
               color="primary"
               size="2xl"
@@ -175,7 +180,7 @@ export const Signup: React.FC = () => {
             </p>
           </div>
           <div className="absolute top-16 -right-20 -mr-0.5">
-            <img src={HumanImg3} className="w-56" />
+            <img src={HumanImg3} className="w-56 animate-bounceNotify" />
           </div>
         </div>
       </div>

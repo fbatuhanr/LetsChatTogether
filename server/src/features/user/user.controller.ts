@@ -50,10 +50,10 @@ async function searchUsers(req: Request, res: Response, next: NextFunction) {
     const searchRegex = new RegExp(req.query.query as string, 'i')
     const page = parseInt(req.query.page as string) || 1
     const limit = parseInt(req.query.limit as string) || 10
-    
+    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1; 
     const currUserId = req.query.currUserId as string
     
-    const result = await userService.searchUsers(searchRegex, page, limit, currUserId)
+    const result = await userService.searchUsers(searchRegex, page, limit, sortOrder, currUserId)
     if (result)
       return res.status(200).json(result)
 

@@ -5,7 +5,7 @@ import { setAccessToken, clearAccessToken } from "../redux/features/authSlice";
 import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import useAxios from "../hooks/useAxios";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/loading/LoadingSpinner";
 
 interface WithAuthCheckProps {
   children?: React.ReactNode;
@@ -35,14 +35,14 @@ const withAuthCheck = <P extends WithAuthCheckProps>(
           const isTokenExpired = decodedJwt.exp * 1000 < Date.now();
 
           if (isTokenExpired) {
-            console.log("Token has expired, refreshing...");
+            // console.log("Token has expired, refreshing...");
             const response = await axiosInstance.post("auth/refresh-token");
 
             if (response.status === 200) {
               dispatch(setAccessToken(response.data.accessToken));
               setIsAuthenticated(true);
             } else {
-              console.log("Failed to obtain a new token!");
+              console.error("Failed to obtain a new token!");
               throw new Error("Failed to obtain a new token!");
             }
           } else {

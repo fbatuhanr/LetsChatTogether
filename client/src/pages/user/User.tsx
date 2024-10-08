@@ -7,7 +7,7 @@ import { Age, Zodiac, Gender, BirthDate } from "../../components/user";
 import cosmicButterFlyLeft from "../../assets/background/cosmic-butterfly-left.png";
 
 import useFetchUser from "../../hooks/api/useFetchUserByUsername";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import NotFound from "../../components/NotFound";
 import { defaultFetchUser } from "../../constants/defaultValues";
 import FriendRequestButton from "../../components/FriendRequestButton";

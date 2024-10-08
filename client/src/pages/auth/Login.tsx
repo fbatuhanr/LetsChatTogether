@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import Button from "../../components/general/clickable/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
+import { useState } from "react";
 
 interface LoginProps {
   username: string;
@@ -13,6 +14,7 @@ interface LoginProps {
 }
 
 export const Login: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const { loginCall } = useAuthentication();
 
   const {
@@ -22,11 +24,13 @@ export const Login: React.FC = () => {
   } = useForm<LoginProps>();
 
   const onSubmit: SubmitHandler<LoginProps> = async (data) => {
-    toast.promise(loginCall(data.username, data.password), {
+    setIsLoading(true);
+    await toast.promise(loginCall(data.username, data.password), {
       pending: "Information is being checked...",
       success: { render: ({ data }) => `${data}` },
       error: { render: ({ data }) => `${data}` },
     });
+    setIsLoading(false);
   };
   /*
     --- WITHOUT react-hook-form
@@ -88,6 +92,7 @@ export const Login: React.FC = () => {
             </div>
 
             <Button
+              disabled={isLoading}
               text="Login"
               color="primary"
               size="2xl"
@@ -101,7 +106,7 @@ export const Login: React.FC = () => {
             </p>
           </div>
           <div className="absolute top-4 -right-24 mr-2 md:-right-20 md:-mr-0.5">
-            <img src={HumanImg3} className="w-56" />
+            <img src={HumanImg3} className="w-56 animate-smallBounce" />
           </div>
         </div>
       </div>

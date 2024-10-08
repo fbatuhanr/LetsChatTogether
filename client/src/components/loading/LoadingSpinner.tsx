@@ -1,17 +1,17 @@
 interface LoadingSpinnerProps {
-  width?: string; // Opsiyonel width prop'u
-  height?: string; // Opsiyonel height prop'u
+  width?: number;
+  height?: number;
 }
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  width = "w-12",
-  height = "h-12",
+  width = 12,
+  height = 12,
 }) => {
   return (
     <div role="status" className="flex justify-center items-center">
       <svg
         aria-hidden="true"
-        className={`${width} ${height} text-white animate-spin fill-[#4e21f1]`}
+        className={`w-${width} h-${height} text-white animate-spin fill-[#4e21f1]`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

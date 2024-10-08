@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import userAvatar from "../../assets/user-avatar.jpg"; // Yedek avatar
+import userAvatar from "../../assets/user-avatar.jpg";
 
 interface ImgProps {
   src?: string | FileList | File | null | undefined;
@@ -20,10 +20,12 @@ const Img: React.FC<ImgProps> = ({
   const [imgSrc, setImgSrc] = useState<string>(typeof src === 'string' ? src : '');
 
   useEffect(() => {
-    if (typeof src === "string") {
+    if (typeof src === 'string' && src.trim() !== '') {
       setImgSrc(src);
     } else if (src instanceof FileList && src.length > 0) {
       setImgSrc(URL.createObjectURL(src[0]));
+    } else {
+      setImgSrc(userAvatar);
     }
   }, [src]);
 
@@ -33,7 +35,7 @@ const Img: React.FC<ImgProps> = ({
       style={{ width, height }}
     >
       {isLoading && (
-        <div className="absolute inset-0 bg-gray-300 animate-shimmer bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 bg-[length:200%_100%]"></div>
+        <div className="absolute inset-0 bg-gray-300 animate-shimmer bg-gradient-to-r from-gray-300 via-gray-50 to-gray-300 bg-[length:200%_100%]"></div>
       )}
       <img
         src={imgSrc}

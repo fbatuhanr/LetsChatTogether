@@ -21,12 +21,13 @@ import {
 import Img from "../../components/general/Img";
 import { ApiErrorProps } from "../../types/ApiError.types";
 import { resizeImage } from "../../utils/imageUtils";
-import LoadingSpinnerPage from "../../components/LoadingSpinnerPage";
+import LoadingSpinnerPage from "../../components/loading/LoadingSpinnerPage";
 import { errorMessages } from "../../constants/errorMessages";
 import { successMessages } from "../../constants/successMessages";
+import { FaTrash, FaTrashRestore } from "react-icons/fa";
 
 const Profile = () => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const axiosInstance = useAxios();
   const decodedToken = useDecodedToken();
@@ -36,6 +37,7 @@ const Profile = () => {
   const [oldProfilePhotoUrl, setOldProfilePhotoUrl] = useState<string | null>(
     null
   );
+  const [isPhotoDeleted, setIsPhotoDeleted] = useState(false);
   const {
     register,
     control,
@@ -46,11 +48,20 @@ const Profile = () => {
   } = useForm<UserProps>();
 
   const onSubmit: SubmitHandler<UserProps> = async (data) => {
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       let newData = { ...data };
-      if ("File" in window && data.profilePhoto instanceof FileList) {
+
+      if (isPhotoDeleted && oldProfilePhotoUrl) {
+        const oldPhotoRef = ref(storage, oldProfilePhotoUrl);
+        await deleteObject(oldPhotoRef).catch((error) => {
+          console.error("Failed to delete old profile photo:", error);
+        });
+        newData = { ...newData, profilePhoto: "" };
+        setOldProfilePhotoUrl(null);
+        setIsPhotoDeleted(false);
+      } else if ("File" in window && data.profilePhoto instanceof FileList) {
         if (data.profilePhoto.length > 0) {
           const file = data.profilePhoto[0];
           const resizedFile = await resizeImage(file);
@@ -112,17 +123,22 @@ const Profile = () => {
           },
         }
       );
+
+      reset({
+        ...newData,
+        dateOfBirth: newData.dateOfBirth ? new Date(newData.dateOfBirth) : undefined
+      });
     } catch (error) {
       console.error("Profile Update Submission Error:", error);
       toast.error(errorMessages.profileUpdate);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      setIsLoading(true);
       try {
         const response = await axiosInstance.get(`user/${decodedToken.userId}`);
         console.log(response.data);
@@ -137,7 +153,7 @@ const Profile = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
     fetchData();
@@ -148,7 +164,7 @@ const Profile = () => {
     console.log(watchProfilePhoto);
   }, [watchProfilePhoto]);
 
-  if (loading) return <LoadingSpinnerPage />;
+  if (isLoading) return <LoadingSpinnerPage />;
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -347,9 +363,24 @@ const Profile = () => {
             <Img
               src={watchProfilePhoto}
               height="100%"
-              width="auto"
+              width="100%"
               className="rounded-r-xl"
             />
+            {watchProfilePhoto && oldProfilePhotoUrl && (
+              <button
+                type="button"
+                onClick={() => setIsPhotoDeleted(!isPhotoDeleted)}
+                className={`flex group justify-center items-center absolute inset-0 bg-black ${
+                  isPhotoDeleted ? "bg-opacity-90" : "bg-opacity-35"
+                } rounded-r-xl hover:bg-opacity-75`}
+              >
+                {isPhotoDeleted ? (
+                  <FaTrashRestore className="text-xl text-green-600" />
+                ) : (
+                  <FaTrash className="text-xl text-red-600 opacity-85 group-hover:opacity-100" />
+                )}
+              </button>
+            )}
           </div>
         </div>
         <ErrorMessage
@@ -373,7 +404,7 @@ const Profile = () => {
       </div>
 
       <Button
-        disabled={loading}
+        disabled={isLoading}
         text="Update"
         color="primary"
         innerHeight={3}

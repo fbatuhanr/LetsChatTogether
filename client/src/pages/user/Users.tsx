@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import LoadingSpinnerPage from "../../components/LoadingSpinnerPage";
+import LoadingSpinnerPage from "../../components/loading/LoadingSpinnerPage";
 import useSearchUsers from "../../hooks/api/useSearchUser";
 import { UserProps } from "../../types/User.types";
 import useDebounce from "../../hooks/useDebounce";
@@ -11,17 +11,31 @@ const Users: React.FC = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [limit, setLimit] = useState<number>(4);
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const { users, totalUsers, totalPages, loading } = useSearchUsers(
+  const { users, totalUsers, totalPages, isLoading } = useSearchUsers(
     debouncedSearchQuery,
     page,
-    limit
+    limit,
+    sortOrder
   );
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
+    setPage(1);
+  };
+
+  const handleLimitChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setLimit(Number(event.target.value));
+    setPage(1);
+  };
+
+  const handleSortOrderChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSortOrder(event.target.value);
     setPage(1);
   };
 
@@ -33,26 +47,41 @@ const Users: React.FC = () => {
         </h1>
       </div>
 
-      <div className="max-w-2xl w-full px-4 lg:px-0 flex items-center gap-x-2">
+      <div className="max-w-3xl w-full px-4 lg:px-0 lg:flex lg:justify-center lg:items-center gap-x-2">
         <input
           type="text"
           placeholder="Search users by name, surname or username..."
-          className="w-full px-6 py-3 text-lg bg-[#472DA6] rounded"
+          className="w-full mb-1.5 lg:mb-0 px-6 py-3 text-lg bg-[#472DA6] rounded"
           value={searchQuery}
           onChange={handleSearchChange}
         />
-        <select
-          className="w-28 lg:w-36 px:3 lg:px-6 py-[13.5px] text-lg bg-[#472DA6] rounded text-center"
-          value={limit}
-          onChange={(e) => setLimit(Number(e.target.value))}
-        >
-          <option value="" disabled>Users per page</option>
-          <option value={4}>4 Results</option>
-          <option value={8}>8 Results</option>
-          <option value={12}>12 Results</option>
-        </select>
+        <div className="flex justify-center gap-x-1">
+          <select
+            className="w-full lg:w-44 px-3 lg:px-6 py-[13.5px] text-lg bg-[#472DA6] rounded text-center"
+            value={sortOrder}
+            onChange={handleSortOrderChange}
+          >
+            <option value="" disabled>
+              Select Sort Order
+            </option>
+            <option value="desc">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
+          <select
+            className="w-full lg:w-36 px:3 lg:px-6 py-[13.5px] text-lg bg-[#472DA6] rounded text-center"
+            value={limit}
+            onChange={handleLimitChange}
+          >
+            <option value="" disabled>
+              Users per page
+            </option>
+            <option value={4}>4 Results</option>
+            <option value={8}>8 Results</option>
+            <option value={12}>12 Results</option>
+          </select>
+        </div>
       </div>
-      {loading ? (
+      {isLoading ? (
         <LoadingSpinnerPage />
       ) : users && users?.length ? (
         <>
@@ -62,7 +91,7 @@ const Users: React.FC = () => {
                 key={index}
                 className="w-full h-auto pt-6 pb-7 px-1 lg:px-2 rounded-sm bg-gradient-to-t from-[#0D0D0D] to-[#472DA6] shadow shadow-[#472DA6]"
               >
-                <div className="flex justify-center items-center relative w-40 h-40 mx-auto rounded-full overflow-hidden p-2 border border-[#cccccc]">
+                <div className="flex justify-center items-center relative w-40 h-40 mx-auto rounded-full overflow-hidden p-2 border border-[#cccccc] bg-gray-300 animate-shimmer bg-gradient-to-r from-gray-300 via-gray-50 to-gray-300 bg-[length:200%_100%]">
                   <Link to={`/user/${user.username}`}>
                     <Img
                       src={

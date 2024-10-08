@@ -19,6 +19,8 @@ const useFriendship = (currentUserId: string) => {
   const axiosInstance = useAxios();
 
   const [friends, setFriends] = useState<FriendProps[]>([]);
+  const [isLoadingFriends, setIsLoadingFriends] = useState(false);
+
   const [incomingRequests, setIncomingRequests] = useState<[]>([]);
   const [outgoingRequests, setOutgoingRequests] = useState<[]>([]);
   const [requestStatusBetweenUsers, setRequestStatusBetweenUsers] =
@@ -26,6 +28,7 @@ const useFriendship = (currentUserId: string) => {
 
   const getFriends = async (includeUser: boolean = false) => {
     try {
+      setIsLoadingFriends(true);
       const response = await axiosInstance.get(`friend/${currentUserId}`);
       if (!includeUser) {
         setFriends(response.data.friends);
@@ -50,6 +53,8 @@ const useFriendship = (currentUserId: string) => {
 
       setFriends([]);
       console.error(errorMessage);
+    } finally {
+      setIsLoadingFriends(false);
     }
   };
 
@@ -173,6 +178,7 @@ const useFriendship = (currentUserId: string) => {
 
   return {
     friends,
+    isLoadingFriends,
 
     incomingRequests,
     outgoingRequests,

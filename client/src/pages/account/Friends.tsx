@@ -15,9 +15,11 @@ import {
   OutgoingRequestProps,
 } from "../../types/Request.types";
 import useGeneralNotifications from "../../hooks/api/useGeneralNotifications";
+import LoadingSpinnerPage from "../../components/loading/LoadingSpinnerPage";
 
 const Friends = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const decodedToken = useDecodedToken();
 
   const { fetchGeneralNotifications } = useGeneralNotifications(decodedToken.userId);
@@ -37,9 +39,10 @@ const Friends = () => {
   } = useFriendship(decodedToken.userId);
 
   useEffect(() => {
-    getFriends();
-    getIncomingRequests();
-    getOutgoingRequests();
+    Promise.all([getFriends(), getIncomingRequests(), getOutgoingRequests()])
+    .finally(() => {
+      setIsLoading(false);
+    });
   }, []);
 
   const handleAcceptRequest = async (targetUserId: string) => {
@@ -113,6 +116,7 @@ const Friends = () => {
     getFriends();
   };
 
+  if (isLoading) return <LoadingSpinnerPage />;
   return (
     <div className="w-full grid lg:grid-cols-[1fr_1.3fr_1fr] gap-4">
       <div>
