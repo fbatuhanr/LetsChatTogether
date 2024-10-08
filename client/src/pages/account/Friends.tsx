@@ -45,49 +45,63 @@ const Friends = () => {
     });
   }, []);
 
-  const handleAcceptRequest = async (targetUserId: string) => {
+  const handleAcceptRequest = (targetUserId: string) => {
     if (isLoading) return;
 
     setIsLoading(true);
-    await toast.promise(acceptRequest(targetUserId), {
+    toast.promise(acceptRequest(targetUserId), {
       pending: "Request sending...",
       success: { render: ({ data }) => `${data}` },
       error: { render: ({ data }) => `${data}` },
+    })
+    .then(() => {
+      return Promise.all([
+        fetchGeneralNotifications(),
+        getIncomingRequests(),
+        getFriends(),
+      ]);
+    })
+    .finally(() => {
+      setIsLoading(false);
     });
-    setIsLoading(false);
-
-    fetchGeneralNotifications();
-    getIncomingRequests();
-    getFriends();
   };
 
-  const handleCancelReceivedRequest = async (targetUserId: string) => {
+  const handleCancelReceivedRequest = (targetUserId: string) => {
     if (isLoading) return;
 
     setIsLoading(true);
-    await toast.promise(cancelRequest(targetUserId), {
+    toast.promise(cancelRequest(targetUserId), {
       pending: "Request sending...",
       success: { render: ({ data }) => `${data}` },
       error: { render: ({ data }) => `${data}` },
-    });
-    setIsLoading(false);
-
-    fetchGeneralNotifications();
-    getIncomingRequests();
+    })
+    .then(() =>{
+      return Promise.all([
+        fetchGeneralNotifications(),
+        getIncomingRequests()
+      ])
+    })
+    .finally(() => {
+      setIsLoading(false);
+    })
+    
   };
 
-  const handleCancelSentRequest = async (targetUserId: string) => {
+  const handleCancelSentRequest = (targetUserId: string) => {
     if (isLoading) return;
 
     setIsLoading(true);
-    await toast.promise(cancelRequest(targetUserId), {
+    toast.promise(cancelRequest(targetUserId), {
       pending: "Request sending...",
       success: { render: ({ data }) => `${data}` },
       error: { render: ({ data }) => `${data}` },
-    });
-    setIsLoading(false);
-
-    getOutgoingRequests();
+    })
+    .then(() => {
+      return getOutgoingRequests();
+    })    
+    .finally(() => {
+      setIsLoading(false);
+    })
   };
 
   const handleRemoveFriend = async (targetUserId: string) => {
@@ -106,14 +120,15 @@ const Friends = () => {
     if (!swalResult.isConfirmed) return;
 
     setIsLoading(true);
-    await toast.promise(removeFriend(targetUserId), {
+    toast.promise(removeFriend(targetUserId), {
       pending: "Request sending...",
       success: { render: ({ data }) => `${data}` },
       error: { render: ({ data }) => `${data}` },
-    });
-    setIsLoading(false);
-
-    getFriends();
+    }).then(() => {
+      return getFriends();
+    }).finally(() => {
+      setIsLoading(false);
+    })
   };
 
   if (isLoading) return <LoadingSpinnerPage />;

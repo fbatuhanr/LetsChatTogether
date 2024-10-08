@@ -27,9 +27,7 @@ const Settings = () => {
 
   const onSubmit: SubmitHandler<UserProps> = async (data) => {
     setIsLoading(true);
-    await toast.promise(
-      axiosInstance.put(`user/${decodedToken.userId}`, data),
-      {
+    toast.promise(axiosInstance.put(`user/${decodedToken.userId}`, data), {
         pending: "Updating...",
         success: {
           render: ({ data }: { data: AxiosResponse }) =>
@@ -40,9 +38,10 @@ const Settings = () => {
             data.response?.data?.message ||
             "An error occurred during the update.",
         },
-      }
-    );
-    setIsLoading(false);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -58,8 +57,7 @@ const Settings = () => {
         });
       } catch (error) {
         console.error("Error fetching data:", error);
-      }
-      finally {
+      } finally {
         setIsLoading(false);
       }
     }

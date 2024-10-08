@@ -26,9 +26,9 @@ export const Signup: React.FC = () => {
     handleSubmit,
   } = useForm<SignupProps>();
 
-  const onSubmit: SubmitHandler<SignupProps> = async (data) => {
+  const onSubmit: SubmitHandler<SignupProps> = (data) => {
     setIsLoading(true);
-    await toast.promise(signupCall(data.username, data.email, data.password), {
+    toast.promise(signupCall(data.username, data.email, data.password), {
       pending: "Information is being checked...",
       success: {
         render: ({ data }) => {
@@ -37,8 +37,9 @@ export const Signup: React.FC = () => {
         },
       },
       error: { render: ({ data }) => `${data}` },
+    }).finally(() => {
+      setIsLoading(false);
     });
-    setIsLoading(false);
   };
   const password = watch("password", "");
   /*

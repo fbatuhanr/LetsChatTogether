@@ -23,8 +23,10 @@ const useFriendship = (currentUserId: string) => {
 
   const [incomingRequests, setIncomingRequests] = useState<[]>([]);
   const [outgoingRequests, setOutgoingRequests] = useState<[]>([]);
+  
   const [requestStatusBetweenUsers, setRequestStatusBetweenUsers] =
     useState<FriendRequestStatus>({ status: RequestStatus.None });
+    const [isLoadingRequestStatusBetweenUsers, setIsLoadingRequestStatusBetweenUsers] = useState(false);
 
   const getFriends = async (includeUser: boolean = false) => {
     try {
@@ -92,6 +94,7 @@ const useFriendship = (currentUserId: string) => {
   };
   const getRequestStatusBetweenUsers = async (targetUserId: string) => {
     try {
+      setIsLoadingRequestStatusBetweenUsers(true);
       const response = await axiosInstance.get("friend-request/status", {
         params: {
           senderId: currentUserId,
@@ -107,6 +110,8 @@ const useFriendship = (currentUserId: string) => {
 
       setRequestStatusBetweenUsers({ status: RequestStatus.None });
       console.error(errorMessage);
+    } finally {
+      setIsLoadingRequestStatusBetweenUsers(false);
     }
   };
 
@@ -188,6 +193,7 @@ const useFriendship = (currentUserId: string) => {
     getIncomingRequests,
     getOutgoingRequests,
     getRequestStatusBetweenUsers,
+    isLoadingRequestStatusBetweenUsers,
 
     removeFriend,
     sendRequest,

@@ -23,14 +23,15 @@ export const Login: React.FC = () => {
     handleSubmit,
   } = useForm<LoginProps>();
 
-  const onSubmit: SubmitHandler<LoginProps> = async (data) => {
+  const onSubmit: SubmitHandler<LoginProps> = (data) => {
     setIsLoading(true);
-    await toast.promise(loginCall(data.username, data.password), {
+    toast.promise(loginCall(data.username, data.password), {
       pending: "Information is being checked...",
       success: { render: ({ data }) => `${data}` },
       error: { render: ({ data }) => `${data}` },
+    }).finally(() => {
+      setIsLoading(false);
     });
-    setIsLoading(false);
   };
   /*
     --- WITHOUT react-hook-form
