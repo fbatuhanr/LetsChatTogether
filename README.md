@@ -106,10 +106,6 @@ REFRESH_TOKEN_EXPIRATION=your_refresh_token_expiration
 - Create a .env file in the client directory with the following variables:
 ```bash
 API_URL=your_api_url
-AUTH_API_URL=your_auth_api_url
-USER_API_URL=your_user_api_url
-CHAT_API_URL=your_chat_api_url
-MESSAGE_API_URL=your_message_api_url
 REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
 REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
 REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
